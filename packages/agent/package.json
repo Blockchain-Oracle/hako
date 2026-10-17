@@ -10,8 +10,9 @@
     "./node": "./src/node.ts"
   },
   "scripts": {
-    "typecheck": "tsc --noEmit -p tsconfig.json",
-    "lint": "eslint src"
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p scripts/tsconfig.json && node --experimental-transform-types --disable-warning=ExperimentalWarning scripts/tool-schemas.ts",
+    "lint": "eslint src scripts",
+    "tool-schemas": "node --experimental-transform-types --disable-warning=ExperimentalWarning scripts/tool-schemas.ts"
   },
   "dependencies": {
     "@hako/cards": "workspace:*",
@@ -23,7 +24,7 @@
   },
   "devDependencies": {
     "@hako/paybox": "workspace:*",
-    "@paybox-sh/sdk": "catalog:",
+    "@types/node": "catalog:",
     "typescript": "catalog:"
   }
 }
