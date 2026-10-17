@@ -100,8 +100,8 @@ in AI hosts), each in words and shape. L6 finishes it (captures, ecosystem, proo
 - `index.ts` exports all 165 names (checked by a throwaway page importing the barrel into a server component and
   building/rendering it; the page is not committed), plus `Mark`/`TokenMark` re-exported from `@hako/identity` (one
   implementation; Mark lives with the marks). `cn` = the `cn` package (catalog 0.4.0) via `@hako/ui/lib/utils`.
-- Dependencies: catalog entries for everything in §3; `radix-ui 1.6.7` (pinned to the lockfile's version; apps/web still
-  says `^1.6.7`) and `@base-ui/react 1.8.0` are the installs' own runtime deps (no catalog entry); `shadcn 4.21.4` is a
+- Dependencies: catalog entries for everything in §3; `radix-ui 1.6.7` (pinned to the lockfile's version, as apps/web
+  now is) and `@base-ui/react 1.8.0` are the installs' own runtime deps (no catalog entry); `shadcn 4.21.4` is a
   devDependency for its `shadcn/tailwind.css`. No tabler, remixicon, hugeicons, framer-motion, clsx or
   tailwind-merge in `@hako/ui`.
 - `apps/web/src/components/ui/*` (identical to the new installs apart from imports) and `lib/utils.ts` are deleted;
@@ -112,8 +112,7 @@ in AI hosts), each in words and shape. L6 finishes it (captures, ecosystem, proo
 - `app/layout.tsx` (shared wiring): wrap with `<TooltipProvider>` (shadcn tooltip asks for it) and, where the gateway is
   not production, `<LogoProxyProvider gatewayUrl={GATEWAY_URL}>`; the default is `HAKO_GATEWAY_URL`
   (`api.usehako.xyz`, not resolving yet on 2026-10-17, so remote logos fall back to the disc until DNS is up).
-- The logo route at merge: see review finding 6 below.
-- `apps/web/src/proxy.ts` matcher: see review finding 5 below.
+- The logo route and the `proxy.ts` matcher: done in the third pass (review findings 5 and 6 below).
 - Provider ids for the C16 catalog providers are assumed `exa`, `artificial-analysis`, `elevenlabs`, `polymarket`,
   `jupiter`, `lifi`, `helius`; L2 uses these or the registry gets an alias.
 - `apps/web/package.json` still lists `clsx`, `tailwind-merge`, `class-variance-authority`, `radix-ui` that only the
@@ -160,6 +159,11 @@ Each finding of the W0.4 (a) review, in its order, with what was done.
    edited in this lane. At merge, change the matcher to
    `["/((?!_next/static|_next/image|favicon.ico|icon).*)"]` so `/icon?<hash>` (served by `app/icon.ts` since this lane)
    is not rewritten to `/sandbox/icon` on the sandbox host.
+   **Fixed (third pass, `w04/fix-a-brand`):** the matcher is now
+   `["/((?!_next/static|_next/image|favicon.ico|icon).*)"]` and its comment names the favicon route. Checked with the
+   built web (`next start`): `curl -H 'Host: sandbox.usehako.xyz' localhost:<port>/icon` returns 200 `image/svg+xml`
+   (the review saw 404), the app host's `/icon` too, and `/` on the sandbox host still reaches `app/sandbox/page.tsx`
+   (its placeholder 404 until L4 builds it, same as `/sandbox` on the app host).
 6. **The logo route defined twice** (`packages/identity/src/identity.config.ts:18`). The package index no longer exports
    `LOGO_PROXY_PATH`/`LOGO_PROXY_PARAM` (index lists identity.config's geometry constants by name), so after the merge
    the only exported route contract is b-cards' `endpoints.logo`; only `logoProxyUrl` reads the two constants. At merge
@@ -167,10 +171,25 @@ Each finding of the W0.4 (a) review, in its order, with what was done.
    b-cards' `endpoints.logo.path` and `logoProxyUrl` read it, keep `src` as the one query key, and delete the two
    constants. Not reading `endpoints.logo.path` from @hako/cards directly: identity → cards would cycle as soon as the
    React cards draw `Mark` (cards → identity).
+   **Fixed (third pass, `w04/fix-a-brand`):** `packages/config/src/hosts.ts` now owns the route:
+   `HAKO_LOGO_PROXY_PATH = "/v1/logo"` and `HAKO_LOGO_PROXY_PARAM = "src"`, next to `HAKO_MCP_URL` (index re-exports
+   hosts). `packages/cards/src/contract/gateway/endpoints.ts` uses `path: HAKO_LOGO_PROXY_PATH`, `read-schemas.ts` uses
+   `z.object({ [HAKO_LOGO_PROXY_PARAM]: urlSchema })` (the inferred key is still `src`), and
+   `packages/identity/src/logo-proxy.ts` imports both from `@hako/config`. `LOGO_PROXY_PATH`/`LOGO_PROXY_PARAM` and
+   their comment are gone from `identity.config.ts`; `rg LOGO_PROXY packages apps` finds only the two config constants and their
+   three readers. Typecheck of @hako/config, @hako/cards (incl. the schema check) and @hako/identity passes.
 7. **`radix-ui` was a caret range** (`packages/ui/package.json:32`). Pinned to `1.6.7`, the version pnpm-lock.yaml
    resolves (and apps/web uses); lockfile committed. apps/web/package.json (not this lane's file) still says `^1.6.7`; the
    coordinator can pin it to `1.6.7` too (or add a catalog entry for both).
+   **Fixed (third pass, `w04/fix-a-brand`):** `apps/web/package.json:30` is now `"radix-ui": "1.6.7"` (the first
+   option: no catalog entry, so `pnpm-workspace.yaml` is untouched). `pnpm install` changed one lockfile line, the
+   apps/web importer's specifier `^1.6.7` → `1.6.7` (same resolved version); pnpm-lock.yaml committed.
 8. **tokens.json `_note` path** (`packages/brand/tokens.json:2`). Now says `generated/tokens.ts`.
 
 Gates after the fixes, from the worktree root: `pnpm install --frozen-lockfile && pnpm lint && pnpm typecheck &&
 pnpm build` (lint: warnings only, all in installed author code). No plugin-safe source was touched.
+
+Third pass (`w04/fix-a-brand`, findings 5, 6, 7): `pnpm install --frozen-lockfile && pnpm lint && pnpm typecheck &&
+pnpm build && pnpm -r --if-present test` pass (lint: 5 warnings in @hako/ui author code, 0 errors). hosts.ts
+is a plugin-safe source, so `plugins/paybox` ran `pnpm install --frozen-lockfile && pnpm typecheck && pnpm build`
+(node 24.21.0): passes.
