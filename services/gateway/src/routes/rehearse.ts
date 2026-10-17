@@ -2,7 +2,7 @@
  * `POST /v1/rehearse` (plan B13, free): simulate one draft version before anyone signs it, cached by `id:version`.
  *   EVM: one `eth_simulateV1` (viem `simulateCalls`) of the approve and the transfer together, from the user's address,
  *        on the public RPCs of the executable chains (@hako/networks);
- *   Solana: `simulateTransaction` on Helius (HELIUS_API_KEY).
+ *   Solana: `simulateTransaction` on Helius (HELIUS_API_KEY), then Solana's public RPCs when Helius can't answer.
  * The budget is REHEARSAL_TIMEOUT_MS: over it the answer is `skipped` with a reason (never cached, so the next ask can
  * pass). A chain that can't simulate is `unsupported` ("Not rehearsed on <chain>"), never a pass.
  */
@@ -20,7 +20,7 @@ import { revertWords, type SimulationOutcome, simulateEvmCalls } from "./money/e
 import { answer, badRequest, MoneyRouteError, readBody } from "./money/http.js";
 import { MONEY_WORDS, REHEARSAL_CACHE_TTL_S } from "./money/money.config.js";
 import { store } from "./money/runtime.js";
-import { heliusUrl, simulateSolana } from "./money/solana.js";
+import { simulateSolana } from "./money/solana.js";
 
 export type RehearseRequest = z.output<typeof rehearseRequestSchema>;
 
@@ -49,9 +49,7 @@ async function simulate(request: RehearseRequest): Promise<SimulationOutcome | {
     return simulateEvmCalls(network, request.from as Address, calls, REHEARSAL_TIMEOUT_MS);
   }
   if (network.family !== "solana") throw badRequest("invalid_request", `${chainName} is an EVM chain; send calls.`);
-  const url = heliusUrl();
-  if (!url) return { unsupported: MONEY_WORDS.notRehearsed(chainName) };
-  return simulateSolana(url, request.transactionBase64, false, REHEARSAL_TIMEOUT_MS);
+  return simulateSolana(request.transactionBase64, false, REHEARSAL_TIMEOUT_MS);
 }
 
 /** Rehearses one draft version (cached per `id:version` and request, so a different body never reads another's result). */

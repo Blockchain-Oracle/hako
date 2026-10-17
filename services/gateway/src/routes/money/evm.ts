@@ -47,9 +47,14 @@ export interface EvmCall {
 
 export type SimulationOutcome = { ok: true } | { ok: false; reason: string };
 
-/** Short words for a revert (viem's `shortMessage` when it has one). */
-export const revertWords = (error: unknown): string =>
-  error instanceof Error ? ((error as Error & { shortMessage?: string }).shortMessage ?? error.message) : String(error);
+/**
+ * Short words for a revert or an RPC refusal: viem's `shortMessage` when it has one, down to its last line (where the
+ * contract's own reason sits, e.g. "ERC20: transfer amount exceeds balance").
+ */
+export function revertWords(error: unknown): string {
+  const text = error instanceof Error ? ((error as Error & { shortMessage?: string }).shortMessage ?? error.message) : String(error);
+  return text.split("\n").map((line) => line.trim()).filter(Boolean).at(-1) ?? text;
+}
 
 /** `eth_simulateV1`: the calls run in order from `from`, each seeing the one before (approve + transfer together). */
 export async function simulateEvmCalls(network: EvmNetwork, from: Address, calls: readonly EvmCall[], timeoutMs: number): Promise<SimulationOutcome> {

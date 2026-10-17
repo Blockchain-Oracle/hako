@@ -39,6 +39,12 @@ export const HELIUS_RPC_URL = "https://mainnet.helius-rpc.com/";
 export const HELIUS_KEY_PARAM = "api-key";
 /** Solana JSON-RPC commitment for simulation, blockhash checks and sends. */
 export const SOLANA_COMMITMENT = "confirmed";
+/** Solana's simulation errors a person can act on, in words (the rest are shown as the cluster names them). */
+export const SOLANA_ERROR_WORDS: Readonly<Record<string, string>> = {
+  AccountNotFound: "The sending wallet holds no SOL yet, so it can't pay Solana's network fee",
+  InsufficientFundsForFee: "The sending wallet doesn't hold enough SOL for Solana's network fee",
+  BlockhashNotFound: "The transaction's blockhash has expired",
+};
 export const JSON_RPC_VERSION = "2.0";
 /** A Solana message's recent blockhash (protocol fact). */
 export const SOLANA_BLOCKHASH_BYTES = 32;

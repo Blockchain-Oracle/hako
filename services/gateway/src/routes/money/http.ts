@@ -30,11 +30,21 @@ export const badRequest = (code: string, message: string, details: string[] = []
   new MoneyRouteError(HTTP_BAD_REQUEST, code, message, details);
 export const unavailable = (code: string, message: string) => new MoneyRouteError(HTTP_UNAVAILABLE, code, message);
 
-const issuesOf = (error: z.ZodError) => error.issues.map((issue) => `${issue.path.join(".") || "body"}: ${issue.message}`);
+/** Each issue as "path: message"; a union that fits no branch reports its closest branch's issues instead. */
+function issuesOf(issues: readonly z.core.$ZodIssue[], prefix: PropertyKey[] = []): string[] {
+  return issues.flatMap((issue) => {
+    const path = [...prefix, ...issue.path];
+    if (issue.code === "invalid_union" && issue.errors.length > 0) {
+      const closest = [...issue.errors].sort((a, b) => a.length - b.length)[0]!;
+      return issuesOf(closest, path);
+    }
+    return [`${path.map(String).join(".") || "body"}: ${issue.message}`];
+  });
+}
 
 function checked<S extends z.ZodType>(schema: S, raw: unknown, where: string): z.output<S> {
   const parsed = schema.safeParse(raw);
-  if (!parsed.success) throw badRequest("invalid_request", `The ${where} does not fit this route's schema.`, issuesOf(parsed.error));
+  if (!parsed.success) throw badRequest("invalid_request", `The ${where} does not fit this route's schema.`, issuesOf(parsed.error.issues));
   return parsed.data;
 }
 

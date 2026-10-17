@@ -23,7 +23,7 @@ import { answer, readBody } from "./money/http.js";
 import { BROADCAST_SENT_TTL_S, MONEY_WORDS, RPC_READ_TIMEOUT_MS, RPC_SEND_TIMEOUT_MS } from "./money/money.config.js";
 import { executableSource } from "./money/proposals.js";
 import { store } from "./money/runtime.js";
-import { blockhashValid, knownSignature, sendSolana, simulateSolana, solanaRpcUrl } from "./money/solana.js";
+import { blockhashValid, knownSignature, sendSolana, simulateSolana } from "./money/solana.js";
 
 export type BroadcastRequest = z.output<typeof broadcastRequestSchema>;
 export type BroadcastResponse = z.output<typeof broadcastResponseSchema>;
@@ -87,16 +87,15 @@ async function relaySolana(signedTx: string, expectation: BroadcastExpectation):
   const checked = checkSolana(signedTx, expectation);
   if (!checked.ok) return refused(checked.reason);
   const { signature, blockhash } = checked.tx;
-  const url = solanaRpcUrl();
   const key = sentKey(SOLANA, signature);
   if (await store().get(key)) return onItsWay(SOLANA, signature, "already_known");
 
-  if (!(await blockhashValid(url, blockhash, RPC_READ_TIMEOUT_MS))) {
-    return (await knownSignature(url, signature, RPC_READ_TIMEOUT_MS))
+  if (!(await blockhashValid(blockhash, RPC_READ_TIMEOUT_MS))) {
+    return (await knownSignature(signature, RPC_READ_TIMEOUT_MS))
       ? onItsWay(SOLANA, signature, "already_known")
       : refused("ask for a fresh quote", MONEY_WORDS.expiredBlockhash);
   }
-  const simulation = await simulateSolana(url, signedTx, true, RPC_READ_TIMEOUT_MS);
+  const simulation = await simulateSolana(signedTx, true, RPC_READ_TIMEOUT_MS);
   if (!simulation.ok) {
     if (ALREADY_KNOWN.test(simulation.reason)) return onItsWay(SOLANA, signature, "already_known");
     return refused(simulation.reason);
@@ -104,10 +103,10 @@ async function relaySolana(signedTx: string, expectation: BroadcastExpectation):
 
   if (!(await store().claim(key, BROADCAST_SENT_TTL_S))) return onItsWay(SOLANA, signature, "already_known");
   try {
-    await sendSolana(url, signedTx, RPC_SEND_TIMEOUT_MS);
+    await sendSolana(signedTx, RPC_SEND_TIMEOUT_MS);
     return onItsWay(SOLANA, signature, "sent");
   } catch (error) {
-    if (ALREADY_KNOWN.test(revertWords(error)) || (await knownSignature(url, signature, RPC_READ_TIMEOUT_MS))) {
+    if (ALREADY_KNOWN.test(revertWords(error)) || (await knownSignature(signature, RPC_READ_TIMEOUT_MS))) {
       return onItsWay(SOLANA, signature, "already_known");
     }
     await store().release(key);
