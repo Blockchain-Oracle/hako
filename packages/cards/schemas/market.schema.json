@@ -1,0 +1,159 @@
+{
+  "$id": "https://usehako.xyz/schemas/cards/market.schema.json",
+  "title": "market",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "markets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "provider": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "outcomes": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "probability": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "price_usd": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "name",
+                "probability"
+              ],
+              "additionalProperties": {}
+            }
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "open",
+              "closed",
+              "resolved"
+            ]
+          },
+          "url": {
+            "type": "string"
+          },
+          "end_date": {
+            "type": "string"
+          },
+          "volume_usd": {
+            "type": "number"
+          },
+          "liquidity_usd": {
+            "type": "number"
+          },
+          "category": {
+            "type": "string"
+          },
+          "image_url": {
+            "type": "string"
+          },
+          "resolved_outcome": {
+            "type": "string"
+          },
+          "world_query": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "provider",
+          "title",
+          "outcomes",
+          "status"
+        ],
+        "additionalProperties": {}
+      }
+    },
+    "query": {
+      "type": "string"
+    },
+    "news": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "publisher": {
+            "type": "string"
+          },
+          "publisher_url": {
+            "type": "string"
+          },
+          "published": {
+            "type": "string"
+          },
+          "snippet": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "domain": {
+            "type": "string"
+          },
+          "seen_at": {
+            "type": "string"
+          },
+          "points": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "also_in": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "image_url": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "position": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "title",
+          "url"
+        ],
+        "additionalProperties": {}
+      }
+    }
+  },
+  "required": [
+    "markets"
+  ],
+  "additionalProperties": {}
+}

@@ -1,0 +1,102 @@
+{
+  "$id": "https://usehako.xyz/schemas/cards/quote.schema.json",
+  "title": "quote",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "quotes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "symbol": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "change": {
+            "type": "number"
+          },
+          "change_pct": {
+            "type": "number"
+          },
+          "change_7d_pct": {
+            "type": "number"
+          },
+          "market_cap": {
+            "type": [
+              "number",
+              "string"
+            ]
+          },
+          "market_cap_rank": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "volume": {
+            "type": "number"
+          },
+          "high": {
+            "type": "number"
+          },
+          "low": {
+            "type": "number"
+          },
+          "open": {
+            "type": "number"
+          },
+          "prev_close": {
+            "type": "number"
+          },
+          "ath": {
+            "type": "number"
+          },
+          "ath_change_pct": {
+            "type": "number"
+          },
+          "exchange": {
+            "type": "string"
+          },
+          "market_state": {
+            "type": "string"
+          },
+          "image_url": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "symbol",
+          "name"
+        ],
+        "additionalProperties": {}
+      }
+    },
+    "category": {
+      "type": "string"
+    },
+    "missing": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "quotes"
+  ],
+  "additionalProperties": {}
+}

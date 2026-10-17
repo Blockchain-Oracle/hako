@@ -9,10 +9,11 @@
     ".": "./src/index.ts",
     "./contract": "./src/contract/index.ts",
     "./client": "./src/client/index.ts",
-    "./schemas/*": "./schemas/*"
+    "./schemas/index.json": "./schemas/index.json",
+    "./schemas/*.schema.json": "./schemas/*.schema.json"
   },
   "scripts": {
-    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p scripts/tsconfig.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p scripts/tsconfig.json && node scripts/schemas.ts --check",
     "lint": "eslint src scripts",
     "schemas": "node scripts/schemas.ts",
     "schemas:check": "node scripts/schemas.ts --check"

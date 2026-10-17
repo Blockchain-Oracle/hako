@@ -1,30 +1,37 @@
 /**
- * `pnpm --filter @hako/cards schemas`: writes one JSON Schema per render kind to `schemas/<kind>.json` (zod's JSON
- * Schema export of the kind's `data` schema, draft 2020-12, output shape) plus `schemas/index.json` naming each kind
+ * `pnpm --filter @hako/cards schemas`: writes one JSON Schema per render kind to `schemas/<kind>.schema.json` (zod's
+ * JSON Schema export of the kind's `data` schema, draft 2020-12, output shape) plus `schemas/index.json` naming each kind
  * and whether a catalog connector or Hako makes it. L2's gate validates every connector's sample output against its
- * kind's file. `--check` writes nothing and fails when a committed file differs from what the contract generates.
+ * kind's file. `--check` writes nothing and fails when a committed file differs from what the contract generates (the
+ * package's `typecheck` runs it, so a stale file fails the gate).
+ *
+ * The `.schema.json` suffix keeps every file from being read as something else by name: the `package` kind would
+ * otherwise be `schemas/package.json`, which package-manifest lookups (bundlers, Renovate, editors) take for a package.
  */
 import { mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 
+import { HAKO_APP_URL } from "@hako/config";
 import { z } from "zod";
 
 import { CARD_KINDS, CARD_SCHEMAS, isCatalogRenderKind } from "../src/contract/registry.ts";
 
 const OUT_DIR = path.join(import.meta.dirname, "..", "schemas");
-const SCHEMA_BASE_URI = "https://usehako.xyz/schemas/cards";
+const SCHEMA_BASE_URI = `${HAKO_APP_URL}/schemas/cards`;
+const SCHEMA_SUFFIX = ".schema.json";
 const JSON_INDENT = 2;
 const INDEX_FILE = "index.json";
 
 const asJson = (value: unknown): string => `${JSON.stringify(value, null, JSON_INDENT)}\n`;
+const fileOf = (kind: string): string => `${kind}${SCHEMA_SUFFIX}`;
 
 function generate(): Map<string, string> {
   const files = new Map<string, string>();
   for (const kind of CARD_KINDS) {
     const schema = z.toJSONSchema(CARD_SCHEMAS[kind], { target: "draft-2020-12", io: "output", unrepresentable: "any" });
-    files.set(`${kind}.json`, asJson({ $id: `${SCHEMA_BASE_URI}/${kind}.json`, title: kind, ...schema }));
+    files.set(fileOf(kind), asJson({ $id: `${SCHEMA_BASE_URI}/${fileOf(kind)}`, title: kind, ...schema }));
   }
-  const index = CARD_KINDS.map((kind) => ({ kind, file: `${kind}.json`, origin: isCatalogRenderKind(kind) ? "catalog" : "hako" }));
+  const index = CARD_KINDS.map((kind) => ({ kind, file: fileOf(kind), origin: isCatalogRenderKind(kind) ? "catalog" : "hako" }));
   files.set(INDEX_FILE, asJson({ kinds: index }));
   return files;
 }
