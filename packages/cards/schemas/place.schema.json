@@ -1,0 +1,164 @@
+{
+  "$id": "https://usehako.xyz/schemas/cards/place.schema.json",
+  "title": "place",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "anyOf": [
+    {
+      "type": "object",
+      "properties": {
+        "places": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "address": {
+                "type": "string"
+              },
+              "category": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "lat": {
+                "type": "number"
+              },
+              "lon": {
+                "type": "number"
+              },
+              "locality": {
+                "type": "string"
+              },
+              "state": {
+                "type": "string"
+              },
+              "postcode": {
+                "type": "string"
+              },
+              "country": {
+                "type": "string"
+              },
+              "country_code": {
+                "type": "string"
+              },
+              "rating": {
+                "type": "number"
+              },
+              "rating_count": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "price_level": {
+                "type": "string"
+              },
+              "phone": {
+                "type": "string"
+              },
+              "website": {
+                "type": "string"
+              },
+              "maps_url": {
+                "type": "string"
+              },
+              "osm_url": {
+                "type": "string"
+              },
+              "position": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              }
+            },
+            "additionalProperties": {}
+          }
+        },
+        "query": {
+          "type": "string"
+        },
+        "location": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "places",
+        "query"
+      ],
+      "additionalProperties": {}
+    },
+    {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "address": {
+          "type": "string"
+        },
+        "category": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "lat": {
+          "type": "number"
+        },
+        "lon": {
+          "type": "number"
+        },
+        "locality": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "postcode": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        },
+        "country_code": {
+          "type": "string"
+        },
+        "rating": {
+          "type": "number"
+        },
+        "rating_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "price_level": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "website": {
+          "type": "string"
+        },
+        "maps_url": {
+          "type": "string"
+        },
+        "osm_url": {
+          "type": "string"
+        },
+        "position": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "lat",
+        "lon"
+      ],
+      "additionalProperties": {}
+    }
+  ]
+}

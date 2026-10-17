@@ -1,0 +1,59 @@
+{
+  "$id": "https://usehako.xyz/schemas/cards/gas.schema.json",
+  "title": "gas",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "chain": {
+      "type": "string",
+      "pattern": "^[-a-z0-9]{3,8}:[-_a-zA-Z0-9]{1,64}$",
+      "description": "CAIP-2 chain id, e.g. eip155:8453 (Base) or solana:mainnet"
+    },
+    "unit": {
+      "type": "string",
+      "enum": [
+        "gwei",
+        "micro_lamports"
+      ]
+    },
+    "levels": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string"
+          },
+          "max_fee": {
+            "type": "number"
+          },
+          "priority_fee": {
+            "type": "number"
+          },
+          "usd": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "label",
+          "max_fee"
+        ],
+        "additionalProperties": {}
+      }
+    },
+    "base_fee": {
+      "type": "number"
+    },
+    "block_number": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    }
+  },
+  "required": [
+    "chain",
+    "unit",
+    "levels"
+  ],
+  "additionalProperties": {}
+}

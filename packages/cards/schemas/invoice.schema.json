@@ -1,0 +1,210 @@
+{
+  "$id": "https://usehako.xyz/schemas/cards/invoice.schema.json",
+  "title": "invoice",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "open",
+        "paid"
+      ]
+    },
+    "amount": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "object",
+          "properties": {
+            "chain": {
+              "type": "string",
+              "pattern": "^[-a-z0-9]{3,8}:[-_a-zA-Z0-9]{1,64}$",
+              "description": "CAIP-2 chain id, e.g. eip155:8453 (Base) or solana:mainnet"
+            },
+            "address": {
+              "type": "string",
+              "minLength": 1
+            },
+            "symbol": {
+              "type": "string",
+              "minLength": 1
+            },
+            "decimals": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "name": {
+              "type": "string"
+            },
+            "logoUrl": {
+              "type": "string",
+              "format": "uri"
+            }
+          },
+          "required": [
+            "chain",
+            "address",
+            "symbol",
+            "decimals"
+          ],
+          "additionalProperties": false
+        },
+        "amountAtomic": {
+          "type": "string",
+          "pattern": "^\\d+$",
+          "description": "Atomic units, e.g. 1000000 = 1 USDC"
+        },
+        "usd": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^-?\\d+(\\.\\d+)?$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "token",
+        "amountAtomic",
+        "usd"
+      ],
+      "additionalProperties": false
+    },
+    "payTo": {
+      "type": "string",
+      "pattern": "^0x[0-9a-fA-F]{40}$"
+    },
+    "note": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "payUrl": {
+      "type": "string",
+      "format": "uri"
+    },
+    "agentPayUrl": {
+      "type": "string",
+      "format": "uri"
+    },
+    "qrPayload": {
+      "type": "string",
+      "minLength": 1
+    },
+    "createdBy": {
+      "type": "string",
+      "enum": [
+        "user",
+        "agent"
+      ]
+    },
+    "payer": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "tx": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "chain": {
+              "type": "string",
+              "pattern": "^[-a-z0-9]{3,8}:[-_a-zA-Z0-9]{1,64}$",
+              "description": "CAIP-2 chain id, e.g. eip155:8453 (Base) or solana:mainnet"
+            },
+            "hash": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^0x[0-9a-fA-F]{64}$"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^[1-9A-HJ-NP-Za-km-z]{64,90}$"
+                }
+              ]
+            },
+            "explorerUrl": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uri"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "role": {
+              "type": "string",
+              "enum": [
+                "approve",
+                "source",
+                "destination",
+                "payment",
+                "deposit",
+                "withdraw",
+                "transfer"
+              ]
+            }
+          },
+          "required": [
+            "chain",
+            "hash",
+            "explorerUrl",
+            "role"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "paidAt": {
+      "anyOf": [
+        {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+    }
+  },
+  "required": [
+    "id",
+    "status",
+    "amount",
+    "payTo",
+    "note",
+    "payUrl",
+    "agentPayUrl",
+    "qrPayload",
+    "createdBy",
+    "payer",
+    "tx",
+    "paidAt",
+    "createdAt"
+  ],
+  "additionalProperties": false
+}

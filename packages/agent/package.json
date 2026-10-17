@@ -1,0 +1,30 @@
+{
+  "name": "@hako/agent",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Server-only: the one tool registry (names, zod input and output, annotations, visibility, card kind, server execute) that /agent, voice, the hosted MCP server and `hako mcp` all serve. `./node` is the gateway's and CLI's entry.",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts",
+    "./node": "./src/node.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p scripts/tsconfig.json && node --experimental-transform-types --disable-warning=ExperimentalWarning scripts/tool-schemas.ts",
+    "lint": "eslint src scripts",
+    "tool-schemas": "node --experimental-transform-types --disable-warning=ExperimentalWarning scripts/tool-schemas.ts"
+  },
+  "dependencies": {
+    "@hako/cards": "workspace:*",
+    "@hako/config": "workspace:*",
+    "@hako/money": "workspace:*",
+    "@hako/networks": "workspace:*",
+    "server-only": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@hako/paybox": "workspace:*",
+    "@types/node": "catalog:",
+    "typescript": "catalog:"
+  }
+}

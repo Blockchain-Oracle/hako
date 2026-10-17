@@ -1,0 +1,52 @@
+{
+  "$id": "https://usehako.xyz/schemas/cards/token.schema.json",
+  "title": "token",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "chain": {
+      "type": "string",
+      "pattern": "^[-a-z0-9]{3,8}:[-_a-zA-Z0-9]{1,64}$",
+      "description": "CAIP-2 chain id, e.g. eip155:8453 (Base) or solana:mainnet"
+    },
+    "address": {
+      "type": "string"
+    },
+    "symbol": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "decimals": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "standard": {
+      "type": "string"
+    },
+    "total_supply_atomic": {
+      "type": "string",
+      "pattern": "^\\d+$",
+      "description": "Atomic units, e.g. 1000000 = 1 USDC"
+    },
+    "logo_url": {
+      "type": "string"
+    },
+    "price_usd": {
+      "type": "number"
+    },
+    "verified": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "chain",
+    "address",
+    "symbol",
+    "name",
+    "decimals"
+  ],
+  "additionalProperties": {}
+}

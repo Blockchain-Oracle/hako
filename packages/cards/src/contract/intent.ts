@@ -88,3 +88,18 @@ const PHASE_BY_STATE = {
 } as const satisfies Record<IntentState, CardPhase>;
 
 export const intentStateToPhase = (state: IntentState): CardPhase => PHASE_BY_STATE[state];
+
+/**
+ * What a draft can be (the keys of @hako/paybox's `DraftInputs`; @hako/agent checks the two stay equal): the five
+ * money moves, a paid catalog run (a pay card) and paying a Hako invoice. Each runs as one PayBox request per version.
+ */
+export const DRAFT_KINDS = ["send", "swap", "bridge", "earn_deposit", "earn_withdraw", "run", "invoice_pay"] as const;
+export type DraftKindName = (typeof DRAFT_KINDS)[number];
+export const draftKindSchema = z.enum(DRAFT_KINDS);
+
+/** One version of one draft: what `hako_execute`, `hako_broadcast` and the `(draft_id, version)` row are keyed by. */
+export const draftRefSchema = z.object({
+  draftId: z.string().min(1),
+  version: z.number().int().min(1),
+});
+export type DraftRef = z.output<typeof draftRefSchema>;
