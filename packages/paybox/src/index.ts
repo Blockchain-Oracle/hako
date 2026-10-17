@@ -24,8 +24,11 @@ export function getPayboxServer(): PayboxServer {
   if (state.server) return state.server;
   const env = loadWebEnv();
   if (!env.REDIS_URL) throw new Error("REDIS_URL is not set: PayBox token refreshes need the per-user Redis lock.");
-  state.redis ??= new Redis(env.REDIS_URL);
-  state.redis.on("error", (error: Error) => console.warn(`[hako-paybox] redis: ${error.message}`));
+  // One client and one error listener per process: a failed build (a missing key) retries with the same client.
+  if (!state.redis) {
+    state.redis = new Redis(env.REDIS_URL);
+    state.redis.on("error", (error: Error) => console.warn(`[hako-paybox] redis: ${error.message}`));
+  }
   state.server = createPayboxServer({
     pool: webPool(),
     redis: state.redis,
