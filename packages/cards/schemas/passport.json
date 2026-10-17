@@ -251,13 +251,6 @@
       "items": {
         "type": "object",
         "properties": {
-          "credentialId": {
-            "type": "string",
-            "minLength": 1
-          },
-          "name": {
-            "type": "string"
-          },
           "kind": {
             "type": "string",
             "enum": [
@@ -265,12 +258,31 @@
               "wallet",
               "secret"
             ]
+          },
+          "family": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "evm",
+                  "solana"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "count": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
           }
         },
         "required": [
-          "credentialId",
-          "name",
-          "kind"
+          "kind",
+          "family",
+          "count"
         ],
         "additionalProperties": false
       }

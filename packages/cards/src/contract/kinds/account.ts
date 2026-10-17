@@ -84,7 +84,9 @@ export const passportIssueSchema = z.object({
   action: cardActionSchema,
 });
 
+/** A PayBox grant's approval mode: passkey in the PayBox app, the in-chat signing window, none inside the grant. */
 export const APPROVAL_MODES = ["always_approve", "iframe", "autonomous", "paybox"] as const;
+export type ApprovalModeName = (typeof APPROVAL_MODES)[number];
 
 export const passportWalletSchema = z.object({
   credentialId: z.string().min(1),
@@ -102,8 +104,11 @@ export const passportWalletSchema = z.object({
 /** The first card after Connect PayBox: what Hako can do with this wallet right now, and every red item's fix. */
 export const passportDataSchema = z.object({
   wallets: z.array(passportWalletSchema),
-  /** Wallets the person owns but has not shared with Hako's PayBox client. */
-  ungranted: z.array(z.object({ credentialId: z.string().min(1), name: z.string(), kind: z.enum(["card", "wallet", "secret"]) })),
+  /**
+   * What the person owns but has not shared with Hako's PayBox client. PayBox reports counts only (never ids, names or
+   * addresses of ungranted credentials), so the card says "1 more EVM wallet you haven't shared".
+   */
+  ungranted: z.array(z.object({ kind: z.enum(["card", "wallet", "secret"]), family: chainFamilySchema.nullable(), count: z.number().int().min(1) })),
   agentSignerRecorded: z.boolean(),
   plugins: z.array(z.object({ id: z.string().min(1), name: z.string().nullable(), type: z.enum(["official", "unofficial"]), enabled: z.boolean() })),
   /** Hako's own plugin is enabled on this account (then money moves run through `use_plugin`). */

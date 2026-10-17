@@ -1,8 +1,8 @@
 import { GATEWAY_TIMEOUT_MS, HAKO_GATEWAY_URL, ROUTE_RACE_TOTAL_TIMEOUT_MS } from "@hako/config";
 import { z } from "zod";
 
-import { HTTP_PAYMENT_REQUIRED, HTTP_UNAUTHORIZED, ROUTE_STREAM_GRACE_MS } from "../contract.config.ts";
-import { type EndpointDef, type EndpointKey, GATEWAY_ENDPOINTS, type GatewayEndpoints, type ResponseType } from "./endpoints.ts";
+import { HTTP_PAYMENT_REQUIRED, HTTP_UNAUTHORIZED, ROUTE_STREAM_GRACE_MS } from "../contract/contract.config.ts";
+import { type EndpointDef, type EndpointKey, GATEWAY_ENDPOINTS, type GatewayEndpoints, type ResponseType } from "../contract/gateway/endpoints.ts";
 
 /**
  * The typed gateway client, built from the endpoint table: real `fetch` against the gateway URL (production
@@ -21,37 +21,45 @@ export const gatewayErrorBodySchema = z.object({
   }),
 });
 
+// Fields are assigned in the constructors (no parameter properties), so Node's type stripping can run these sources.
 export class GatewayError extends Error {
-  constructor(
-    readonly endpoint: EndpointKey,
-    readonly status: number,
-    readonly code: string,
-    message: string,
-    readonly retryable: boolean,
-    readonly details: readonly string[] = [],
-  ) {
+  readonly endpoint: EndpointKey;
+  readonly status: number;
+  readonly code: string;
+  readonly retryable: boolean;
+  readonly details: readonly string[];
+
+  constructor(endpoint: EndpointKey, status: number, code: string, message: string, retryable: boolean, details: readonly string[] = []) {
     super(message);
     this.name = "GatewayError";
+    this.endpoint = endpoint;
+    this.status = status;
+    this.code = code;
+    this.retryable = retryable;
+    this.details = details;
   }
 }
 
 /** An x402 route answered 402: PayBox pays it (`use_service`, a plugin proposal); this client does not. */
 export class GatewayPaymentRequired extends GatewayError {
-  constructor(
-    endpoint: EndpointKey,
-    /** The `PAYMENT-REQUIRED` challenge header, as the gateway sent it. */
-    readonly challenge: string | null,
-  ) {
+  /** The `PAYMENT-REQUIRED` challenge header, as the gateway sent it. */
+  readonly challenge: string | null;
+
+  constructor(endpoint: EndpointKey, challenge: string | null) {
     super(endpoint, HTTP_PAYMENT_REQUIRED, "payment_required", `${endpoint} is a paid route: PayBox pays it, this client does not`, false);
     this.name = "GatewayPaymentRequired";
+    this.challenge = challenge;
   }
 }
 
 /** The gateway answered 2xx with a body outside the endpoint table: the contract drifted. */
 export class GatewayContractError extends GatewayError {
-  constructor(endpoint: EndpointKey, readonly issues: z.core.$ZodIssue[]) {
+  readonly issues: z.core.$ZodIssue[];
+
+  constructor(endpoint: EndpointKey, issues: z.core.$ZodIssue[]) {
     super(endpoint, 0, "contract_mismatch", `${endpoint} answered outside its schema: ${z.prettifyError(new z.ZodError(issues))}`, false);
     this.name = "GatewayContractError";
+    this.issues = issues;
   }
 }
 
@@ -75,6 +83,10 @@ export interface CallInit {
 }
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type -- "no required field" is exactly `{}`
 type Args<K extends EndpointKey> = {} extends EndpointRequest<K> ? [request?: EndpointRequest<K>, init?: CallInit] : [request: EndpointRequest<K>, init?: CallInit];
+/** A URL needs only the path params and the query. */
+export type EndpointLocation<K extends EndpointKey> = Omit<EndpointRequest<K>, "body">;
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type -- "no required field" is exactly `{}`
+type UrlArgs<K extends EndpointKey> = {} extends EndpointLocation<K> ? [location?: EndpointLocation<K>] : [location: EndpointLocation<K>];
 
 export interface BinaryBody {
   contentType: string;
@@ -94,7 +106,7 @@ export interface GatewayClientOptions {
 export interface GatewayClient {
   readonly baseUrl: string;
   /** The absolute URL of a route (x402 `paidUrl`s, `/v1/files/<id>`, logo proxy links). */
-  url<K extends EndpointKey>(key: K, ...args: Args<K>): string;
+  url<K extends EndpointKey>(key: K, ...args: UrlArgs<K>): string;
   call<K extends JsonEndpointKey>(key: K, ...args: Args<K>): Promise<EndpointResponse<K>>;
   stream<K extends StreamEndpointKey>(key: K, ...args: Args<K>): AsyncGenerator<EndpointResponse<K>>;
   bytes<K extends BinaryEndpointKey>(key: K, ...args: Args<K>): Promise<BinaryBody>;
@@ -153,7 +165,7 @@ export function createGatewayClient(options: GatewayClientOptions = {}): Gateway
 
   return {
     baseUrl,
-    url: (key, ...[request]) => urlOf(defOf(key), (request ?? {}) as RawRequest).toString(),
+    url: (key, ...[location]) => urlOf(defOf(key), (location ?? {}) as RawRequest).toString(),
     async call(key, ...[request, init]) {
       const res = await send(key, (request ?? {}) as RawRequest, init);
       return checked(key, await res.json());

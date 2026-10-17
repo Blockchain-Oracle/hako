@@ -87,10 +87,11 @@ export const providerDocSchema = z.looseObject({
   terms: text,
   endpointCount: z.number().int().min(0),
   available: z.boolean(),
-  docsUrl: text.optional(),
-  licence: text.optional(),
-  attribution: text.optional(),
-  logoDomain: text.optional(),
+  // hako-api writes null for a provider field it doesn't have (Provider.doc() is a plain dict).
+  docsUrl: text.nullish(),
+  licence: text.nullish(),
+  attribution: text.nullish(),
+  logoDomain: text.nullish(),
 });
 
 /** `GET /v1/catalog`: every provider and tool with schemas and prices, and a content hash. */
