@@ -77,6 +77,13 @@ class RunContext:
                        headers: dict[str, str] | None = None) -> str:
         return (await self._send(provider, "GET", path, params=params, headers=headers)).text
 
+    async def post_bytes(self, provider: Provider, path: str, *, json: Any = None,
+                         params: dict[str, Any] | None = None,
+                         headers: dict[str, str] | None = None) -> tuple[bytes, dict[str, str]]:
+        """A binary answer (generated audio): the bytes and the response headers (content type, provider cost)."""
+        resp = await self._send(provider, "POST", path, params=params, json=json, headers=headers)
+        return resp.content, {k.lower(): v for k, v in resp.headers.items()}
+
     async def call(self, endpoint_id: str, payload: dict[str, Any]) -> ToolOutput:
         """Run another endpoint's handler inside this run (same deadline; its sources join ours)."""
         target = REGISTRY.get(endpoint_id)

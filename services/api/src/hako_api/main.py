@@ -8,6 +8,7 @@ from typing import Any
 
 import orjson
 from fastapi import FastAPI, Request
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
 from hako_api.lifespan import lifespan
@@ -15,6 +16,8 @@ from hako_core.app.handlers import install_handlers
 from hako_core.app.middleware import BodyLimitMiddleware, DeadlineMiddleware
 from hako_core.app.responses import HakoJSONResponse
 from hako_core.constants.app import APP_VERSION, HEALTH_OK
+from hako_core.constants.http import HTTP_NOT_FOUND
+from hako_tools import files
 from hako_tools.categories import Category
 from hako_tools.constants import (
     CATALOG_ROUTE_DEADLINE_S,
@@ -31,6 +34,7 @@ from hako_tools.framework.errors import ToolError, UnknownEndpoint
 
 _HTTP_BAD_REQUEST = 400
 _ENDPOINT_ID_MAX = 120
+FILE_CACHE_CONTROL = f"public, max-age={files.FILE_TTL_S}, immutable"  # an id never changes its bytes
 
 app = FastAPI(
     title="Hako Tool Router",
@@ -139,6 +143,15 @@ async def post_run(provider: str, slug: str, request: Request) -> Any:
     except orjson.JSONDecodeError:
         return _error(_HTTP_BAD_REQUEST, "invalid_json", "Request body is not valid JSON.")
     return await run(f"{provider}/{slug}", payload)
+
+
+@app.get(f"{files.FILES_ROUTE}/{{file_id}}", summary="A generated file (audio), kept 24 h")
+async def get_file(file_id: str) -> Any:
+    found = files.find(file_id)
+    if found is None:
+        return _error(HTTP_NOT_FOUND, "not_found", "No such file, or it expired (generated files are kept 24 h).")
+    path, mime_type = found
+    return FileResponse(path, media_type=mime_type, headers={"cache-control": FILE_CACHE_CONTROL})
 
 
 # Outermost first: the body limit rejects oversized requests before anything else; every request gets a clock
