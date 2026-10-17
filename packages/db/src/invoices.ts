@@ -1,5 +1,7 @@
+import type { AtomicString } from "@hako/defi/core";
+
 import type { Queryable } from "./pool.ts";
-import { newInvoiceId, pageLimit, type AtomicString, type PageOptions, type Surface } from "./shared.ts";
+import { cursorParams, newInvoiceId, pageLimit, type PageOptions, type Surface } from "./shared.ts";
 
 /** An invoice is open until a payment claims it (settling), then paid; a failed settlement releases it (plan B12). */
 export const INVOICE_STATUSES = ["open", "settling", "paid"] as const;
@@ -81,9 +83,9 @@ export async function listInvoicesByPayTo(q: Queryable, addresses: readonly stri
   if (addresses.length === 0) return [];
   const { rows } = await q.query<InvoiceRow>(
     `select ${COLUMNS} from invoices
-     where lower(pay_to) = any($1::text[]) and ($2::timestamptz is null or created_at < $2)
-     order by created_at desc, id desc limit $3`,
-    [addresses.map((address) => address.toLowerCase()), page.before ?? null, pageLimit(page.limit)],
+     where lower(pay_to) = any($1::text[]) and ($2::timestamptz is null or (created_at, id) < ($2::timestamptz, $3::text))
+     order by created_at desc, id desc limit $4`,
+    [addresses.map((address) => address.toLowerCase()), ...cursorParams(page), pageLimit(page.limit)],
   );
   return rows;
 }
@@ -91,9 +93,9 @@ export async function listInvoicesByPayTo(q: Queryable, addresses: readonly stri
 export async function listInvoicesByCreator(q: Queryable, userId: string, page: PageOptions = {}): Promise<InvoiceRow[]> {
   const { rows } = await q.query<InvoiceRow>(
     `select ${COLUMNS} from invoices
-     where created_by = $1 and ($2::timestamptz is null or created_at < $2)
-     order by created_at desc, id desc limit $3`,
-    [userId, page.before ?? null, pageLimit(page.limit)],
+     where created_by = $1 and ($2::timestamptz is null or (created_at, id) < ($2::timestamptz, $3::text))
+     order by created_at desc, id desc limit $4`,
+    [userId, ...cursorParams(page), pageLimit(page.limit)],
   );
   return rows;
 }

@@ -6,9 +6,6 @@ import { BYTE_VALUES, DB_LIST_DEFAULT_LIMIT, DB_LIST_MAX_LIMIT, INVOICE_ID_LENGT
 export const SURFACES = ["web", "voice", "mcp", "cli", "plugin", "gateway"] as const;
 export type Surface = (typeof SURFACES)[number];
 
-/** Atomic amounts travel as base-10 integer strings (pg returns numeric as an exact string). */
-export type AtomicString = string;
-
 /** A new row id. */
 export const newId = (): string => randomUUID();
 
@@ -27,10 +24,28 @@ export function newInvoiceId(): string {
   return id;
 }
 
-/** A keyset page: newest first, continuing strictly before `before` (a row's `createdAt`). */
+/**
+ * Where a newest-first list continues: the last row of the previous page (any row works, it carries both fields).
+ * Rows sharing a `created_at` (everything one transaction records shares `now()`) are told apart by `id`, and the
+ * paged tables store `created_at` to the millisecond (0003_keyset_paging.sql), so a JS `Date` holds it exactly.
+ */
+export interface PageCursor {
+  createdAt: Date;
+  id: string;
+}
+
+/** A keyset page: newest first (`created_at desc, id desc`), continuing strictly after the `before` row. */
 export interface PageOptions {
   limit?: number;
-  before?: Date;
+  before?: PageCursor;
+}
+
+/**
+ * The `[createdAt, id]` parameters of a list helper's keyset filter, which every helper writes the same way:
+ * `($n::timestamptz is null or (created_at, id) < ($n::timestamptz, $n+1::text))`.
+ */
+export function cursorParams(page: PageOptions): [Date | null, string | null] {
+  return page.before ? [page.before.createdAt, page.before.id] : [null, null];
 }
 
 /** Postgres SQLSTATE 23505: a unique index refused the row. */

@@ -1,5 +1,7 @@
+import type { AtomicString } from "@hako/defi/core";
+
 import type { Queryable } from "./pool.ts";
-import { newId, pageLimit, type AtomicString, type PageOptions, type Surface } from "./shared.ts";
+import { cursorParams, newId, pageLimit, type PageOptions, type Surface } from "./shared.ts";
 
 /**
  * What a receipt records (plan add-ons, Activity ledger): an x402 settlement the gateway saw (paid runs, batches,
@@ -47,6 +49,16 @@ export interface ReceiptRow {
 export type NewReceipt = Pick<ReceiptRow, "kind" | "status" | "surface" | "chain" | "asset" | "amountAtomic"> &
   Partial<Omit<ReceiptRow, "id" | "kind" | "status" | "surface" | "chain" | "asset" | "amountAtomic" | "createdAt" | "updatedAt">>;
 
+/** The CAIP-2 namespace of EVM chains, whose transaction hashes are hex. */
+const EVM_CHAIN_PREFIX = "eip155:";
+
+/**
+ * The one spelling of a transaction hash on `chain`: EVM hashes are hex, so `0xAB…` and `0xab…` are the same
+ * transaction and are stored lowercase (0003_keyset_paging.sql checks it); Solana signatures are base58, where case
+ * is part of the value, and stay as given.
+ */
+const canonicalTxHash = (chain: string, hash: string): string => (chain.startsWith(EVM_CHAIN_PREFIX) ? hash.toLowerCase() : hash);
+
 const COLUMNS = `id, kind, status, surface, user_id as "userId", chain, asset, amount_atomic::text as "amountAtomic",
   payer, pay_to as "payTo", tx_hash as "txHash", to_chain as "toChain", to_asset as "toAsset",
   to_amount_atomic::text as "toAmountAtomic", dest_tx_hash as "destTxHash", lifi_tool as "lifiTool",
@@ -59,6 +71,8 @@ const COLUMNS = `id, kind, status, surface, user_id as "userId", chain, asset, a
  * PayBox request returns the row already there and changes nothing, so retries and replays are harmless.
  */
 export async function recordReceipt(q: Queryable, input: NewReceipt): Promise<{ receipt: ReceiptRow; created: boolean }> {
+  const txHash = input.txHash ? canonicalTxHash(input.chain, input.txHash) : null;
+  const destTxHash = input.destTxHash ? canonicalTxHash(input.toChain ?? input.chain, input.destTxHash) : null;
   const { rows } = await q.query<ReceiptRow>(
     `insert into receipts (id, kind, status, surface, user_id, chain, asset, amount_atomic, payer, pay_to, tx_hash,
        to_chain, to_asset, to_amount_atomic, dest_tx_hash, lifi_tool, tool_id, batch_id, invoice_id,
@@ -67,8 +81,8 @@ export async function recordReceipt(q: Queryable, input: NewReceipt): Promise<{ 
      on conflict do nothing returning ${COLUMNS}`,
     [
       newId(), input.kind, input.status, input.surface, input.userId ?? null, input.chain, input.asset, input.amountAtomic,
-      input.payer ?? null, input.payTo ?? null, input.txHash ?? null, input.toChain ?? null, input.toAsset ?? null,
-      input.toAmountAtomic ?? null, input.destTxHash ?? null, input.lifiTool ?? null, input.toolId ?? null,
+      input.payer ?? null, input.payTo ?? null, txHash, input.toChain ?? null, input.toAsset ?? null,
+      input.toAmountAtomic ?? null, destTxHash, input.lifiTool ?? null, input.toolId ?? null,
       input.batchId ?? null, input.invoiceId ?? null, input.payboxRequestId ?? null, input.payboxClientId ?? null,
       input.draftId ?? null, input.draftVersion ?? null, input.feeUsd ?? null, input.isPublic ?? false,
     ],
@@ -76,7 +90,7 @@ export async function recordReceipt(q: Queryable, input: NewReceipt): Promise<{ 
   if (rows[0]) return { receipt: rows[0], created: true };
   const existing =
     (input.payboxRequestId ? await findReceiptByRequestId(q, input.payboxRequestId) : null) ??
-    (input.txHash ? await findReceiptByTx(q, input.kind, input.chain, input.txHash) : null);
+    (txHash ? await findReceiptByTx(q, input.kind, input.chain, txHash) : null);
   if (!existing) throw new Error("recordReceipt: the insert conflicted but no matching receipt was found");
   return { receipt: existing, created: false };
 }
@@ -91,8 +105,13 @@ export async function findReceiptByRequestId(q: Queryable, payboxRequestId: stri
   return rows[0] ?? null;
 }
 
+/** The receipt of one settlement transaction (an EVM hash matches in any case). */
 export async function findReceiptByTx(q: Queryable, kind: ReceiptKind, chain: string, txHash: string): Promise<ReceiptRow | null> {
-  const { rows } = await q.query<ReceiptRow>(`select ${COLUMNS} from receipts where kind = $1 and chain = $2 and tx_hash = $3`, [kind, chain, txHash]);
+  const { rows } = await q.query<ReceiptRow>(`select ${COLUMNS} from receipts where kind = $1 and chain = $2 and tx_hash = $3`, [
+    kind,
+    chain,
+    canonicalTxHash(chain, txHash),
+  ]);
   return rows[0] ?? null;
 }
 
@@ -105,15 +124,23 @@ export interface ReceiptUpdate {
   isPublic?: boolean;
 }
 
-/** Moves a receipt forward (pending → confirmed/failed, the destination hash once LI.FI reports it). */
+/**
+ * Moves a receipt forward (pending → confirmed/failed, the destination hash once LI.FI reports it). Hashes are
+ * stored in their one spelling for the row's chain (the destination's for `destTxHash`), as `recordReceipt` does.
+ */
 export async function updateReceipt(q: Queryable, id: string, update: ReceiptUpdate): Promise<ReceiptRow | null> {
   const { rows } = await q.query<ReceiptRow>(
     `update receipts set
-       status = coalesce($2, status), tx_hash = coalesce($3, tx_hash), dest_tx_hash = coalesce($4, dest_tx_hash),
+       status = coalesce($2, status),
+       tx_hash = coalesce(case when starts_with(chain, $8::text) then lower($3::text) else $3::text end, tx_hash),
+       dest_tx_hash = coalesce(case when starts_with(coalesce(to_chain, chain), $8::text) then lower($4::text) else $4::text end, dest_tx_hash),
        to_amount_atomic = coalesce($5, to_amount_atomic), fee_usd = coalesce($6, fee_usd),
        is_public = coalesce($7, is_public), updated_at = now()
      where id = $1 returning ${COLUMNS}`,
-    [id, update.status ?? null, update.txHash ?? null, update.destTxHash ?? null, update.toAmountAtomic ?? null, update.feeUsd ?? null, update.isPublic ?? null],
+    [
+      id, update.status ?? null, update.txHash ?? null, update.destTxHash ?? null, update.toAmountAtomic ?? null,
+      update.feeUsd ?? null, update.isPublic ?? null, EVM_CHAIN_PREFIX,
+    ],
   );
   return rows[0] ?? null;
 }
@@ -121,9 +148,9 @@ export async function updateReceipt(q: Queryable, id: string, update: ReceiptUpd
 /** The user's own receipts, newest first. */
 export async function listReceiptsForUser(q: Queryable, userId: string, page: PageOptions = {}): Promise<ReceiptRow[]> {
   const { rows } = await q.query<ReceiptRow>(
-    `select ${COLUMNS} from receipts where user_id = $1 and ($2::timestamptz is null or created_at < $2)
-     order by created_at desc, id desc limit $3`,
-    [userId, page.before ?? null, pageLimit(page.limit)],
+    `select ${COLUMNS} from receipts where user_id = $1 and ($2::timestamptz is null or (created_at, id) < ($2::timestamptz, $3::text))
+     order by created_at desc, id desc limit $4`,
+    [userId, ...cursorParams(page), pageLimit(page.limit)],
   );
   return rows;
 }
@@ -136,9 +163,10 @@ export async function listReceiptsForAddresses(q: Queryable, addresses: readonly
   if (addresses.length === 0) return [];
   const { rows } = await q.query<ReceiptRow>(
     `select ${COLUMNS} from receipts
-     where (lower(payer) = any($1::text[]) or lower(pay_to) = any($1::text[])) and ($2::timestamptz is null or created_at < $2)
-     order by created_at desc, id desc limit $3`,
-    [addresses.map((address) => address.toLowerCase()), page.before ?? null, pageLimit(page.limit)],
+     where (lower(payer) = any($1::text[]) or lower(pay_to) = any($1::text[]))
+       and ($2::timestamptz is null or (created_at, id) < ($2::timestamptz, $3::text))
+     order by created_at desc, id desc limit $4`,
+    [addresses.map((address) => address.toLowerCase()), ...cursorParams(page), pageLimit(page.limit)],
   );
   return rows;
 }
@@ -146,9 +174,9 @@ export async function listReceiptsForAddresses(q: Queryable, addresses: readonly
 /** Shared receipts (`/r/<id>`, the landing proof), newest first. */
 export async function listPublicReceipts(q: Queryable, page: PageOptions = {}): Promise<ReceiptRow[]> {
   const { rows } = await q.query<ReceiptRow>(
-    `select ${COLUMNS} from receipts where is_public and ($1::timestamptz is null or created_at < $1)
-     order by created_at desc, id desc limit $2`,
-    [page.before ?? null, pageLimit(page.limit)],
+    `select ${COLUMNS} from receipts where is_public and ($1::timestamptz is null or (created_at, id) < ($1::timestamptz, $2::text))
+     order by created_at desc, id desc limit $3`,
+    [...cursorParams(page), pageLimit(page.limit)],
   );
   return rows;
 }
