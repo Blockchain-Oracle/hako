@@ -26,5 +26,8 @@ export function getAuth(): HakoAuth {
 
 const handle = (request: Request): Promise<Response> => getAuth().handler(request);
 
-/** The route handlers `app/api/auth/[...all]/route.ts` exports (Better Auth's `toNextJsHandler`, built lazily). */
-export const authRouteHandlers = { GET: handle, POST: handle } as const;
+/**
+ * The route handlers `app/api/auth/[...all]/route.ts` exports: the same methods as Better Auth's `toNextJsHandler`
+ * (GET, POST, PATCH, PUT, DELETE in 1.7.7), so no Better Auth or plugin endpoint answers 405; built lazily.
+ */
+export const authRouteHandlers = { GET: handle, POST: handle, PATCH: handle, PUT: handle, DELETE: handle } as const;

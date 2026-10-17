@@ -1,4 +1,4 @@
-import { HAKO_AUTH_ISSUER, HAKO_MCP_SERVER_NAME } from "@hako/config";
+import { HAKO_AUTH_ISSUER } from "@hako/config";
 
 /**
  * Where Better Auth is mounted (`apps/web/src/app/api/auth/[...all]`), read from the issuer @hako/config names
@@ -6,5 +6,8 @@ import { HAKO_AUTH_ISSUER, HAKO_MCP_SERVER_NAME } from "@hako/config";
  */
 export const AUTH_BASE_PATH = new URL(HAKO_AUTH_ISSUER).pathname;
 
-/** Hako's cookies read `hako.session_token`, `hako.session_data`… instead of Better Auth's default prefix. */
-export const AUTH_COOKIE_PREFIX = HAKO_MCP_SERVER_NAME;
+/**
+ * Hako's cookies read `hako.session_token`, `hako.session_data`… instead of Better Auth's default prefix. Its own
+ * constant: changing it renames every session cookie and signs every user out, so nothing else may move it.
+ */
+export const AUTH_COOKIE_PREFIX = "hako";

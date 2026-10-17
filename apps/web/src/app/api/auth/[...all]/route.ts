@@ -6,4 +6,4 @@ import { authRouteHandlers } from "@hako/auth";
 
 export const dynamic = "force-dynamic";
 
-export const { GET, POST } = authRouteHandlers;
+export const { GET, POST, PATCH, PUT, DELETE } = authRouteHandlers;
