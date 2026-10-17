@@ -5,21 +5,28 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch --env-file-if-exists=.env.local src/server.ts",
-    "build": "tsc -p tsconfig.json --noEmit && esbuild src/server.ts --bundle --platform=node --target=node24 --format=esm --outfile=dist/server.mjs --external:@x402/extensions --banner:js=\"import{createRequire}from'module';const require=createRequire(import.meta.url);\"",
+    "build": "tsc -p tsconfig.json --noEmit && esbuild src/server.ts --bundle --platform=node --target=node24 --format=esm --outfile=dist/server.mjs --external:@x402/extensions --external:pg-native --banner:js=\"import{createRequire}from'module';const require=createRequire(import.meta.url);\"",
     "start": "node dist/server.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "test": "tsx --test \"src/**/*.test.ts\""
   },
   "dependencies": {
     "@coinbase/cdp-sdk": "catalog:",
+    "@hako/cards": "workspace:*",
     "@hako/config": "workspace:*",
+    "@hako/db": "workspace:*",
     "@hako/env": "workspace:*",
+    "@hako/money": "workspace:*",
+    "@hako/networks": "workspace:*",
     "@hono/node-server": "catalog:",
     "@modelcontextprotocol/sdk": "^1.31.0",
     "@x402/core": "catalog:",
     "@x402/evm": "catalog:",
     "@x402/hono": "catalog:",
     "hono": "catalog:",
+    "ioredis": "catalog:",
+    "jose": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
