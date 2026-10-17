@@ -1,0 +1,22 @@
+{
+  "name": "@hako/cards",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Hako's cards: the card contract (phases, PayBox request status, intents, schemas per render kind) and the React cards shared by /agent and the MCP Apps view.",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts",
+    "./contract": "./src/contract/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint": "eslint src"
+  },
+  "dependencies": {
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "typescript": "catalog:"
+  }
+}
