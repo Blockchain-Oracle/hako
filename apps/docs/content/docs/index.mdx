@@ -24,24 +24,24 @@ Three verbs. The first two are free.
 </Step>
 <Step>
 
-**Run** (paid per call). The tool's paid URL is `POST https://api.usehako.xyz/v2/run/<provider>/<endpoint>`. Unpaid, it answers `402 Payment Required` with the exact price. PayBox's `use_service` reads that price, gets your approval as your PayBox grant requires, pays from your wallet and fetches the answer. A failed run is never charged.
+**Run** (paid per call). The tool's paid URL is `POST https://api.usehako.site/v2/run/<provider>/<endpoint>`. Unpaid, it answers `402 Payment Required` with the exact price. PayBox's `use_service` reads that price, gets your approval as your PayBox grant requires, pays from your wallet and fetches the answer. A failed run is never charged.
 
 </Step>
 </Steps>
 
 ```bash title="Discover, then inspect (no account needed)"
-curl -s -X POST https://api.usehako.xyz/v1/discover \
+curl -s -X POST https://api.usehako.site/v1/discover \
   -H 'content-type: application/json' \
   -d '{"query": "weather in Lagos", "limit": 3}'
 
-curl -s -X POST https://api.usehako.xyz/v1/inspect \
+curl -s -X POST https://api.usehako.site/v1/inspect \
   -H 'content-type: application/json' \
   -d '{"id": "openweather/current"}'
 ```
 
 ```json title="Run: ask your PayBox agent to call use_service with"
 {
-  "url": "https://api.usehako.xyz/v2/run/openweather/current",
+  "url": "https://api.usehako.site/v2/run/openweather/current",
   "method": "POST",
   "body": { "city": "Lagos,NG" }
 }
@@ -49,7 +49,7 @@ curl -s -X POST https://api.usehako.xyz/v1/inspect \
 
 ## What happens to a run
 
-The public gateway at `https://api.usehako.xyz` checks the input for free, then asks for the price with a `402`. When PayBox retries with the payment, the gateway verifies it through Coinbase's CDP facilitator on Base (`eip155:8453`), runs the tool and settles the payment only when the run succeeds. See [Pricing and payments](/docs/pricing).
+The public gateway at `https://api.usehako.site` checks the input for free, then asks for the price with a `402`. When PayBox retries with the payment, the gateway verifies it through Coinbase's CDP facilitator on Base (`eip155:8453`), runs the tool and settles the payment only when the run succeeds. See [Pricing and payments](/docs/pricing).
 
 ## The tools
 
@@ -59,7 +59,7 @@ Each tool has an id of the form `provider/endpoint`, such as `firecrawl/search` 
 
 <Cards>
   <Card title="Skill" href="/docs/quickstart/skill">
-    Tell your agent `set up https://usehako.xyz/SKILL.md`.
+    Tell your agent `set up https://usehako.site/SKILL.md`.
   </Card>
   <Card title="MCP" href="/docs/quickstart/mcp">
     `hako_discover` and `hako_inspect`, hosted or local. Free.
@@ -83,4 +83,4 @@ Hako's PayBox plugin (`hako_discover`, `hako_inspect`, `hako_run` inside PayBox)
 
 - [Pricing and payments](/docs/pricing): the three prices, the x402 handshake, and when you are not charged.
 - [API reference](/docs/api): base URL, the result envelope, errors and limits.
-- Machine-readable: [`https://usehako.xyz/llms.txt`](https://usehako.xyz/llms.txt) and [`https://usehako.xyz/SKILL.md`](https://usehako.xyz/SKILL.md).
+- Machine-readable: [`https://usehako.site/llms.txt`](https://usehako.site/llms.txt) and [`https://usehako.site/SKILL.md`](https://usehako.site/SKILL.md).

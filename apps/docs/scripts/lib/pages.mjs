@@ -4,7 +4,7 @@ import { code, codeCell, fence, frontmatter, GENERATED_NOTE, mdCell, mdText, tab
 import { inputSection } from "./schema.mjs";
 
 export const TOOLS_ROUTE = "/docs/tools";
-const API_URL = "https://api.usehako.xyz"; // rewritten to NEXT_PUBLIC_API_URL at build (lib/remark-site-urls.ts)
+const API_URL = "https://api.usehako.site"; // rewritten to NEXT_PUBLIC_API_URL at build (lib/remark-site-urls.ts)
 const RUN_V2_PREFIX = "/v2/run"; // the paid mainnet routes the user's PayBox wallet pays (use_service)
 const PAID_METHOD = "POST";
 const SAMPLE_TOOL_ID = "openweather/current"; // the overview's worked example (any tool if it leaves the catalog)

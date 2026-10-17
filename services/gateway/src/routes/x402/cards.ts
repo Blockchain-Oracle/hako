@@ -38,7 +38,7 @@ export function txLink(chain: string, hash: string, role: Role): TxLink {
 
 const appUrl = (path: string, id: string) => `${HAKO_APP_URL}${path}/${encodeURIComponent(id)}`;
 
-/** `usehako.xyz/pay/<id>`: the page the invoice's QR opens. */
+/** `usehako.site/pay/<id>`: the page the invoice's QR opens. */
 export const invoicePayUrl = (id: string) => appUrl(HAKO_APP_PATHS.pay, id);
 
 /**

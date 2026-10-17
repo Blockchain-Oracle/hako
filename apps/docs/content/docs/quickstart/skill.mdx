@@ -3,21 +3,21 @@ title: For AI agents (Skill)
 description: Give your agent Hako's SKILL.md. It learns discover and inspect, the MCP and CLI connections, and how to pay a run with your PayBox wallet.
 ---
 
-The skill is one Markdown file: `https://usehako.xyz/SKILL.md`. It tells an agent when to reach for Hako, how to find and read a tool, how to connect through MCP or the npm CLI, and how a run is paid with the user's PayBox wallet.
+The skill is one Markdown file: `https://usehako.site/SKILL.md`. It tells an agent when to reach for Hako, how to find and read a tool, how to connect through MCP or the npm CLI, and how a run is paid with the user's PayBox wallet.
 
 ## Install it
 
 Tell your agent:
 
 ```text
-set up https://usehako.xyz/SKILL.md
+set up https://usehako.site/SKILL.md
 ```
 
 The agent downloads the file and saves it to its skills. To install it yourself in Claude Code:
 
 ```bash
 mkdir -p ~/.claude/skills/hako
-curl -fsSL https://usehako.xyz/SKILL.md -o ~/.claude/skills/hako/SKILL.md
+curl -fsSL https://usehako.site/SKILL.md -o ~/.claude/skills/hako/SKILL.md
 ```
 
 ## What the agent can do with it
@@ -25,15 +25,15 @@ curl -fsSL https://usehako.xyz/SKILL.md -o ~/.claude/skills/hako/SKILL.md
 Discover and inspect need nothing but HTTP, so the agent can use them at once:
 
 ```bash
-curl -s -X POST https://api.usehako.xyz/v1/discover -H 'content-type: application/json' \
+curl -s -X POST https://api.usehako.site/v1/discover -H 'content-type: application/json' \
   -d '{"query": "recent papers on RAG hallucination", "limit": 5}'
-curl -s -X POST https://api.usehako.xyz/v1/inspect -H 'content-type: application/json' \
+curl -s -X POST https://api.usehako.site/v1/inspect -H 'content-type: application/json' \
   -d '{"id": "firecrawl/research-papers"}'
 ```
 
 The same two verbs are available as MCP tools ([For AI agents (MCP)](/docs/quickstart/mcp)) and as CLI commands ([For humans (CLI)](/docs/quickstart/cli)).
 
-A run is paid in USDC on Base from the user's own PayBox wallet. With PayBox connected, the agent calls PayBox's `use_service` with the tool's paid URL, `https://api.usehako.xyz/v2/run/<provider>/<endpoint>`, method `POST` and the tool's input as the body. Hako holds no key and never pays on anyone's behalf. See [From code (HTTP)](/docs/quickstart/http#paid-runs).
+A run is paid in USDC on Base from the user's own PayBox wallet. With PayBox connected, the agent calls PayBox's `use_service` with the tool's paid URL, `https://api.usehako.site/v2/run/<provider>/<endpoint>`, method `POST` and the tool's input as the body. Hako holds no key and never pays on anyone's behalf. See [From code (HTTP)](/docs/quickstart/http#paid-runs).
 
 Then ask your agent for something that needs a live tool, for example: "What is 100 USD in NGN today, and is it raining in Lagos?"
 

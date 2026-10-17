@@ -28,12 +28,12 @@ The result has every `discover` field except `score` and `health`, plus:
 | `input` | The input JSON Schema. Unknown fields are rejected. |
 | `output` | The JSON Schema of `data` in a successful run |
 | `example` | A valid input; it is also the tool's live probe |
-| `paidUrl` | Where a run is paid: `https://api.usehako.xyz/v2/run/<provider>/<endpoint>` (from `HAKO_API_URL`) |
+| `paidUrl` | Where a run is paid: `https://api.usehako.site/v2/run/<provider>/<endpoint>` (from `HAKO_API_URL`) |
 | `howToPay` | One line saying how: USDC on Base (`eip155:8453`) from your PayBox wallet, through PayBox's `use_service` with that URL, method `POST` and the input as body |
 
 Read `input` before a run. Copy `example` as a starting point:
 
 ```bash
 npx -y usehako inspect openweather/current | jq -c '{paidUrl, example}'
-# {"paidUrl":"https://api.usehako.xyz/v2/run/openweather/current","example":{"city":"Lagos,NG","units":"metric"}}
+# {"paidUrl":"https://api.usehako.site/v2/run/openweather/current","example":{"city":"Lagos,NG","units":"metric"}}
 ```

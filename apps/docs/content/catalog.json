@@ -315,7 +315,7 @@
       "id": "hako",
       "displayName": "Hako",
       "summary": "Hako's own tools: cited answers from live sources, time zones and holidays, cross-checked FX and weather, a 72-hour news index and 89 company job boards.",
-      "homepage": "https://usehako.xyz",
+      "homepage": "https://usehako.site",
       "docsUrl": null,
       "categories": [
         "ai-answers",
@@ -328,7 +328,7 @@
       "terms": "ours",
       "licence": null,
       "attribution": null,
-      "logoDomain": "usehako.xyz",
+      "logoDomain": "usehako.site",
       "endpointCount": 9,
       "available": true
     },
