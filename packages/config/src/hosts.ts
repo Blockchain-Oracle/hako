@@ -11,9 +11,11 @@ export const HAKO_GATEWAY_HOST = `api.${HAKO_DOMAIN}`;
 export const HAKO_DOCS_HOST = `docs.${HAKO_DOMAIN}`;
 /**
  * The signing host's second origin (SP4): served by hako-web, whose `proxy.ts` rewrites this host to `app/sandbox/**`
- * so PayBox's window runs in a sandboxed origin that is not the app's own.
+ * so PayBox's window runs in a sandboxed origin that is not the app's own. Any host whose first label is the
+ * subdomain counts (sandbox.localhost in development, a staging host's sandbox name).
  */
-export const HAKO_SANDBOX_HOST = `sandbox.${HAKO_DOMAIN}`;
+export const HAKO_SANDBOX_SUBDOMAIN = "sandbox";
+export const HAKO_SANDBOX_HOST = `${HAKO_SANDBOX_SUBDOMAIN}.${HAKO_DOMAIN}`;
 
 export const HAKO_APP_URL = `https://${HAKO_DOMAIN}`;
 export const HAKO_GATEWAY_URL = `https://${HAKO_GATEWAY_HOST}`;
@@ -24,6 +26,11 @@ export const HAKO_MCP_URL = `${HAKO_GATEWAY_URL}/mcp`;
 /** Better Auth, mounted by the web at `app/api/auth/[...all]` (plan E33): issuer and the JWKS the gateway verifies with. */
 export const HAKO_AUTH_ISSUER = `${HAKO_APP_URL}/api/auth`;
 export const HAKO_AUTH_JWKS_URL = `${HAKO_AUTH_ISSUER}/jwks`;
+
+/** Local development: hako-api, the gateway and the web app on their dev ports (each service's .env.example). */
+export const GATEWAY_DEFAULT_PORT = 8080;
+export const LOCAL_HAKO_API_URL = "http://localhost:8000";
+export const LOCAL_GATEWAY_URL = `http://localhost:${GATEWAY_DEFAULT_PORT}`;
 
 /** Web routes other surfaces link to (MCP cards, the CLI, receipts, the plugin's text). */
 export const HAKO_APP_PATHS = {
