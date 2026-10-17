@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@hako/cards": "workspace:*",
+    "@hako/defi": "workspace:*",
     "@hako/env": "workspace:*",
     "pg": "catalog:",
     "server-only": "catalog:",

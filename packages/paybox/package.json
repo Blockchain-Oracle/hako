@@ -22,8 +22,7 @@
     "@hako/money": "workspace:*",
     "@hako/networks": "workspace:*",
     "ioredis": "catalog:",
-    "server-only": "catalog:",
-    "zod": "catalog:"
+    "server-only": "catalog:"
   },
   "devDependencies": {
     "@types/node": "catalog:",
