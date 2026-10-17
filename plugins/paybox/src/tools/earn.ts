@@ -12,7 +12,7 @@ import { canonicalCaip2, networkByCaip2, type ReviewedRoute } from "../shared.js
 import { resolveToken } from "../tokens.js";
 import { earnMoveRequestSchema, type EarnMoveRequest } from "../wire/money.js";
 import { earnPositionsRequestSchema, earnVaultsRequestSchema, runEnvelopeSchema } from "../wire/reads.js";
-import { MOVES_MONEY, READ_ONLY } from "./annotations.js";
+import { PROPOSES, READ_ONLY } from "./annotations.js";
 import { envelopeResult, isRecord, rows } from "./envelope.js";
 
 const moveInput = z
@@ -118,7 +118,7 @@ export function registerEarnTools(server: McpServer) {
       description: moveDescription("Deposits a token into a vault", "Pick the vault with hako_earn_vaults."),
       inputSchema: moveInput,
       outputSchema: evmMoveOutputSchema,
-      annotations: MOVES_MONEY,
+      annotations: PROPOSES,
     },
     guarded(async (input) => earnMove(input, "deposit")),
   );
@@ -130,7 +130,7 @@ export function registerEarnTools(server: McpServer) {
       description: moveDescription("Withdraws from a vault back to the underlying token", "See hako_earn_positions for the share balance."),
       inputSchema: moveInput,
       outputSchema: evmMoveOutputSchema,
-      annotations: MOVES_MONEY,
+      annotations: PROPOSES,
     },
     guarded(async (input) => earnMove(input, "withdraw")),
   );

@@ -11,7 +11,7 @@ import { amountText, executableChain, moveOutputSchema, proposeMove } from "../p
 import { canonicalCaip2, networkByCaip2, type ReviewedRoute } from "../shared.js";
 import { requireWalletFor, resolveToken } from "../tokens.js";
 import { bridgeRequestSchema, bridgeStatusQuerySchema, bridgeStatusResponseSchema, quoteRequestSchema, type RouteData, routeDataSchema } from "../wire/money.js";
-import { MOVES_MONEY, READ_ONLY } from "./annotations.js";
+import { PROPOSES, READ_ONLY } from "./annotations.js";
 
 const routeFields = {
   fromChain: quoteRequestSchema.shape.fromChain.describe("Source chain, CAIP-2: eip155:8453 (Base), solana:mainnet, eip155:1, eip155:42161…"),
@@ -98,7 +98,7 @@ export function registerMoneyTools(server: McpServer) {
         })
         .strict(),
       outputSchema: moveOutputSchema,
-      annotations: MOVES_MONEY,
+      annotations: PROPOSES,
     },
     guarded(async (input) => {
       const fromChain = executableChain(input.fromChain);
