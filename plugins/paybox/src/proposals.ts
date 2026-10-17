@@ -136,8 +136,8 @@ export function normalizedQuote(route: RouteData, tx: Transfer["tx"]): Normalize
   };
 }
 
-/** The new quote in words, for the person to review (R15's lower-minimum case). */
-function reviewError(reviewed: ReviewedRoute, route: RouteData, toolName: string, reason: string): HakoError {
+/** The new quote in words, for the person to review (R15's lower-minimum or unreviewed-tool case). */
+export function reviewError(reviewed: ReviewedRoute, route: RouteData, toolName: string, reason: string): HakoError {
   const { decimals, symbol } = route.toToken;
   return new HakoError(
     "quote_needs_review",

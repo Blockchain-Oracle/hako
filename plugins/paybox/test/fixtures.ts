@@ -6,7 +6,7 @@
 import { decodeBase58 } from "../../../packages/defi/src/core/index.ts";
 import { LIFI_DIAMOND, NETWORKS } from "../../../packages/networks/src/index.ts";
 import type { ReviewedRoute } from "../src/shared.js";
-import type { ProposalResponse, RouteData } from "../src/wire/money.js";
+import type { EarnMoveRequest, ProposalResponse, RouteData } from "../src/wire/money.js";
 
 export const BASE_USDC = NETWORKS.base.usdc.address;
 export const SOL_USDC = NETWORKS.solana.usdc.address;
@@ -16,6 +16,8 @@ export const SOL_WALLET = SOL_USDC;
 export const ONE_USDC = "1000000";
 export const MIN_RECEIVED = "990000";
 export const TOOL = "relaydepository";
+/** Aave v3's aBasUSDC on Base (6 decimals), standing in for a LI.FI Earn USDC vault. */
+export const BASE_USDC_VAULT = "0x4e65fE4DbA92790696d040ac24Aa414708F5c0AB";
 
 export const reviewedBaseToSolana = (): ReviewedRoute => ({
   fromChain: "eip155:8453",
@@ -59,6 +61,24 @@ export function route(overrides: Partial<RouteData> = {}): RouteData {
     ...overrides,
   };
 }
+
+/** A 1 USDC Earn deposit into BASE_USDC_VAULT on Base, as the plugin sends it; `tool` only once the person reviewed one. */
+export const earnDepositBody = (tool?: string): EarnMoveRequest => ({
+  chain: "eip155:8453",
+  vault: BASE_USDC_VAULT,
+  token: BASE_USDC,
+  amountAtomic: ONE_USDC,
+  fromAddress: EVM_WALLET,
+  minReceivedAtomic: MIN_RECEIVED,
+  ...(tool === undefined ? {} : { tool }),
+});
+
+/** The gateway's Earn deposit route: USDC → vault shares on Base, back to the sender. */
+export const earnDepositRoute: Partial<RouteData> = {
+  toChain: "eip155:8453",
+  toToken: { chain: "eip155:8453", address: BASE_USDC_VAULT, symbol: "aBasUSDC", decimals: 6 },
+  toAddress: EVM_WALLET,
+};
 
 /** LI.FI's bridge call on Base: to the Diamond, no native value, some calldata. */
 export const evmTransfer = (overrides: Partial<{ chainId: number; to: string; data: string; value: string }> = {}) => ({

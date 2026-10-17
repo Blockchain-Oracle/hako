@@ -1,8 +1,6 @@
 /** Hako PayBox plugin constants. Every limit names the reason it has that value; shared ones come from ./shared.ts. */
 import { HAKO_APP_URL, X402_NETWORK } from "./shared.js";
 
-export const PLUGIN_NAME = "hako";
-export const PLUGIN_TITLE = "Hako";
 export const PLUGIN_VERSION = "2.0.0";
 export const PROTOCOL_VERSION = "2026-07-28"; // starter 1.0.2's MCP protocol version
 

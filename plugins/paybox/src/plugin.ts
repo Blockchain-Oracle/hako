@@ -4,13 +4,12 @@ import { serveStdio } from "@modelcontextprotocol/server/stdio";
 import {
   PLUGIN_DESCRIPTION,
   PLUGIN_ICON,
-  PLUGIN_NAME,
-  PLUGIN_TITLE,
   PLUGIN_VERSION,
   PLUGIN_WEBSITE_URL,
   PROTOCOL_VERSION,
   SERVER_INSTRUCTIONS,
 } from "./constants.js";
+import { HAKO_MCP_SERVER_NAME, HAKO_NAME } from "./shared.js";
 import { registerCatalogTools } from "./tools/catalog.js";
 import { registerEarnTools } from "./tools/earn.js";
 import { registerInvoiceTools } from "./tools/invoice.js";
@@ -21,8 +20,9 @@ import { registerReadTools } from "./tools/reads.js";
 function createServer() {
   const server = new McpServer(
     {
-      name: PLUGIN_NAME,
-      title: PLUGIN_TITLE,
+      // The MCP server name is how the agent's passport recognises this plugin among a PayBox user's plugins (@hako/config).
+      name: HAKO_MCP_SERVER_NAME,
+      title: HAKO_NAME,
       version: PLUGIN_VERSION,
       description: PLUGIN_DESCRIPTION,
       websiteUrl: PLUGIN_WEBSITE_URL,
