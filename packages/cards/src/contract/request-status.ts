@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import type { CardPhase } from "./phase.ts";
+import type { CardPhase, MoveStage } from "./phase.ts";
 
 /**
  * A PayBox request's status, exactly as PayBox reports it: `RequestStatus` in @paybox-sh/sdk 2.2.0
@@ -43,6 +43,11 @@ export const REQUEST_WAITS_ON = {
   pending_confirmation: "confirmation",
 } as const satisfies Record<PendingRequestStatus, string>;
 export type RequestWait = (typeof REQUEST_WAITS_ON)[PendingRequestStatus];
+export const REQUEST_WAITS = ["approval", "funding", "signature", "settlement", "confirmation"] as const satisfies readonly RequestWait[];
+export const requestWaitSchema = z.enum(REQUEST_WAITS);
+
+export const requestWaitsOn = (status: PayboxRequestStatus): RequestWait | null =>
+  isTerminalRequestStatus(status) ? null : REQUEST_WAITS_ON[status];
 
 const PHASE_BY_STATUS = {
   pending_approval: "live",
@@ -57,3 +62,18 @@ const PHASE_BY_STATUS = {
 
 /** The card phase for a PayBox request's status. `success` on an on-chain request means confirmed, never just sent. */
 export const requestStatusToPhase = (status: PayboxRequestStatus): CardPhase => PHASE_BY_STATUS[status];
+
+/**
+ * The move stage a pending request shows. A terminal status has none here: `success` means "signed" for a wallet sign
+ * (Hako's broadcast job then sends it) and "done" for a transfer or a paid run, so the caller decides from the draft.
+ */
+const STAGE_BY_PENDING = {
+  pending_approval: "approval",
+  pending_funding: "funding",
+  pending_signature: "signing",
+  pending_settlement: "arriving",
+  pending_confirmation: "sent",
+} as const satisfies Record<PendingRequestStatus, MoveStage>;
+
+export const pendingRequestStage = (status: PayboxRequestStatus): MoveStage | null =>
+  isTerminalRequestStatus(status) ? null : STAGE_BY_PENDING[status];
