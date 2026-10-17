@@ -43,7 +43,7 @@ export interface AgentUser {
   id: string;
 }
 
-/** A draft as the caller may see it: the latest version and who owns it. */
+/** A draft version as the caller may see it, and who owns the draft. */
 export interface OwnedDraft {
   view: DraftView;
   /** The Hako user who made it, or null for a draft made by an anonymous session. */
@@ -54,6 +54,8 @@ export interface OwnedDraft {
 export interface DraftReader {
   /** The latest version; null for an unknown id or a draft outside the caller's scope (as if it did not exist). */
   getDraft(id: string): Promise<OwnedDraft | null>;
+  /** One stored version (the one a revision just wrote), scoped the same way; null for an unknown id or version. */
+  getVersion(id: string, version: number): Promise<OwnedDraft | null>;
 }
 
 /** A wallet the user granted to Hako's PayBox client (PayBox `list_credentials`, wallets only). */

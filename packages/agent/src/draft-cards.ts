@@ -13,7 +13,7 @@ import { BASE, type Caip2, isExecutableCaip2, networkByCaip2 } from "@hako/netwo
 import type { DraftKind, DraftView } from "@hako/paybox";
 
 import { card } from "./define.ts";
-import type { AgentDeps } from "./deps.ts";
+import type { AgentDeps, OwnedDraft } from "./deps.ts";
 import { AgentToolError, authRequired } from "./errors.ts";
 import { familyOf, resolveToken } from "./resolve.ts";
 import { draftChains } from "./status-cards.ts";
@@ -124,11 +124,10 @@ export function executableBlock(view: DraftView): Blocked | undefined {
 }
 
 /**
- * The latest version of one of the caller's drafts, or a not-found error. A draft a signed-in user owns is refused to
- * an anonymous caller (sign in first) and hidden from every other user.
+ * A draft version the caller may see, or a not-found error. A draft a signed-in user owns is refused to an anonymous
+ * caller (sign in first) and hidden from every other user.
  */
-export async function loadDraft(deps: AgentDeps, draftId: string, tool: string): Promise<DraftView> {
-  const owned = await deps.drafts.getDraft(draftId);
+function ownedView(deps: AgentDeps, owned: OwnedDraft | null, draftId: string, tool: string): DraftView {
   const notFound = new AgentToolError("not_found", `No draft ${draftId}: it may have expired. Ask for a fresh quote.`);
   if (!owned) throw notFound;
   if (owned.ownerUserId !== null) {
@@ -138,6 +137,23 @@ export async function loadDraft(deps: AgentDeps, draftId: string, tool: string):
   return owned.view;
 }
 
+/** The latest version of one of the caller's drafts. */
+export async function loadDraft(deps: AgentDeps, draftId: string, tool: string): Promise<DraftView> {
+  return ownedView(deps, await deps.drafts.getDraft(draftId), draftId, tool);
+}
+
+/** One stored version of one of the caller's drafts (the version a revision wrote), whatever landed after it. */
+export async function loadDraftAt(deps: AgentDeps, ref: DraftRef, tool: string): Promise<DraftView> {
+  return ownedView(deps, await deps.drafts.getVersion(ref.draftId, ref.version), ref.draftId, tool);
+}
+
+/** `stale_version` for a card behind the store, carrying the latest card to draw instead. */
+export async function staleVersion(deps: AgentDeps, latest: DraftView): Promise<AgentToolError> {
+  const card = isMoveDraft(latest.kind) ? await draftCard(latest, deps) : null;
+  const message = `This card is out of date: the draft is at version ${latest.version} now. Make the change on the latest card.`;
+  return new AgentToolError("stale_version", message, { card });
+}
+
 /**
  * The draft at the version its card shows. A card behind the store (another edit landed first, or the card was
  * re-mounted from an old message) is refused with `stale_version`, carrying the latest card to draw instead.
@@ -145,8 +161,5 @@ export async function loadDraft(deps: AgentDeps, draftId: string, tool: string):
 export async function loadDraftVersion(deps: AgentDeps, ref: DraftRef, tool: string): Promise<DraftView> {
   const view = await loadDraft(deps, ref.draftId, tool);
   if (view.version === ref.version) return view;
-  const latest = isMoveDraft(view.kind) ? await draftCard(view, deps) : null;
-  throw new AgentToolError("stale_version", `This card is out of date: the draft is at version ${view.version} now. Make the change on the latest card.`, {
-    card: latest,
-  });
+  throw await staleVersion(deps, view);
 }
