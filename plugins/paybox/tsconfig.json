@@ -6,7 +6,15 @@
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "noEmit": true,
+    "allowImportingTsExtensions": true,
     "types": ["node"]
   },
-  "include": ["src/**/*.ts"]
+  "include": [
+    "src/**/*.ts",
+    "test/**/*.ts",
+    "../../packages/config/src/**/*.ts",
+    "../../packages/networks/src/**/*.ts",
+    "../../packages/money/src/**/*.ts",
+    "../../packages/defi/src/core/**/*.ts"
+  ]
 }
