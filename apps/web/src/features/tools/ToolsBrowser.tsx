@@ -6,7 +6,7 @@ import { useMemo, useState } from "react";
 
 import { ProviderLogo } from "@/components/common/ProviderLogo";
 import type { Catalog } from "@/lib/catalog/types";
-import { cn } from "@/lib/utils";
+import { cn } from "@hako/ui/lib/utils";
 
 const ALL = "all";
 
@@ -31,7 +31,7 @@ export function ToolsBrowser({ catalog }: { catalog: Catalog }) {
 
   return (
     <div className="mt-10">
-      <label className="flex h-12 items-center gap-3 rounded-md border border-line bg-background px-4 shadow-card focus-within:border-brand">
+      <label className="flex h-12 items-center gap-3 rounded-md border border-border bg-background px-4 focus-within:border-ring">
         <Search className="size-4 text-muted-foreground" aria-hidden />
         <input
           value={query}
@@ -50,7 +50,7 @@ export function ToolsBrowser({ catalog }: { catalog: Catalog }) {
               onClick={() => setCategory(c.id)}
               className={cn(
                 "flex shrink-0 items-center gap-2.5 rounded-md px-3 py-2 text-left text-[0.9375rem] transition-colors",
-                category === c.id ? "bg-muted font-medium text-foreground" : "text-ink-2 hover:bg-subtle",
+                category === c.id ? "bg-muted font-medium text-foreground" : "text-muted-foreground hover:bg-card",
               )}
             >
               {c.id === ALL && <LayoutGrid className="size-4" aria-hidden />}
@@ -64,7 +64,7 @@ export function ToolsBrowser({ catalog }: { catalog: Catalog }) {
             <li key={p.id}>
               <Link
                 href={`/tools/${p.id}`}
-                className="flex h-full flex-col rounded-md border border-line bg-background p-5 shadow-card transition-shadow hover:shadow-card-hover"
+                className="flex h-full flex-col rounded-md border border-border bg-background p-5 transition-shadow"
               >
                 <span className="flex items-center gap-3">
                   <ProviderLogo id={p.id} name={p.displayName} />
@@ -78,7 +78,7 @@ export function ToolsBrowser({ catalog }: { catalog: Catalog }) {
             </li>
           ))}
           {providers.length === 0 && (
-            <li className="col-span-full rounded-md border border-dashed border-line-default p-10 text-center text-muted-foreground">
+            <li className="col-span-full rounded-md border border-dashed border-border p-10 text-center text-muted-foreground">
               No tool matches. Your agent can still ask: <code className="font-mono">POST /v1/discover</code>
             </li>
           )}

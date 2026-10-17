@@ -36,7 +36,7 @@ export function Composer({
     }
   };
   return (
-    <div className="rounded-lg border border-line bg-background shadow-card focus-within:border-brand">
+    <div className="rounded-lg border border-border bg-background focus-within:border-ring">
       <textarea
         ref={ref}
         value={value}
@@ -49,7 +49,7 @@ export function Composer({
       />
       <div className="flex items-center justify-end gap-3 px-3 pb-3">
         {busy ? (
-          <button type="button" onClick={onStop} className="flex size-8 items-center justify-center rounded-md bg-dark text-white" aria-label="Stop">
+          <button type="button" onClick={onStop} className="flex size-8 items-center justify-center rounded-md bg-primary text-primary-foreground" aria-label="Stop">
             <Square className="size-3.5" aria-hidden />
           </button>
         ) : (
@@ -57,7 +57,7 @@ export function Composer({
             type="button"
             onClick={onSend}
             disabled={!canSend}
-            className="flex size-8 items-center justify-center rounded-md bg-brand text-primary-foreground hover:bg-brand-hover disabled:bg-line-default"
+            className="flex size-8 items-center justify-center rounded-md bg-primary text-primary-foreground hover:bg-primary-pressed disabled:bg-border"
             aria-label="Send"
           >
             <ArrowUp className="size-4" aria-hidden />

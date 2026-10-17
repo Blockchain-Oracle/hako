@@ -32,7 +32,7 @@ function Place({ place }: { place: Rec }) {
         </h4>
         {rating !== null && (
           <span className="inline-flex items-center gap-1 font-mono text-[0.8125rem] text-foreground">
-            <Star className="size-3.5 fill-current text-brand" aria-hidden />
+            <Star className="size-3.5 fill-current text-link" aria-hidden />
             {formatNumber(rating, RATING_DECIMALS)}
             {count !== null && <span className="text-muted-foreground">({formatCount(count)})</span>}
           </span>
@@ -45,7 +45,7 @@ function Place({ place }: { place: Rec }) {
       </Meta>
       <p className="mt-1.5 flex flex-wrap gap-x-3 gap-y-1 text-xs">
         {phone && dial && (
-          <a href={`tel:${dial}`} className="inline-flex items-center gap-1 text-ink-2 hover:text-brand">
+          <a href={`tel:${dial}`} className="inline-flex items-center gap-1 text-muted-foreground hover:text-link">
             <Phone className="size-3" aria-hidden /> {phone}
           </a>
         )}
@@ -89,7 +89,7 @@ export function PlaceCard({ data }: { data: Rec }) {
         <Empty>No places matched.</Empty>
       ) : (
         <>
-          <ol className="divide-y divide-line">
+          <ol className="divide-y divide-border">
             {shown.map((place, index) => (
               <Place key={rowKey(place, index, "name")} place={place} />
             ))}

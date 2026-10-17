@@ -65,7 +65,7 @@ export function AgentApp({ endpoints, initialChatId, initialInput }: {
   return (
     <EndpointsProvider endpoints={endpoints}>
       <div className="flex h-dvh flex-col">
-        <header className="flex h-14 shrink-0 items-center justify-between border-b border-line px-4">
+        <header className="flex h-14 shrink-0 items-center justify-between border-b border-border px-4">
           <div className="flex items-center gap-6">
             <Logo />
             <nav className="hidden items-center gap-5 text-sm text-muted-foreground sm:flex">

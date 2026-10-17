@@ -1,0 +1,99 @@
+{
+  "$id": "https://usehako.xyz/schemas/cards/positions.schema.json",
+  "title": "positions",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "address": {
+      "type": "string"
+    },
+    "positions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "chain": {
+            "type": "string",
+            "pattern": "^[-a-z0-9]{3,8}:[-_a-zA-Z0-9]{1,64}$",
+            "description": "CAIP-2 chain id, e.g. eip155:8453 (Base) or solana:mainnet"
+          },
+          "vault": {
+            "type": "object",
+            "properties": {
+              "address": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "protocol": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "address",
+              "name"
+            ],
+            "additionalProperties": {}
+          },
+          "token": {
+            "type": "object",
+            "properties": {
+              "symbol": {
+                "type": "string"
+              },
+              "address": {
+                "type": "string"
+              },
+              "decimals": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "name": {
+                "type": "string"
+              },
+              "logo_url": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "symbol",
+              "address",
+              "decimals"
+            ],
+            "additionalProperties": {}
+          },
+          "amount_atomic": {
+            "type": "string",
+            "pattern": "^\\d+$",
+            "description": "Atomic units, e.g. 1000000 = 1 USDC"
+          },
+          "shares_atomic": {
+            "type": "string",
+            "pattern": "^\\d+$",
+            "description": "Atomic units, e.g. 1000000 = 1 USDC"
+          },
+          "usd": {
+            "type": "number"
+          },
+          "apy": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "chain",
+          "vault",
+          "token",
+          "amount_atomic"
+        ],
+        "additionalProperties": {}
+      }
+    }
+  },
+  "required": [
+    "address",
+    "positions"
+  ],
+  "additionalProperties": {}
+}

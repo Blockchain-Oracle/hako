@@ -1,15 +1,11 @@
-/** Runtime configuration from the environment. Fails fast on anything the paid route cannot work without. */
+/** Runtime configuration from @hako/env. Fails fast on anything the paid route cannot work without. */
+
+import { GATEWAY_DEFAULT_PORT } from "@hako/config";
+import { loadGatewayEnv } from "@hako/env/node";
 
 import { ANY_ORIGIN, CDP_FACILITATOR_URL, MAINNET_NETWORK } from "./constants.js";
 
-const DEFAULT_PORT = 8080;
 const ADDRESS = /^0x[0-9a-fA-F]{40}$/;
-
-function required(name: string): string {
-  const value = process.env[name]?.trim();
-  if (!value) throw new Error(`${name} is required`);
-  return value;
-}
 
 export interface GatewayConfig {
   port: number;
@@ -29,26 +25,29 @@ export interface MainnetConfig {
   cdpKeySecret: string;
 }
 
+type Env = ReturnType<typeof loadGatewayEnv>;
+
 /**
  * X402_MAINNET_NETWORK is Base mainnet unless overridden. eip155:84532 (Base Sepolia) is a local-dev override only:
  * the production image (NODE_ENV=production) refuses any other network.
  */
-function readNetwork(): `${string}:${string}` {
-  const network = process.env.X402_MAINNET_NETWORK?.trim() || MAINNET_NETWORK;
-  if (process.env.NODE_ENV === "production" && network !== MAINNET_NETWORK) {
+function readNetwork(env: Env): `${string}:${string}` {
+  const network = env.X402_MAINNET_NETWORK || MAINNET_NETWORK;
+  if (env.NODE_ENV === "production" && network !== MAINNET_NETWORK) {
     throw new Error(`X402_MAINNET_NETWORK must be ${MAINNET_NETWORK} in production (got ${network})`);
   }
   return network as `${string}:${string}`;
 }
 
-function readMainnet(): MainnetConfig | undefined {
-  const cdpKeyId = process.env.CDP_API_KEY_ID?.trim();
-  const cdpKeySecret = process.env.CDP_API_KEY_SECRET?.trim().replace(/\\n/g, "\n");
+function readMainnet(env: Env): MainnetConfig | undefined {
+  const cdpKeyId = env.CDP_API_KEY_ID;
+  const cdpKeySecret = env.CDP_API_KEY_SECRET;
   if (!cdpKeyId || !cdpKeySecret) return undefined;
-  const payTo = required("HAKO_PAY_TO");
+  const payTo = env.HAKO_PAY_TO;
+  if (!payTo) throw new Error("HAKO_PAY_TO is required");
   if (!ADDRESS.test(payTo)) throw new Error("HAKO_PAY_TO must be a 0x address");
   return {
-    network: readNetwork(),
+    network: readNetwork(env),
     payTo: payTo as `0x${string}`,
     facilitatorUrl: CDP_FACILITATOR_URL,
     cdpKeyId,
@@ -63,11 +62,20 @@ function corsOrigins(value: string): string | string[] {
 }
 
 export function readConfig(): GatewayConfig {
+  const env = loadGatewayEnv();
   return {
-    port: Number(process.env.PORT?.trim() || DEFAULT_PORT),
-    apiUrl: required("HAKO_API_URL").replace(/\/$/, ""),
-    publicBaseUrl: (process.env.HAKO_PUBLIC_URL?.trim() || `http://localhost:${DEFAULT_PORT}`).replace(/\/$/, ""),
-    corsOrigins: corsOrigins(process.env.HAKO_CORS_ORIGINS ?? ANY_ORIGIN),
-    mainnet: readMainnet(),
+    port: env.PORT,
+    apiUrl: env.HAKO_API_URL.replace(/\/$/, ""),
+    publicBaseUrl: (env.HAKO_PUBLIC_URL || `http://localhost:${GATEWAY_DEFAULT_PORT}`).replace(/\/$/, ""),
+    corsOrigins: corsOrigins(env.HAKO_CORS_ORIGINS ?? ANY_ORIGIN),
+    mainnet: readMainnet(env),
   };
+}
+
+let current: GatewayConfig | undefined;
+
+/** The process's configuration, read once on first use; routes and the MCP server share it. */
+export function gatewayConfig(): GatewayConfig {
+  current ??= readConfig();
+  return current;
 }

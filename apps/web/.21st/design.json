@@ -1,0 +1,860 @@
+{
+  "version": 2,
+  "project": {
+    "name": "web (usehako.xyz)",
+    "productType": "Hako: a box of paid tools and LI.FI money moves for AI agents, paid and signed with the user's PayBox wallet, shown as cards in the web app and inside AI hosts"
+  },
+  "direction": {
+    "name": "Senryo · Hako",
+    "summary": "Kawase's Senryo exactly (tamion/DESIGN.md): light-first neutrals (#F5F5F5 ground, white cards, #ECECEC insets), black primary actions, one accent with black labels only for selected controls, the focus ring and badges, up/down only for direction, Inter for the interface and Roboto Condensed Black for money and titles, tabular figures. Hako's accent is asagi (浅葱) #009CA8 instead of Kawase's magenta."
+  },
+  "authority": {
+    "designSystem": "tamion/DESIGN.md (Senryo) with packages/brand/tokens.json for Hako's values"
+  },
+  "sources": {
+    "tokens": [
+      "packages/brand/tokens.json",
+      "packages/brand/mark.json",
+      "packages/brand/scripts/build.mjs",
+      "packages/brand/scripts/check-contrast.mjs"
+    ],
+    "components": [
+      "packages/ui/src/components/ui",
+      "packages/identity/src"
+    ],
+    "kawase": "tamion:packages/ui-web/src/components, tamion:packages/identity, tamion:packages/ui-tokens"
+  },
+  "design": {
+    "colorMode": "light-default-with-dark",
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "accent": {
+      "name": "asagi",
+      "kanji": "浅葱",
+      "value": "#009CA8",
+      "contrast": {
+        "blackLabel": 6.32,
+        "onWhiteCard": 3.32,
+        "onDarkCard": 5.13,
+        "linkOnWhite": 6.26,
+        "linkOnDarkCard": 9.89
+      }
+    },
+    "colors": {
+      "--background": {
+        "light": "#F5F5F5",
+        "dark": "#111111",
+        "source": "packages/brand/tokens.json"
+      },
+      "--foreground": {
+        "light": "#000000",
+        "dark": "#F5F5F5",
+        "source": "packages/brand/tokens.json"
+      },
+      "--card": {
+        "light": "#FFFFFF",
+        "dark": "#1C1C1C",
+        "source": "packages/brand/tokens.json"
+      },
+      "--card-foreground": {
+        "light": "#000000",
+        "dark": "#F5F5F5",
+        "source": "packages/brand/tokens.json"
+      },
+      "--popover": {
+        "light": "#F5F5F5",
+        "dark": "#171717",
+        "source": "packages/brand/tokens.json"
+      },
+      "--popover-foreground": {
+        "light": "#000000",
+        "dark": "#F5F5F5",
+        "source": "packages/brand/tokens.json"
+      },
+      "--primary": {
+        "light": "#000000",
+        "dark": "#F5F5F5",
+        "source": "packages/brand/tokens.json"
+      },
+      "--primary-foreground": {
+        "light": "#FFFFFF",
+        "dark": "#000000",
+        "source": "packages/brand/tokens.json"
+      },
+      "--secondary": {
+        "light": "#ECECEC",
+        "dark": "#292929",
+        "source": "packages/brand/tokens.json"
+      },
+      "--secondary-foreground": {
+        "light": "#000000",
+        "dark": "#F5F5F5",
+        "source": "packages/brand/tokens.json"
+      },
+      "--muted": {
+        "light": "#ECECEC",
+        "dark": "#292929",
+        "source": "packages/brand/tokens.json"
+      },
+      "--muted-foreground": {
+        "light": "#666666",
+        "dark": "#B8B8B8",
+        "source": "packages/brand/tokens.json"
+      },
+      "--accent": {
+        "light": "#009CA8",
+        "dark": "#009CA8",
+        "source": "packages/brand/tokens.json"
+      },
+      "--accent-foreground": {
+        "light": "#000000",
+        "dark": "#000000",
+        "source": "packages/brand/tokens.json"
+      },
+      "--destructive": {
+        "light": "#C83225",
+        "dark": "#FF5A48",
+        "source": "packages/brand/tokens.json"
+      },
+      "--destructive-foreground": {
+        "light": "#FFFFFF",
+        "dark": "#000000",
+        "source": "packages/brand/tokens.json"
+      },
+      "--success": {
+        "light": "#2F7A00",
+        "dark": "#B5F543",
+        "source": "packages/brand/tokens.json"
+      },
+      "--border": {
+        "light": "#D4D4D4",
+        "dark": "#414141",
+        "source": "packages/brand/tokens.json"
+      },
+      "--input": {
+        "light": "#ECECEC",
+        "dark": "#292929",
+        "source": "packages/brand/tokens.json"
+      },
+      "--ring": {
+        "light": "#009CA8",
+        "dark": "#009CA8",
+        "source": "packages/brand/tokens.json"
+      },
+      "--glass": {
+        "light": "#ECECECEB",
+        "dark": "#292929EB",
+        "source": "packages/brand/tokens.json"
+      },
+      "--glass-border": {
+        "light": "#FFFFFFB3",
+        "dark": "#FFFFFF24",
+        "source": "packages/brand/tokens.json"
+      },
+      "--scrim": {
+        "light": "#000000B3",
+        "dark": "#000000B3",
+        "source": "packages/brand/tokens.json"
+      },
+      "--texture": {
+        "light": "#0000000F",
+        "dark": "#FFFFFF14",
+        "source": "packages/brand/tokens.json"
+      },
+      "--silver": {
+        "light": "#999999",
+        "dark": "#A0A0A0",
+        "source": "packages/brand/tokens.json"
+      },
+      "--silver-deep": {
+        "light": "#666666",
+        "dark": "#B8B8B8",
+        "source": "packages/brand/tokens.json"
+      },
+      "--text-3": {
+        "light": "#6E6E6E",
+        "dark": "#A0A0A0",
+        "source": "packages/brand/tokens.json"
+      },
+      "--link": {
+        "light": "#006B74",
+        "dark": "#5FD6E0",
+        "source": "packages/brand/tokens.json"
+      },
+      "--up": {
+        "light": "#2F7A00",
+        "dark": "#B5F543",
+        "source": "packages/brand/tokens.json"
+      },
+      "--down": {
+        "light": "#C8283F",
+        "dark": "#FF647C",
+        "source": "packages/brand/tokens.json"
+      },
+      "--warn": {
+        "light": "#8A5800",
+        "dark": "#F2B85C",
+        "source": "packages/brand/tokens.json"
+      },
+      "--raised-2": {
+        "light": "#ECECEC",
+        "dark": "#292929",
+        "source": "packages/brand/tokens.json"
+      },
+      "--row-pressed": {
+        "light": "#E2E2E2",
+        "dark": "#363636",
+        "source": "packages/brand/tokens.json"
+      },
+      "--selected-row": {
+        "light": "#DDF3F5",
+        "dark": "#163A3D",
+        "source": "packages/brand/tokens.json"
+      },
+      "--skeleton": {
+        "light": "#DEDEDE",
+        "dark": "#363636",
+        "source": "packages/brand/tokens.json"
+      },
+      "--primary-pressed": {
+        "light": "#252525",
+        "dark": "#DEDEDE",
+        "source": "packages/brand/tokens.json"
+      },
+      "--up-fill": {
+        "light": "#B5F543",
+        "dark": "#B5F543",
+        "source": "packages/brand/tokens.json"
+      },
+      "--down-fill": {
+        "light": "#FF647C",
+        "dark": "#FF647C",
+        "source": "packages/brand/tokens.json"
+      },
+      "--up-fill-edge": {
+        "light": "#7FB224",
+        "dark": "#7FB224",
+        "source": "packages/brand/tokens.json"
+      },
+      "--down-fill-edge": {
+        "light": "#D9435C",
+        "dark": "#D9435C",
+        "source": "packages/brand/tokens.json"
+      },
+      "--on-fill": {
+        "light": "#000000",
+        "dark": "#000000",
+        "source": "packages/brand/tokens.json"
+      },
+      "--up-foreground": {
+        "light": "#FFFFFF",
+        "dark": "#000000",
+        "source": "packages/brand/tokens.json"
+      },
+      "--down-foreground": {
+        "light": "#FFFFFF",
+        "dark": "#000000",
+        "source": "packages/brand/tokens.json"
+      },
+      "--up-surface": {
+        "light": "#EEF9DC",
+        "dark": "#1E2A0C",
+        "source": "packages/brand/tokens.json"
+      },
+      "--down-surface": {
+        "light": "#FDE7EA",
+        "dark": "#3A1A20",
+        "source": "packages/brand/tokens.json"
+      },
+      "--warn-surface": {
+        "light": "#FFF0D5",
+        "dark": "#332719",
+        "source": "packages/brand/tokens.json"
+      },
+      "--destructive-surface": {
+        "light": "#FBE8E5",
+        "dark": "#35201F",
+        "source": "packages/brand/tokens.json"
+      },
+      "--glass-opaque": {
+        "light": "#ECECEC",
+        "dark": "#292929",
+        "source": "packages/brand/tokens.json"
+      },
+      "--sheet-handle": {
+        "light": "#999999",
+        "dark": "#999999",
+        "source": "packages/brand/tokens.json"
+      }
+    },
+    "fonts": {
+      "ui": "Inter (next/font, --font-inter)",
+      "money": "Roboto Condensed Black 900 (next/font, --font-roboto-condensed)",
+      "mono": "system monospace stack"
+    },
+    "radius": {
+      "none": 0,
+      "xs": 8,
+      "sm": 12,
+      "md": 16,
+      "lg": 24,
+      "xl": 32,
+      "pill": 999
+    },
+    "space": {
+      "none": 0,
+      "xxs": 2,
+      "xs": 4,
+      "sm": 8,
+      "md": 12,
+      "lg": 16,
+      "lgPlus": 20,
+      "inset": 20,
+      "xl": 24,
+      "xxl": 32,
+      "xxxl": 48
+    },
+    "motion": {
+      "pressMs": 100,
+      "pressReleaseMs": 160,
+      "selectionMs": 170,
+      "sheetEnterMs": 480,
+      "sheetExitMs": 240,
+      "staggerMs": 40,
+      "reducedMotionMs": 100,
+      "easing": [
+        0.2,
+        0.8,
+        0.2,
+        1
+      ],
+      "sheetEasing": [
+        0.32,
+        0.72,
+        0,
+        1
+      ]
+    }
+  },
+  "components": {
+    "installed": [
+      {
+        "name": "Message Scroller",
+        "web": "packages/ui/src/components/ui/message-scroller.tsx",
+        "source": [
+          {
+            "shadcn": "message-scroller",
+            "style": "radix-nova",
+            "url": "https://ui.shadcn.com/docs/components/radix/message-scroller"
+          }
+        ],
+        "install": "shadcn CLI 4.21.4 (`pnpm dlx shadcn@4.21.4 add`, packages/ui/components.json)"
+      },
+      {
+        "name": "Message",
+        "web": "packages/ui/src/components/ui/message.tsx",
+        "source": [
+          {
+            "shadcn": "message",
+            "style": "radix-nova",
+            "url": "https://ui.shadcn.com/docs/components/radix/message"
+          }
+        ],
+        "install": "shadcn CLI 4.21.4 (`pnpm dlx shadcn@4.21.4 add`, packages/ui/components.json)"
+      },
+      {
+        "name": "Bubble",
+        "web": "packages/ui/src/components/ui/bubble.tsx",
+        "source": [
+          {
+            "shadcn": "bubble",
+            "style": "radix-nova",
+            "url": "https://ui.shadcn.com/docs/components/radix/bubble"
+          }
+        ],
+        "install": "shadcn CLI 4.21.4 (`pnpm dlx shadcn@4.21.4 add`, packages/ui/components.json)"
+      },
+      {
+        "name": "Trace",
+        "web": "packages/ui/src/components/ui/trace.tsx",
+        "source": [
+          {
+            "shadcn": "trace",
+            "style": "radix-nova",
+            "url": "https://ui.shadcn.com/docs/components/radix/trace"
+          }
+        ],
+        "install": "shadcn CLI 4.21.4 (`pnpm dlx shadcn@4.21.4 add`, packages/ui/components.json)"
+      },
+      {
+        "name": "Code Block",
+        "web": "packages/ui/src/components/ui/code-block.tsx",
+        "source": [
+          {
+            "shadcn": "code-block",
+            "style": "radix-nova",
+            "url": "https://ui.shadcn.com/docs/components/radix/code-block"
+          }
+        ],
+        "install": "shadcn CLI 4.21.4 (`pnpm dlx shadcn@4.21.4 add`, packages/ui/components.json)"
+      },
+      {
+        "name": "Marker",
+        "web": "packages/ui/src/components/ui/marker.tsx",
+        "source": [
+          {
+            "shadcn": "marker",
+            "style": "radix-nova",
+            "url": "https://ui.shadcn.com/docs/components/radix/marker"
+          }
+        ],
+        "install": "shadcn CLI 4.21.4 (`pnpm dlx shadcn@4.21.4 add`, packages/ui/components.json)"
+      },
+      {
+        "name": "Item",
+        "web": "packages/ui/src/components/ui/item.tsx",
+        "source": [
+          {
+            "shadcn": "item",
+            "style": "radix-nova",
+            "url": "https://ui.shadcn.com/docs/components/radix/item"
+          }
+        ],
+        "install": "shadcn CLI 4.21.4 (`pnpm dlx shadcn@4.21.4 add`, packages/ui/components.json)"
+      },
+      {
+        "name": "Questionnaire",
+        "web": "packages/ui/src/components/ui/questionnaire.tsx",
+        "source": [
+          {
+            "shadcn": "questionnaire",
+            "style": "radix-nova",
+            "url": "https://ui.shadcn.com/docs/components/radix/questionnaire"
+          }
+        ],
+        "install": "shadcn CLI 4.21.4 (`pnpm dlx shadcn@4.21.4 add`, packages/ui/components.json)"
+      },
+      {
+        "name": "Attachment",
+        "web": "packages/ui/src/components/ui/attachment.tsx",
+        "source": [
+          {
+            "shadcn": "attachment",
+            "style": "radix-nova",
+            "url": "https://ui.shadcn.com/docs/components/radix/attachment"
+          }
+        ],
+        "install": "shadcn CLI 4.21.4 (`pnpm dlx shadcn@4.21.4 add`, packages/ui/components.json)"
+      },
+      {
+        "name": "Button",
+        "web": "packages/ui/src/components/ui/button.tsx",
+        "source": [
+          {
+            "shadcn": "button",
+            "style": "radix-nova",
+            "url": "https://ui.shadcn.com/docs/components/radix/button"
+          }
+        ],
+        "install": "shadcn CLI 4.21.4 (`pnpm dlx shadcn@4.21.4 add`, packages/ui/components.json)"
+      },
+      {
+        "name": "Input",
+        "web": "packages/ui/src/components/ui/input.tsx",
+        "source": [
+          {
+            "shadcn": "input",
+            "style": "radix-nova",
+            "url": "https://ui.shadcn.com/docs/components/radix/input"
+          }
+        ],
+        "install": "shadcn CLI 4.21.4 (`pnpm dlx shadcn@4.21.4 add`, packages/ui/components.json)"
+      },
+      {
+        "name": "Dialog",
+        "web": "packages/ui/src/components/ui/dialog.tsx",
+        "source": [
+          {
+            "shadcn": "dialog",
+            "style": "radix-nova",
+            "url": "https://ui.shadcn.com/docs/components/radix/dialog"
+          }
+        ],
+        "install": "shadcn CLI 4.21.4 (`pnpm dlx shadcn@4.21.4 add`, packages/ui/components.json)"
+      },
+      {
+        "name": "Sheet",
+        "web": "packages/ui/src/components/ui/sheet.tsx",
+        "source": [
+          {
+            "shadcn": "sheet",
+            "style": "radix-nova",
+            "url": "https://ui.shadcn.com/docs/components/radix/sheet"
+          }
+        ],
+        "install": "shadcn CLI 4.21.4 (`pnpm dlx shadcn@4.21.4 add`, packages/ui/components.json)"
+      },
+      {
+        "name": "Tooltip",
+        "web": "packages/ui/src/components/ui/tooltip.tsx",
+        "source": [
+          {
+            "shadcn": "tooltip",
+            "style": "radix-nova",
+            "url": "https://ui.shadcn.com/docs/components/radix/tooltip"
+          }
+        ],
+        "install": "shadcn CLI 4.21.4 (`pnpm dlx shadcn@4.21.4 add`, packages/ui/components.json)"
+      },
+      {
+        "name": "Accordion",
+        "web": "packages/ui/src/components/ui/accordion.tsx",
+        "source": [
+          {
+            "shadcn": "accordion",
+            "style": "radix-nova",
+            "url": "https://ui.shadcn.com/docs/components/radix/accordion"
+          }
+        ],
+        "install": "shadcn CLI 4.21.4 (`pnpm dlx shadcn@4.21.4 add`, packages/ui/components.json)"
+      },
+      {
+        "name": "Textarea",
+        "web": "packages/ui/src/components/ui/textarea.tsx",
+        "source": [
+          {
+            "shadcn": "textarea",
+            "style": "radix-nova",
+            "url": "https://ui.shadcn.com/docs/components/radix/textarea"
+          }
+        ],
+        "install": "shadcn CLI 4.21.4 (`pnpm dlx shadcn@4.21.4 add`, packages/ui/components.json)"
+      },
+      {
+        "name": "Collapsible",
+        "web": "packages/ui/src/components/ui/collapsible.tsx",
+        "source": [
+          {
+            "shadcn": "collapsible",
+            "style": "radix-nova",
+            "url": "https://ui.shadcn.com/docs/components/radix/collapsible"
+          }
+        ],
+        "install": "shadcn CLI 4.21.4 (`pnpm dlx shadcn@4.21.4 add`, packages/ui/components.json)"
+      },
+      {
+        "name": "Separator",
+        "web": "packages/ui/src/components/ui/separator.tsx",
+        "source": [
+          {
+            "shadcn": "separator",
+            "style": "radix-nova",
+            "url": "https://ui.shadcn.com/docs/components/radix/separator"
+          }
+        ],
+        "install": "shadcn CLI 4.21.4 (`pnpm dlx shadcn@4.21.4 add`, packages/ui/components.json)"
+      },
+      {
+        "name": "Empty",
+        "web": "packages/ui/src/components/ui/empty.tsx",
+        "source": [
+          {
+            "shadcn": "empty",
+            "style": "radix-nova",
+            "url": "https://ui.shadcn.com/docs/components/radix/empty"
+          }
+        ],
+        "install": "shadcn CLI 4.21.4 (`pnpm dlx shadcn@4.21.4 add`, packages/ui/components.json)"
+      },
+      {
+        "name": "Skeleton",
+        "web": "packages/ui/src/components/ui/skeleton.tsx",
+        "source": [
+          {
+            "shadcn": "skeleton",
+            "style": "radix-nova",
+            "url": "https://ui.shadcn.com/docs/components/radix/skeleton"
+          },
+          {
+            "21st": 1588,
+            "slug": "shadcn/skeleton",
+            "url": "https://21st.dev/r/shadcn/skeleton",
+            "role": "same component"
+          }
+        ],
+        "install": "shadcn CLI 4.21.4 (`pnpm dlx shadcn@4.21.4 add`, packages/ui/components.json)"
+      },
+      {
+        "name": "Sonner (toasts)",
+        "web": "packages/ui/src/components/ui/sonner.tsx",
+        "source": [
+          {
+            "shadcn": "sonner",
+            "style": "radix-nova",
+            "url": "https://ui.shadcn.com/docs/components/radix/sonner"
+          },
+          {
+            "21st": 886,
+            "slug": "shadcn/sonner",
+            "url": "https://21st.dev/r/shadcn/sonner",
+            "role": "same component"
+          }
+        ],
+        "install": "shadcn CLI 4.21.4 (`pnpm dlx shadcn@4.21.4 add`, packages/ui/components.json)"
+      },
+      {
+        "name": "Rail (Sidebar 001)",
+        "web": "packages/ui/src/components/ui/sidebar-001.tsx + sidebar-001-utils/{context,parts}.tsx",
+        "source": [
+          {
+            "21st": 21517,
+            "slug": "unlumen/sidebar-001",
+            "url": "https://21st.dev/r/unlumen/sidebar-001",
+            "role": "installed"
+          }
+        ],
+        "install": "shadcn CLI 4.21.4 with the 21st registry item (`21st add` resolves to the same command)",
+        "deviations": "The published file is 552 lines; its contexts, scroll hook and hover highlight moved unchanged to sidebar-001-utils/context.tsx, and its separator, header and footer to sidebar-001-utils/parts.tsx (re-exported from sidebar-001.tsx under the same names), so every file stays under the repo's 400-line limit. Its --accent-pro indicator colour points at the Hako accent in packages/ui/src/styles.css (the active row: the moment that matters). Its hover highlight `bg-accent/50` (shadcn's `accent` is a hover surface) is Senryo's pressed row `bg-row-pressed`: Hako's `accent` is the hue, so the author's class would paint every hovered row asagi."
+      },
+      {
+        "name": "Tx steps (Task Steps)",
+        "web": "packages/ui/src/components/ui/task-steps.tsx",
+        "source": [
+          {
+            "21st": 23569,
+            "slug": "ddoemonn/task-steps",
+            "url": "https://21st.dev/r/ddoemonn/task-steps",
+            "role": "installed"
+          }
+        ],
+        "install": "shadcn CLI 4.21.4 with the 21st registry item (`21st add` resolves to the same command)"
+      },
+      {
+        "name": "Tx steps (Stepper primitive)",
+        "web": "packages/ui/src/components/ui/stepper.tsx + stepper-utils/context.tsx",
+        "source": [
+          {
+            "21st": 29815,
+            "slug": "sean0205/c-stepper-15",
+            "url": "https://21st.dev/r/sean0205/c-stepper-15",
+            "role": "installed"
+          }
+        ],
+        "install": "shadcn CLI 4.21.4 with the 21st registry item (`21st add` resolves to the same command)",
+        "deviations": "The item's own file is a demo (three sample steps: Account, Profile, Review); only the stepper primitive it installs (sean0205/stepper) is kept. Its types, two contexts and their hooks moved unchanged to stepper-utils/context.tsx (the repo's 400-line limit; stepper.tsx re-exports useStepper and useStepItem). The pending indicator's `bg-accent text-accent-foreground` (shadcn's quiet surface) is `bg-muted text-muted-foreground`: Hako's `accent` is the hue, kept for the moment that matters."
+      },
+      {
+        "name": "Skeleton Swap",
+        "web": "packages/ui/src/components/ui/skeleton-swap.tsx",
+        "source": [
+          {
+            "21st": 23557,
+            "slug": "ddoemonn/skeleton-swap",
+            "url": "https://21st.dev/r/ddoemonn/skeleton-swap",
+            "role": "installed"
+          }
+        ],
+        "install": "shadcn CLI 4.21.4 with the 21st registry item (`21st add` resolves to the same command)",
+        "deviations": "An eslint-disable comment for jsx-a11y (not configured in this repo) removed."
+      },
+      {
+        "name": "Empty state",
+        "web": "packages/ui/src/components/ui/empty-state.tsx",
+        "source": [
+          {
+            "21st": 1435,
+            "slug": "serafimcloud/empty-state",
+            "url": "https://21st.dev/r/serafimcloud/empty-state",
+            "role": "installed"
+          }
+        ],
+        "install": "by hand from the 21st registry item: the CLI stopped at its dependency on 21st's copy of shadcn's button, which @hako/ui already has",
+        "deviations": "Import paths; a type-only import and three index assertions for strict TypeScript."
+      },
+      {
+        "name": "Error state",
+        "web": "packages/ui/src/components/ui/empty.tsx",
+        "source": [
+          {
+            "21st": 19376,
+            "slug": "olewandowski1/empty-states-4",
+            "url": "https://21st.dev/r/olewandowski1/empty-states-4",
+            "role": "installed"
+          },
+          {
+            "shadcn": "empty",
+            "style": "radix-nova",
+            "url": "https://ui.shadcn.com/docs/components/radix/empty"
+          }
+        ],
+        "install": "its primitive, shadcn `empty`, through the CLI",
+        "deviations": "The 21st block depends on shadcn/button and shadcn/sonner in a style shadcn 4.21.4 cannot resolve (radix-nova/shadcn/button 404), on @remixicon/react (a second icon set), and its body is a demo (sample toasts). Its utils file is shadcn's Empty API; L3 composes the error state (what still works + one fix, Kawase rules) from it."
+      },
+      {
+        "name": "Text Shimmer",
+        "web": "packages/ui/src/components/ui/text-shimmer.tsx",
+        "source": [
+          {
+            "21st": 12336,
+            "slug": "serafimcloud/text-shimmer",
+            "url": "https://21st.dev/r/serafimcloud/text-shimmer",
+            "role": "installed"
+          }
+        ],
+        "install": "by hand from the 21st registry item: its file has no `type`, which shadcn 4.21.4 rejects",
+        "deviations": "@hako/ui's `cn` instead of the bundled clsx + tailwind-merge copy; \"use client\" (it injects its keyframes). Its --an-foreground-* colours point at tokens in styles.css."
+      },
+      {
+        "name": "Sheet / drawer",
+        "web": "packages/ui/src/components/ui/drawer.tsx",
+        "source": [
+          {
+            "21st": 31360,
+            "slug": "wensity/drawer",
+            "url": "https://21st.dev/r/wensity/drawer",
+            "role": "installed"
+          }
+        ],
+        "install": "shadcn CLI 4.21.4 with the 21st registry item (`21st add` resolves to the same command)",
+        "deviations": "Close icon from lucide (X) instead of @tabler/icons-react (one icon set, plan research); @hako/ui's `cn` instead of the bundled copy. Base UI pinned to 1.8.0, the version fumadocs already locks."
+      },
+      {
+        "name": "Number flow (Odometer)",
+        "web": "packages/ui/src/components/ui/number-flow.tsx",
+        "source": [
+          {
+            "21st": 1444,
+            "slug": "barvian/number-flow",
+            "url": "https://21st.dev/r/barvian/number-flow",
+            "role": "installed"
+          },
+          {
+            "kawase": "tamion/packages/ui-web/src/components/ui/number-flow.tsx"
+          }
+        ],
+        "install": "copied from Kawase ui-web as-is (its Odometer wrapper over @number-flow/react)"
+      },
+      {
+        "name": "Slide to confirm",
+        "web": "packages/ui/src/components/ui/slide-action-button.tsx + slide-action-button-utils/",
+        "source": [
+          {
+            "21st": 29304,
+            "slug": "starc007/slide-action-button",
+            "url": "https://21st.dev/r/starc007/slide-action-button",
+            "role": "installed"
+          },
+          {
+            "kawase": "tamion/packages/ui-web/src/components/ui/slide-action-button.tsx"
+          }
+        ],
+        "install": "copied from Kawase ui-web as-is (Senryo reskin)"
+      },
+      {
+        "name": "Hold to confirm",
+        "web": "packages/ui/src/components/ui/hold-to-confirm.tsx",
+        "source": [
+          {
+            "21st": 23527,
+            "slug": "ddoemonn/hold-to-confirm",
+            "url": "https://21st.dev/r/ddoemonn/hold-to-confirm",
+            "role": "installed"
+          },
+          {
+            "kawase": "tamion/packages/ui-web/src/components/ui/hold-to-confirm.tsx"
+          }
+        ],
+        "install": "copied from Kawase ui-web as-is",
+        "deviations": "Kawase's network plate (its testnet capsule; equal to primary on mainnet) is Hako's primary plate."
+      },
+      {
+        "name": "Segmented control",
+        "web": "packages/ui/src/components/ui/segmented-control.tsx",
+        "source": [
+          {
+            "21st": 23552,
+            "slug": "ddoemonn/segmented-control",
+            "url": "https://21st.dev/r/ddoemonn/segmented-control",
+            "role": "installed"
+          },
+          {
+            "kawase": "tamion/packages/ui-web/src/components/ui/segmented-control.tsx"
+          }
+        ],
+        "install": "copied from Kawase ui-web as-is"
+      },
+      {
+        "name": "Prompt input",
+        "web": "packages/ui/src/components/ui/prompt-input.tsx",
+        "source": [
+          {
+            "kawase": "tamion/packages/ui-web/src/components/ui/prompt-input.tsx"
+          }
+        ],
+        "install": "copied from Kawase ui-web as-is"
+      },
+      {
+        "name": "Response stream",
+        "web": "packages/ui/src/components/ui/response-stream.tsx",
+        "source": [
+          {
+            "kawase": "tamion/packages/ui-web/src/components/ui/response-stream.tsx"
+          }
+        ],
+        "install": "copied from Kawase ui-web as-is",
+        "deviations": "\"use client\" added (it holds state; the barrel is importable from server components)."
+      },
+      {
+        "name": "Mark / TokenMark",
+        "web": "packages/identity/src/{mark,token-mark}.tsx",
+        "source": [
+          {
+            "kawase": "tamion/packages/ui-web/src/components/mark.tsx"
+          }
+        ],
+        "install": "ported into @hako/identity (one implementation; @hako/ui re-exports it)",
+        "deviations": "Hako's keys; a remote LI.FI logoURI through the gateway's /v1/logo proxy before the labelled neutral disc; no `cn` (identity has no UI dependency)."
+      }
+    ]
+  },
+  "decisions": [
+    {
+      "date": "2026-10-17",
+      "decision": "Hako's accent is asagi #009CA8 with black labels, chosen against the contrast check; every other value is Senryo's",
+      "ref": "plan §6"
+    },
+    {
+      "date": "2026-10-17",
+      "decision": "Token names keep Kawase's (shadcn's variables plus Senryo's), so Kawase code ports without renames; `accent` is the hue, as in Kawase",
+      "ref": "plan §6"
+    },
+    {
+      "date": "2026-10-17",
+      "decision": "One icon set (lucide) and one `cn` (the `cn` package via @hako/ui/lib/utils): installed files that bundled tabler icons or their own clsx + tailwind-merge helper were pointed at them",
+      "ref": "plan research2 (UI notes)"
+    },
+    {
+      "date": "2026-10-17",
+      "decision": "Demo bodies of 21st items (c-stepper-15's sample steps, empty-states-4's sample toasts) are not kept; their primitives are",
+      "ref": "no demo data"
+    },
+    {
+      "date": "2026-10-17",
+      "decision": "shadcn's `accent` is a hover surface; Hako's `accent` is the hue (one accent only for the moment that matters). Installed files that use `bg-accent` as a surface point at Senryo's quiet surfaces instead: `bg-row-pressed` for hover (Sidebar 001's highlight), `bg-muted` for pending (the stepper's indicator). `rg 'bg-accent|text-accent-foreground' packages/ui apps` finds no other use",
+      "ref": "plan §6"
+    },
+    {
+      "date": "2026-10-17",
+      "decision": "@hako/ui imports the radix-nova style base `shadcn/tailwind.css` (shadcn 4.21.4 as its devDependency, the CLI version that did the installs): the data-open/closed/checked/active/horizontal/vertical variants on Radix's data-state and data-orientation, the accordion keyframes, and the shimmer, scroll-fade and no-scrollbar utilities the installed components use",
+      "ref": "ui.shadcn.com/r/styles/radix-nova/index.json"
+    }
+  ],
+  "rules": [
+    "21st.dev and shadcn first for every visible component; every installed file is listed here with its source.",
+    "Installed code keeps its author's style; colours always resolve to @hako/brand tokens (no hex outside packages/brand).",
+    "Real marks from @hako/identity for every chain, token, provider and route; the labelled neutral disc when none is delivered, never a stand-in.",
+    "Every surface draws loading (shaped skeleton, held 300 ms), empty (why + next action), error (what still works + one fix) and offline states."
+  ]
+}

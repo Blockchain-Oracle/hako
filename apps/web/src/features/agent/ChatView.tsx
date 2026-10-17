@@ -109,7 +109,7 @@ export function ChatView({
           <div ref={bottomRef} />
         </div>
       </div>
-      <div className="border-t border-line bg-background/90 backdrop-blur">
+      <div className="border-t border-border bg-background/90 backdrop-blur">
         <div className="mx-auto w-full max-w-[760px] px-4 py-4">
           <Composer
             value={input}

@@ -11,8 +11,14 @@
   },
   "dependencies": {
     "@ai-sdk/react": "catalog:",
+    "@hako/auth": "workspace:*",
     "@hako/brand": "workspace:*",
+    "@hako/config": "workspace:*",
+    "@hako/db": "workspace:*",
+    "@hako/env": "workspace:*",
+    "@hako/identity": "workspace:*",
     "@hako/model": "workspace:*",
+    "@hako/ui": "workspace:*",
     "ai": "catalog:",
     "class-variance-authority": "catalog:",
     "clsx": "catalog:",
@@ -21,7 +27,7 @@
     "motion": "catalog:",
     "next": "catalog:",
     "next-themes": "catalog:",
-    "radix-ui": "^1.6.7",
+    "radix-ui": "1.6.7",
     "react": "catalog:",
     "react-dom": "catalog:",
     "server-only": "catalog:",
@@ -36,9 +42,7 @@
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "eslint": "catalog:",
-    "eslint-config-next": "catalog:",
     "tailwindcss": "catalog:",
-    "typescript": "catalog:",
-    "typescript-eslint": "catalog:"
+    "typescript": "catalog:"
   }
 }

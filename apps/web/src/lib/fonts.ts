@@ -1,26 +1,12 @@
-import localFont from "next/font/local";
+import { Inter, Roboto_Condensed } from "next/font/google";
 
 /**
- * Monid's three faces (packages/brand/tokens/paint.css), self-hosted from packages/brand/assets/fonts (Fontsource
- * variable woff2, latin subset, OFL) so a build never depends on fonts.gstatic.com.
+ * Senryo's two faces (packages/brand/tokens.json `fonts`): Inter for the interface, Roboto Condensed (Black for money
+ * and titles) for figures that roll. next/font downloads them at build time and serves them from this app, so no page
+ * asks fonts.gstatic.com. The variable names must match tokens.json (`fonts.body.variable`, `fonts.display.variable`):
+ * next/font takes literals only, and generated/web.css builds `--font-sans` and `--font-display` on them.
  */
-const outfit = localFont({
-  src: "../../../../packages/brand/assets/fonts/outfit-latin.woff2",
-  weight: "100 900",
-  variable: "--font-outfit",
-  display: "swap",
-});
-const inter = localFont({
-  src: "../../../../packages/brand/assets/fonts/inter-latin.woff2",
-  weight: "100 900",
-  variable: "--font-inter",
-  display: "swap",
-});
-const jetbrains = localFont({
-  src: "../../../../packages/brand/assets/fonts/jetbrains-mono-latin.woff2",
-  weight: "100 800",
-  variable: "--font-jetbrains",
-  display: "swap",
-});
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
+const robotoCondensed = Roboto_Condensed({ subsets: ["latin"], variable: "--font-roboto-condensed", display: "swap" });
 
-export const fontVariables = [outfit, inter, jetbrains].map((f) => f.variable).join(" ");
+export const fontVariables = [inter, robotoCondensed].map((f) => f.variable).join(" ");

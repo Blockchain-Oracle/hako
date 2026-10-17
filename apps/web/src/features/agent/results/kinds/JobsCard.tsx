@@ -28,7 +28,7 @@ function Job({ job }: { job: Rec }) {
     <li className="py-3 first:pt-0 last:pb-0">
       <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
         <h4 className="min-w-0 text-[0.9375rem] leading-snug font-medium">
-          <ExtLink href={job.url ?? job.link} className="text-foreground hover:text-brand">
+          <ExtLink href={job.url ?? job.link} className="text-foreground hover:text-link">
             {pickStr(job, "title", "role", "name") ?? "Untitled role"}
           </ExtLink>
         </h4>
@@ -36,7 +36,7 @@ function Job({ job }: { job: Rec }) {
       </div>
       <Meta className="mt-1">
         {company && (
-          <span className="inline-flex items-center gap-1 font-medium text-ink-2">
+          <span className="inline-flex items-center gap-1 font-medium text-muted-foreground">
             <Building2 className="size-3" aria-hidden /> {company}
           </span>
         )}
@@ -70,7 +70,7 @@ export function JobsCard({ data }: { data: Rec }) {
         <Empty>No open roles matched.</Empty>
       ) : (
         <>
-          <ol className="divide-y divide-line">
+          <ol className="divide-y divide-border">
             {shown.map((job, index) => (
               <Job key={rowKey(job, index)} job={job} />
             ))}

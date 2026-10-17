@@ -1,54 +1,37 @@
 /**
- * The seal and wordmark as React components, shared by apps/web and apps/docs. Colours come from tokens only:
- * frame, glyph and letters take the current text colour; the check is var(--primary), the mark's one colour.
+ * The Hako mark and lockup as React components, shared by apps/web, apps/docs and the cards. Colours come from tokens
+ * only: the body takes the current text colour and the lid the accent (`var(--accent)`); `tone="mono"` draws the whole
+ * mark in the current colour (dense rows, the inverse plate).
  */
-import { BRAND } from "./index";
-import { SEAL, WORDMARK } from "./marks.generated";
+import { BRAND } from "./index.ts";
+import { MARK } from "../generated/mark.ts";
 
-const DEFAULT_SEAL_LABEL = `${BRAND.name} ${BRAND.kanji} seal`;
-const CHECK_STYLE = { stroke: "var(--primary)" } as const;
+const DEFAULT_LABEL = BRAND.name;
+const LID_ACCENT = { fill: "var(--accent)" } as const;
 
-function join(...classes: (string | undefined)[]): string {
-  return classes.filter(Boolean).join(" ");
-}
+export type HakoMarkProps = {
+  className?: string;
+  /** `null` marks it decorative (when the name stands next to it). */
+  label?: string | null;
+  tone?: "accent" | "mono";
+};
 
-/** `label={null}` marks the seal decorative (when a visible name stands next to it). */
-export function Seal({ className, label = DEFAULT_SEAL_LABEL }: { className?: string; label?: string | null }) {
+export function HakoMark({ className, label = DEFAULT_LABEL, tone = "accent" }: HakoMarkProps) {
   const a11y = label === null ? { "aria-hidden": true } : { role: "img", "aria-label": label };
   return (
-    <svg viewBox={SEAL.viewBox} className={join("shrink-0", className)} {...a11y}>
-      <g fill="none" stroke="currentColor" strokeLinecap="square">
-        <path d={SEAL.outer.d} strokeWidth={SEAL.outer.strokeWidth} />
-        <path d={SEAL.inner.d} strokeWidth={SEAL.inner.strokeWidth} />
-      </g>
-      <path d={SEAL.glyph} fill="currentColor" />
-      <polyline
-        points={SEAL.check.points}
-        fill="none"
-        style={CHECK_STYLE}
-        strokeWidth={SEAL.check.strokeWidth}
-        strokeLinecap="square"
-      />
+    <svg viewBox={MARK.viewBox} className={["shrink-0", className].filter(Boolean).join(" ")} {...a11y}>
+      <path d={MARK.body} fill="currentColor" fillRule="evenodd" />
+      <path d={MARK.lid} fill="currentColor" style={tone === "accent" ? LID_ACCENT : undefined} />
     </svg>
   );
 }
 
-/** HAKO | 証, outlined. `kanji={false}` gives the letters alone, for next to the seal. */
-export function Wordmark({ className, kanji = true }: { className?: string; kanji?: boolean }) {
+/** The mark beside "Hako" in the display face; the caller sizes it through `className` (font size). */
+export function HakoLockup({ className, tone = "accent" }: { className?: string; tone?: HakoMarkProps["tone"] }) {
   return (
-    <svg
-      viewBox={kanji ? WORDMARK.viewBox : WORDMARK.lettersViewBox}
-      className={join("shrink-0", className)}
-      role="img"
-      aria-label={BRAND.wordmark}
-    >
-      <path d={WORDMARK.letters} fill="currentColor" />
-      {kanji && (
-        <>
-          <path d={WORDMARK.rule.d} stroke="currentColor" strokeWidth={WORDMARK.rule.strokeWidth} />
-          <path d={WORDMARK.kanji} fill="currentColor" />
-        </>
-      )}
-    </svg>
+    <span className={["inline-flex items-center gap-[0.3em] font-display font-black tracking-[-0.02em]", className].filter(Boolean).join(" ")}>
+      <HakoMark className="size-[1.15em]" label={null} tone={tone} />
+      <span>{BRAND.name}</span>
+    </span>
   );
 }

@@ -1,12 +1,17 @@
 packages:
   - "apps/*"
-  - "packages/brand"
-  - "packages/model"
+  - "packages/*"
   - "services/gateway"
+# plugins/** stays outside: the PayBox plugin keeps its own lockfile (starter 1.0.2, pnpm 11.11.0) and imports the
+# plugin-safe sources (packages/{config,networks,money}/src, packages/defi/src/core) by relative path.
+# Python packages (packages/{core,tools,now}, services/api) have no package.json, so pnpm ignores them.
 
 # Supply chain: never resolve a release younger than 7 days, transitive ones included (minutes). A brand-new
 # mdast-util-to-markdown 2.1.3 (2026-09-27) crashed every docs page with emphasis in fumadocs' stringifier.
 minimumReleaseAge: 10080
+# First-party PayBox SDK (plan §3): pinned to the exact release PayBox documents, whatever its age.
+minimumReleaseAgeExclude:
+  - "@paybox-sh/sdk"
 
 overrides:
   mdast-util-to-markdown: 2.1.2
@@ -23,8 +28,11 @@ allowBuilds:
 
 # One version of each shared dependency across apps and packages (`"catalog:"` in a manifest).
 # Next 16.3.4 + React 19.2.8 is the pair already proven in an earlier build (Stocklana); TypeScript stays on 5.9.
-# Supply chain: every pin is the newest release at least a week old when chosen (2026-09-30), not the latest.
+# Supply chain: every pin is the newest release at least a week old when chosen, not the latest. The entries below
+# the first block are the plan's §3 pins (docs/plan/hako-plan.md, checked 2026-10-17); a lane adds a dependency to
+# its own package.json as "catalog:" and never edits this file.
 catalog:
+  # Web, design and shared tooling
   next: 16.3.4
   react: 19.2.8
   react-dom: 19.2.8
@@ -46,14 +54,64 @@ catalog:
   tailwind-merge: 3.7.0
   tw-animate-css: 1.4.0
   next-themes: 0.4.6
-  ai: 7.0.111
-  "@ai-sdk/anthropic": 4.0.60
-  "@ai-sdk/openai": 4.0.72
-  "@ai-sdk/react": 4.0.125
+  "@number-flow/react": 0.6.2
+  sonner: 2.0.8
+  use-sound: 5.0.0
+  # Logos, QR, charts, feed
+  "@web3icons/react": 4.1.24
+  blo: 2.1.1
+  qrcode: 1.5.4
+  lightweight-charts: 5.2.1
+  "@tanstack/react-query": 5.104.1
+  nuqs: 2.10.2
+  date-fns: 4.4.0
+  modern-screenshot: 4.7.0
+  # Chat engine (one matched AI SDK 7 set) and chat UI
+  ai: 7.0.137
+  "@ai-sdk/react": 4.0.140
+  "@ai-sdk/mcp": 2.0.73
+  "@ai-sdk/openai": 4.0.91
+  "@ai-sdk/anthropic": 4.0.78
   streamdown: 2.6.0
+  resumable-stream: 2.2.13
+  "@shadcn/react": 0.3.1
+  cn: 0.4.0
+  # Voice
+  "@openai/agents": 0.20.0
+  # Gateway and x402
+  hono: 4.13.12
+  "@hono/node-server": 2.1.4
   "@x402/core": 2.27.0
   "@x402/evm": 2.27.0
+  "@x402/hono": 2.27.0
+  "@coinbase/cdp-sdk": 1.58.0
   ioredis: 6.0.0
+  # Hako MCP (hosted + stdio) and the MCP Apps view
+  "@modelcontextprotocol/server": 2.3.1
+  "@modelcontextprotocol/core": 2.3.1
+  "@modelcontextprotocol/client": 2.3.1
+  "@modelcontextprotocol/ext-apps": 2.0.3
+  vite: 8.3.4
+  "@vitejs/plugin-react": 6.1.2
+  "@tailwindcss/vite": 4.3.3
+  vite-plugin-singlefile: 2.3.3
+  # Money (server and CLI): LI.FI, PayBox, rehearsal
+  "@lifi/sdk": 4.12.0
+  "@lifi/types": 18.13.0
+  "@paybox-sh/sdk": 2.2.0
+  viem: 2.57.4
+  # Auth and storage (Better Auth Phase 1; Phase 2 MCP login plugins on the same release)
+  better-auth: 1.7.7
+  "@better-auth/mcp": 1.7.7
+  "@better-auth/cimd": 1.7.7
+  "@better-auth/oauth-provider": 1.7.7
+  pg: 8.23.1
+  jose: 6.2.12
+  # CLI
+  citty: 0.2.2
+  "@clack/prompts": 1.8.1
+  open: 11.0.4
+  # Docs (Akashi's tested set)
   fumadocs-core: 16.15.13
   fumadocs-ui: "npm:@fumadocs/base-ui@16.15.13"
   fumadocs-mdx: 15.4.3

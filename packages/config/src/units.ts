@@ -1,0 +1,8 @@
+/** Units, so every duration and size below reads as arithmetic instead of a bare number. */
+export const MS_PER_SECOND = 1_000;
+export const SECONDS_PER_MINUTE = 60;
+export const SECONDS_PER_HOUR = 3_600;
+export const SECONDS_PER_DAY = 86_400;
+
+export const BYTES_PER_KIB = 1_024;
+export const BYTES_PER_MIB = 1_048_576;

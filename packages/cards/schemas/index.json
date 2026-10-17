@@ -1,0 +1,249 @@
+{
+  "kinds": [
+    {
+      "kind": "search_results",
+      "file": "search_results.schema.json",
+      "origin": "catalog"
+    },
+    {
+      "kind": "answer",
+      "file": "answer.schema.json",
+      "origin": "catalog"
+    },
+    {
+      "kind": "page",
+      "file": "page.schema.json",
+      "origin": "catalog"
+    },
+    {
+      "kind": "papers",
+      "file": "papers.schema.json",
+      "origin": "catalog"
+    },
+    {
+      "kind": "news",
+      "file": "news.schema.json",
+      "origin": "catalog"
+    },
+    {
+      "kind": "jobs",
+      "file": "jobs.schema.json",
+      "origin": "catalog"
+    },
+    {
+      "kind": "quote",
+      "file": "quote.schema.json",
+      "origin": "catalog"
+    },
+    {
+      "kind": "fx",
+      "file": "fx.schema.json",
+      "origin": "catalog"
+    },
+    {
+      "kind": "weather",
+      "file": "weather.schema.json",
+      "origin": "catalog"
+    },
+    {
+      "kind": "place",
+      "file": "place.schema.json",
+      "origin": "catalog"
+    },
+    {
+      "kind": "package",
+      "file": "package.schema.json",
+      "origin": "catalog"
+    },
+    {
+      "kind": "definition",
+      "file": "definition.schema.json",
+      "origin": "catalog"
+    },
+    {
+      "kind": "time",
+      "file": "time.schema.json",
+      "origin": "catalog"
+    },
+    {
+      "kind": "table",
+      "file": "table.schema.json",
+      "origin": "catalog"
+    },
+    {
+      "kind": "json",
+      "file": "json.schema.json",
+      "origin": "catalog"
+    },
+    {
+      "kind": "market",
+      "file": "market.schema.json",
+      "origin": "catalog"
+    },
+    {
+      "kind": "audio",
+      "file": "audio.schema.json",
+      "origin": "catalog"
+    },
+    {
+      "kind": "yield",
+      "file": "yield.schema.json",
+      "origin": "catalog"
+    },
+    {
+      "kind": "positions",
+      "file": "positions.schema.json",
+      "origin": "catalog"
+    },
+    {
+      "kind": "model_bench",
+      "file": "model_bench.schema.json",
+      "origin": "catalog"
+    },
+    {
+      "kind": "balance",
+      "file": "balance.schema.json",
+      "origin": "catalog"
+    },
+    {
+      "kind": "token",
+      "file": "token.schema.json",
+      "origin": "catalog"
+    },
+    {
+      "kind": "tx_receipt",
+      "file": "tx_receipt.schema.json",
+      "origin": "catalog"
+    },
+    {
+      "kind": "block",
+      "file": "block.schema.json",
+      "origin": "catalog"
+    },
+    {
+      "kind": "gas",
+      "file": "gas.schema.json",
+      "origin": "catalog"
+    },
+    {
+      "kind": "contract_read",
+      "file": "contract_read.schema.json",
+      "origin": "catalog"
+    },
+    {
+      "kind": "logs",
+      "file": "logs.schema.json",
+      "origin": "catalog"
+    },
+    {
+      "kind": "chain_name",
+      "file": "chain_name.schema.json",
+      "origin": "catalog"
+    },
+    {
+      "kind": "route",
+      "file": "route.schema.json",
+      "origin": "hako"
+    },
+    {
+      "kind": "route_race",
+      "file": "route_race.schema.json",
+      "origin": "hako"
+    },
+    {
+      "kind": "pay",
+      "file": "pay.schema.json",
+      "origin": "hako"
+    },
+    {
+      "kind": "send_draft",
+      "file": "send_draft.schema.json",
+      "origin": "hako"
+    },
+    {
+      "kind": "swap_draft",
+      "file": "swap_draft.schema.json",
+      "origin": "hako"
+    },
+    {
+      "kind": "bridge_draft",
+      "file": "bridge_draft.schema.json",
+      "origin": "hako"
+    },
+    {
+      "kind": "earn_deposit_draft",
+      "file": "earn_deposit_draft.schema.json",
+      "origin": "hako"
+    },
+    {
+      "kind": "earn_withdraw_draft",
+      "file": "earn_withdraw_draft.schema.json",
+      "origin": "hako"
+    },
+    {
+      "kind": "status",
+      "file": "status.schema.json",
+      "origin": "hako"
+    },
+    {
+      "kind": "receipt",
+      "file": "receipt.schema.json",
+      "origin": "hako"
+    },
+    {
+      "kind": "failure",
+      "file": "failure.schema.json",
+      "origin": "hako"
+    },
+    {
+      "kind": "invoice",
+      "file": "invoice.schema.json",
+      "origin": "hako"
+    },
+    {
+      "kind": "activity",
+      "file": "activity.schema.json",
+      "origin": "hako"
+    },
+    {
+      "kind": "passport",
+      "file": "passport.schema.json",
+      "origin": "hako"
+    },
+    {
+      "kind": "contact",
+      "file": "contact.schema.json",
+      "origin": "hako"
+    },
+    {
+      "kind": "portfolio",
+      "file": "portfolio.schema.json",
+      "origin": "hako"
+    },
+    {
+      "kind": "receive",
+      "file": "receive.schema.json",
+      "origin": "hako"
+    },
+    {
+      "kind": "fund",
+      "file": "fund.schema.json",
+      "origin": "hako"
+    },
+    {
+      "kind": "limit",
+      "file": "limit.schema.json",
+      "origin": "hako"
+    },
+    {
+      "kind": "catalog",
+      "file": "catalog.schema.json",
+      "origin": "hako"
+    },
+    {
+      "kind": "tool",
+      "file": "tool.schema.json",
+      "origin": "hako"
+    }
+  ]
+}

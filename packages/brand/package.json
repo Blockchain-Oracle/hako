@@ -2,6 +2,7 @@
   "name": "@hako/brand",
   "version": "0.0.0",
   "private": true,
+  "description": "Hako's name, mark and design tokens: Kawase's Senryo pipeline (tokens.json -> web.css + tokens.ts, contrast check) with Hako's asagi accent.",
   "type": "module",
   "sideEffects": [
     "*.css"
@@ -10,11 +11,13 @@
     ".": "./src/index.ts",
     "./react": "./src/react.tsx",
     "./assets/*": "./assets/*",
-    "./paint.css": "./tokens/paint.css"
+    "./paint.css": "./generated/web.css"
   },
   "scripts": {
+    "build": "node scripts/build.mjs && node scripts/check-contrast.mjs",
+    "check": "node scripts/check-contrast.mjs",
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "lint": "tsc --noEmit -p tsconfig.json"
+    "lint": "eslint src"
   },
   "devDependencies": {
     "@types/react": "catalog:",

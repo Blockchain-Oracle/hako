@@ -1,0 +1,18 @@
+{
+  "name": "@hako/money",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Exact amounts (atomic bigint ↔ decimal), Intl display, address shortening, fee and min-received math (plain TypeScript, no runtime imports).",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint": "eslint src"
+  },
+  "devDependencies": {
+    "typescript": "catalog:"
+  }
+}

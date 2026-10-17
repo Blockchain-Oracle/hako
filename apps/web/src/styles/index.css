@@ -1,40 +1,21 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "@hako/brand/paint.css";
+@import "@hako/ui/styles.css";
+
+/* Tailwind scans the shared React packages too: the card library, the installed UI components, the brand's mark and
+ * lockup, and the identity marks (plan §3). */
+@source "../../../../packages/cards/src";
+@source "../../../../packages/ui/src";
+@source "../../../../packages/brand/src";
+@source "../../../../packages/identity/src";
 
 /*
  * Dark mode: `.dark` on <html>, set before the first paint by the script in app/layout.tsx (the visitor's choice,
- * else the system's). The palette matches the docs' dark theme (apps/docs/app/global.css): a near-black page,
- * #1e1e1e panels, light text, and the accent's light tint for links and filled buttons, which then carry dark text
- * (--primary-foreground). The "dark" surfaces (footer, terminal, dark buttons, your chat bubble) turn raised
- * graphite so they still stand off the page.
+ * else the system's). Every colour is a token from @hako/brand (generated/web.css): light is the default and dark is
+ * an adaptation, never an inversion (Senryo).
  */
 @custom-variant dark (&:where(.dark, .dark *));
-
-.dark {
-  color-scheme: dark;
-  --ak-accent: #8fb4ff;
-  --ak-accent-hover: #a9c5ff;
-  --ak-accent-press: #7aa3f5;
-  --ak-bg: #121212;
-  --ak-bg-muted: #1e1e1e;
-  --ak-bg-subtle: #181818;
-  --ak-dark: #262626;
-  --ak-dark-2: #303030;
-  --ak-ink: #fafafa;
-  --ak-ink-2: #d4d4d4;
-  --ak-muted: #adadad;
-  --ak-line: #2b2b2b;
-  --ak-line-default: #3a3a3a;
-  --ak-line-strong: #737373;
-  --ak-success: #34d399;
-  --primary-foreground: #121212;
-  --destructive: #ff7a66;
-  --shadow-window: 0 24px 48px -16px rgb(0 0 0 / 0.6), 0 2px 6px rgb(0 0 0 / 0.4);
-  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.3);
-  --shadow-card-hover: 0 6px 18px -6px rgb(0 0 0 / 0.6);
-  --shadow-pill: 0 4px 14px -4px rgb(0 0 0 / 0.6);
-}
 
 @layer base {
   * {
@@ -47,52 +28,18 @@
   body {
     background: var(--background);
     color: var(--foreground);
-    font-family: var(--font-sans);
   }
   ::selection {
-    background: color-mix(in srgb, var(--ak-accent) 18%, transparent);
+    background: var(--selected-row);
   }
 }
 
-/* Display headings: Outfit 600, tight tracking (monid.ai h1: 66.56px / 63.9px, −2.66px). */
+/* Page titles: Roboto Condensed Black, tight tracking (Senryo pageTitle; the size comes from the call site). */
 .display {
-  font-family: var(--font-display);
-  font-weight: 600;
-  letter-spacing: var(--tracking-display);
-  line-height: 0.96;
+  @apply font-display leading-none font-black tracking-[-0.02em];
 }
 
-/* The hero's faint character field behind the headline (Monid draws an ASCII texture that fades at the centre). */
-.char-field {
-  background-image: radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--ak-accent) 22%, transparent) 1px, transparent 0);
-  background-size: 14px 14px;
-  mask-image: radial-gradient(ellipse 60% 55% at 50% 40%, transparent 35%, black 75%);
-}
-
-/* Connector lines from the hub to the tool grid. */
-.hub-lines path {
-  stroke: var(--ak-line-default);
-  stroke-width: 1;
-  fill: none;
-}
-
-/* Terminal caret */
-@keyframes caret-blink {
-  50% {
-    opacity: 0;
-  }
-}
-.caret {
-  animation: caret-blink 1s steps(1) infinite;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .caret {
-    animation: none;
-  }
-}
-
-/* The tools line's running label (21st serafimcloud/tool-group, via KeeperHub Copilot v2). */
+/* A running step's label (21st serafimcloud/text-shimmer 12336, as Kawase's WaitingText): still under reduced motion. */
 @keyframes tool-shimmer {
   from {
     background-position: 100% center;
@@ -107,23 +54,30 @@
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
-  background-image: linear-gradient(90deg, var(--ak-muted) 0%, var(--ak-muted) 40%, var(--ak-ink) 50%, var(--ak-muted) 60%, var(--ak-muted) 100%);
+  background-image: linear-gradient(
+    90deg,
+    var(--muted-foreground) 0%,
+    var(--muted-foreground) 40%,
+    var(--foreground) 50%,
+    var(--muted-foreground) 60%,
+    var(--muted-foreground) 100%
+  );
   background-repeat: no-repeat;
   animation: tool-shimmer 2s linear infinite;
 }
 @media (prefers-reduced-motion: reduce) {
   .tool-shimmer {
     animation: none;
-    color: var(--ak-ink);
+    color: var(--foreground);
   }
 }
 
-/* Assistant prose (Streamdown output) in Monid paint. */
+/* Assistant prose (Streamdown output) on the Senryo tokens. */
 .prose-hako p {
   margin: 0.5em 0;
 }
 .prose-hako a {
-  color: var(--ak-accent);
+  color: var(--link);
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -139,10 +93,10 @@
   list-style: decimal;
 }
 .prose-hako code {
-  font-family: var(--font-mono);
+  @apply font-mono;
   font-size: 0.85em;
-  background: var(--ak-bg-muted);
-  border-radius: 4px;
+  background: var(--muted);
+  @apply rounded-step-xs;
   padding: 0.1em 0.35em;
 }
 .prose-hako strong {
@@ -151,8 +105,6 @@
 .prose-hako h1,
 .prose-hako h2,
 .prose-hako h3 {
-  font-family: var(--font-display);
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  @apply font-display font-black tracking-[-0.02em];
   margin: 0.8em 0 0.3em;
 }

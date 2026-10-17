@@ -2,7 +2,7 @@
 
 import { MessageSquarePlus, Pin, Trash2 } from "lucide-react";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@hako/ui/lib/utils";
 
 export interface ChatSummary {
   id: string;
@@ -32,12 +32,12 @@ export function Sidebar({
   onPin: (id: string, pinned: boolean) => void;
 }) {
   return (
-    <aside className="hidden w-[260px] shrink-0 flex-col border-r border-line bg-subtle md:flex">
+    <aside className="hidden w-[260px] shrink-0 flex-col border-r border-border bg-card md:flex">
       <div className="p-3">
         <button
           type="button"
           onClick={onNew}
-          className="flex h-9 w-full items-center gap-2 rounded-md border border-line bg-background px-3 text-sm font-medium shadow-card hover:bg-muted"
+          className="flex h-9 w-full items-center gap-2 rounded-md border border-border bg-background px-3 text-sm font-medium hover:bg-muted"
         >
           <MessageSquarePlus className="size-4" aria-hidden /> New chat
         </button>
@@ -56,7 +56,7 @@ export function Sidebar({
                       onClick={() => onOpen(chat.id)}
                       className={cn(
                         "w-full truncate rounded-sm px-2 py-1.5 pr-14 text-left text-[0.8125rem]",
-                        chat.id === activeId ? "bg-background font-medium text-foreground shadow-card" : "text-ink-2 hover:bg-background",
+                        chat.id === activeId ? "bg-background font-medium text-foreground" : "text-muted-foreground hover:bg-background",
                       )}
                     >
                       {chat.title}

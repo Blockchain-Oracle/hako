@@ -1,0 +1,8 @@
+// GENERATED from svg/ by build.mjs. Do not edit; replace the SVG and rebuild.
+import type { SVGProps } from "react";
+
+const MarkBaseMono = (props: SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 1280 1280" fill="currentColor" width="100%" height="100%" {...props}><defs /><path fill="currentColor" d="M0,101.12c0-34.64,0-51.95,6.53-65.28,6.25-12.76,16.56-23.07,29.32-29.32C49.17,0,66.48,0,101.12,0h1077.76C1213.51,0,1230.84,0,1244.16,6.53c12.75,6.25,23.06,16.56,29.32,29.32,6.52,13.32,6.52,30.64,6.52,65.28v1077.76c0,34.63,0,51.96-6.52,65.28-6.26,12.75-16.57,23.06-29.32,29.32-13.32,6.52-30.65,6.52-65.28,6.52H101.12c-34.64,0-51.95,0-65.28-6.52-12.76-6.26-23.07-16.57-29.32-29.32-6.53-13.32-6.53-30.65-6.53-65.28V101.12Z" /></svg>
+);
+
+export default MarkBaseMono;

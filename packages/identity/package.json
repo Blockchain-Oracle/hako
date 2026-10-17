@@ -1,0 +1,29 @@
+{
+  "name": "@hako/identity",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Real entity marks (chains, tokens, providers, LI.FI routes, currencies) keyed chain:eip155:<id>, token:<caip2>:<address>, provider:<slug>, with provenance: SVG sources in svg/, generated DOM components, Mark and TokenMark.",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "node build.mjs",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint": "eslint src"
+  },
+  "dependencies": {
+    "@hako/config": "workspace:*",
+    "@hako/networks": "workspace:*"
+  },
+  "devDependencies": {
+    "@hako/brand": "workspace:*",
+    "@types/react": "catalog:",
+    "react": "catalog:",
+    "typescript": "catalog:"
+  },
+  "peerDependencies": {
+    "react": "^19.2.0"
+  }
+}

@@ -10,9 +10,9 @@ dependency's own licence still apply.
 
 The website Hako starts from is Akashi's, and Akashi's look followed [monid.ai](https://monid.ai): its palette, type
 scale, radii and the layout of its landing page, tool catalog and docs, read from monid.ai's own stylesheet on
-2026-10-07. Those tokens are in `packages/brand/tokens/paint.css`, and each component that follows a Monid section
-names it in a comment. No code or asset from monid.ai is included. That look is being replaced by Senryo, the design
-system of Kawase, the owner's own project.
+2026-10-07. Hako replaced that palette, type and radii with Senryo, the design system of Kawase, the owner's own
+project (`packages/brand/tokens.json`, with Hako's own accent). The tool catalog and docs pages that still follow a
+Monid layout name it in a comment. No code or asset from monid.ai is included.
 
 Monid's open connector repository ([monid-ai/monid](https://github.com/monid-ai/monid), MIT) was read, for Akashi, as
 a reference for the connector format. No files are copied from it; the connector framework is the author's own
@@ -28,10 +28,10 @@ those components started from 21st.dev community components, named in their comm
 
 | Font | Terms | Where |
 | --- | --- | --- |
-| Outfit | SIL Open Font License 1.1 | `packages/brand/assets/fonts/`, through `next/font` |
-| Inter | SIL Open Font License 1.1 | the same |
-| JetBrains Mono | SIL Open Font License 1.1 | the same |
-| Shippori Mincho B1, IBM Plex Sans | SIL Open Font License 1.1 | drawn into the marks by `packages/brand/scripts/build_marks.py` |
+| Inter | SIL Open Font License 1.1 | downloaded at build time by `next/font/google` and served by each app (`lib/fonts.ts`) |
+| Roboto Condensed | SIL Open Font License 1.1 | the same |
+
+The Hako mark is drawn from geometry (`packages/brand/mark.json`); no font is drawn into it.
 
 ## Data served by the tools
 
@@ -46,7 +46,9 @@ envelope; set per provider in `packages/tools/src/hako_tools/connectors/*/provid
 - NASA and USGS: US Government works, public domain (image credits as stated per image).
 - OpenAlex (CC0), Crossref and arXiv metadata; Open Food Facts (ODbL); PubChem (NCBI).
 
-Provider logos in `apps/web/public/logos/` are the providers' own icons, used only to identify each integration.
+Provider, chain and token marks live in `packages/identity/svg/`, each with its source and licence in
+`packages/identity/PROVENANCE.md` (first-party brand assets, web3icons under MIT, simple-icons under CC0, circle-flags
+under MIT); they are shown only to identify each integration and remain their owners' trademarks.
 
 ## Packaged libraries
 

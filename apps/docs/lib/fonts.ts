@@ -1,26 +1,10 @@
-import localFont from "next/font/local";
+import { Inter, Roboto_Condensed } from "next/font/google";
 
 /**
- * The paint's three faces (packages/brand/tokens/paint.css: Outfit display, Inter body, JetBrains Mono data),
- * self-hosted from packages/brand/assets/fonts, the same files and variables as apps/web.
+ * The same two faces as apps/web (packages/brand/tokens.json `fonts`): Inter for the interface, Roboto Condensed for
+ * titles and figures. The variable names must match tokens.json; next/font takes literals only.
  */
-const outfit = localFont({
-  src: "../../../packages/brand/assets/fonts/outfit-latin.woff2",
-  weight: "100 900",
-  variable: "--font-outfit",
-  display: "swap",
-});
-const inter = localFont({
-  src: "../../../packages/brand/assets/fonts/inter-latin.woff2",
-  weight: "100 900",
-  variable: "--font-inter",
-  display: "swap",
-});
-const jetbrains = localFont({
-  src: "../../../packages/brand/assets/fonts/jetbrains-mono-latin.woff2",
-  weight: "100 800",
-  variable: "--font-jetbrains",
-  display: "swap",
-});
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
+const robotoCondensed = Roboto_Condensed({ subsets: ["latin"], variable: "--font-roboto-condensed", display: "swap" });
 
-export const fontVariables = [outfit, inter, jetbrains].map((f) => f.variable).join(" ");
+export const fontVariables = [inter, robotoCondensed].map((f) => f.variable).join(" ");

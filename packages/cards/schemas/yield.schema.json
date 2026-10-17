@@ -1,0 +1,103 @@
+{
+  "$id": "https://usehako.xyz/schemas/cards/yield.schema.json",
+  "title": "yield",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "vaults": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "string"
+          },
+          "chain": {
+            "type": "string",
+            "pattern": "^[-a-z0-9]{3,8}:[-_a-zA-Z0-9]{1,64}$",
+            "description": "CAIP-2 chain id, e.g. eip155:8453 (Base) or solana:mainnet"
+          },
+          "name": {
+            "type": "string"
+          },
+          "protocol": {
+            "type": "string"
+          },
+          "token": {
+            "type": "object",
+            "properties": {
+              "symbol": {
+                "type": "string"
+              },
+              "address": {
+                "type": "string"
+              },
+              "decimals": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "name": {
+                "type": "string"
+              },
+              "logo_url": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "symbol",
+              "address",
+              "decimals"
+            ],
+            "additionalProperties": {}
+          },
+          "apy": {
+            "type": "number"
+          },
+          "apy_base": {
+            "type": "number"
+          },
+          "apy_reward": {
+            "type": "number"
+          },
+          "tvl_usd": {
+            "type": "number"
+          },
+          "url": {
+            "type": "string"
+          },
+          "logo_url": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "address",
+          "chain",
+          "name",
+          "protocol",
+          "token",
+          "apy"
+        ],
+        "additionalProperties": {}
+      }
+    },
+    "chain": {
+      "type": "string",
+      "pattern": "^[-a-z0-9]{3,8}:[-_a-zA-Z0-9]{1,64}$",
+      "description": "CAIP-2 chain id, e.g. eip155:8453 (Base) or solana:mainnet"
+    },
+    "token": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "vaults"
+  ],
+  "additionalProperties": {}
+}

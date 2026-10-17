@@ -3,7 +3,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { z } from "zod";
 
 import type { Hako } from "./client.js";
-import { DEFAULT_DISCOVER_LIMIT, MCP_MAX_TEXT_CHARS, VERSION } from "./constants.js";
+import { DEFAULT_DISCOVER_LIMIT, MAX_DISCOVER_LIMIT, MCP_MAX_TEXT_CHARS, VERSION } from "./constants.js";
 
 const text = (value: unknown) => {
   const json = JSON.stringify(value, null, 1);
@@ -26,7 +26,7 @@ export async function serveMcp(hako: Hako): Promise<void> {
       description:
         "Free. Rank Hako's tool catalog for a job (web search, page reading, cited answers, papers, news, weather, " +
         "maps, crypto and FX, GitHub and packages, time, dictionaries…). Returns ids, prices, health and hints.",
-      inputSchema: { query: z.string().min(2), limit: z.number().int().min(1).max(25).optional() },
+      inputSchema: { query: z.string().min(2), limit: z.number().int().min(1).max(MAX_DISCOVER_LIMIT).optional() },
     },
     async ({ query, limit }) => {
       try {

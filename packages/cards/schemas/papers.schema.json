@@ -1,0 +1,290 @@
+{
+  "$id": "https://usehako.xyz/schemas/cards/papers.schema.json",
+  "title": "papers",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "anyOf": [
+    {
+      "type": "object",
+      "properties": {
+        "papers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "title": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "paper_id": {
+                "type": "string"
+              },
+              "primary_id": {
+                "type": "string"
+              },
+              "scholar_id": {
+                "type": "string"
+              },
+              "doi": {
+                "type": "string"
+              },
+              "authors": {
+                "type": "string"
+              },
+              "abstract": {
+                "type": "string"
+              },
+              "snippet": {
+                "type": "string"
+              },
+              "published": {
+                "type": "string"
+              },
+              "created": {
+                "type": "string"
+              },
+              "updated": {
+                "type": "string"
+              },
+              "year": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "venue": {
+                "type": "string"
+              },
+              "journal_ref": {
+                "type": "string"
+              },
+              "publication_info": {
+                "type": "string"
+              },
+              "publisher": {
+                "type": "string"
+              },
+              "primary_category": {
+                "type": "string"
+              },
+              "categories": {
+                "anyOf": [
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  {
+                    "type": "string"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string"
+              },
+              "cited_by": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "references": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "pdf_url": {
+                "type": "string"
+              },
+              "open_access_url": {
+                "type": "string"
+              },
+              "topic": {
+                "type": "string"
+              },
+              "score": {
+                "type": "number"
+              },
+              "license": {
+                "type": "string"
+              },
+              "retracted": {
+                "type": "boolean"
+              },
+              "is_retracted": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "title"
+            ],
+            "additionalProperties": {}
+          }
+        },
+        "query": {
+          "type": "string"
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "mode": {
+          "type": "string"
+        },
+        "paper_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "papers"
+      ],
+      "additionalProperties": {}
+    },
+    {
+      "type": "object",
+      "properties": {
+        "paper": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string"
+            },
+            "url": {
+              "type": "string"
+            },
+            "id": {
+              "type": "string"
+            },
+            "paper_id": {
+              "type": "string"
+            },
+            "primary_id": {
+              "type": "string"
+            },
+            "scholar_id": {
+              "type": "string"
+            },
+            "doi": {
+              "type": "string"
+            },
+            "authors": {
+              "type": "string"
+            },
+            "abstract": {
+              "type": "string"
+            },
+            "snippet": {
+              "type": "string"
+            },
+            "published": {
+              "type": "string"
+            },
+            "created": {
+              "type": "string"
+            },
+            "updated": {
+              "type": "string"
+            },
+            "year": {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "venue": {
+              "type": "string"
+            },
+            "journal_ref": {
+              "type": "string"
+            },
+            "publication_info": {
+              "type": "string"
+            },
+            "publisher": {
+              "type": "string"
+            },
+            "primary_category": {
+              "type": "string"
+            },
+            "categories": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "string"
+                }
+              ]
+            },
+            "type": {
+              "type": "string"
+            },
+            "cited_by": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "references": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "pdf_url": {
+              "type": "string"
+            },
+            "open_access_url": {
+              "type": "string"
+            },
+            "topic": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            },
+            "license": {
+              "type": "string"
+            },
+            "retracted": {
+              "type": "boolean"
+            },
+            "is_retracted": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "title"
+          ],
+          "additionalProperties": {}
+        },
+        "passages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "text": {
+                "type": "string"
+              },
+              "score": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "text"
+            ],
+            "additionalProperties": {}
+          }
+        }
+      },
+      "required": [
+        "paper"
+      ],
+      "additionalProperties": {}
+    }
+  ]
+}
