@@ -338,6 +338,12 @@ importers:
         specifier: 'catalog:'
         version: 5.9.3
 
+  packages/config:
+    devDependencies:
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+
   packages/model:
     dependencies:
       '@ai-sdk/anthropic':
@@ -356,6 +362,18 @@ importers:
       '@types/node':
         specifier: 'catalog:'
         version: 24.12.3
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+
+  packages/money:
+    devDependencies:
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+
+  packages/networks:
+    devDependencies:
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
