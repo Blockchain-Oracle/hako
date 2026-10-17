@@ -12,6 +12,10 @@
     "typecheck": "turbo run typecheck"
   },
   "devDependencies": {
-    "turbo": "2.11.3"
+    "eslint": "catalog:",
+    "eslint-config-next": "catalog:",
+    "turbo": "2.11.3",
+    "typescript": "catalog:",
+    "typescript-eslint": "catalog:"
   }
 }
