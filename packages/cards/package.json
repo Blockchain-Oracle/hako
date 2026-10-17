@@ -2,21 +2,27 @@
   "name": "@hako/cards",
   "version": "0.0.0",
   "private": true,
-  "description": "Hako's cards: the card contract (phases, PayBox request status, intents, schemas per render kind) and the React cards shared by /agent and the MCP Apps view.",
+  "description": "Hako's cards: the card contract (phases, PayBox request status, intents, one schema per render kind, the structuredContent envelope, CardHost, the typed gateway endpoint table and its client) and the React cards shared by /agent and the MCP Apps view.",
   "type": "module",
   "sideEffects": false,
   "exports": {
     ".": "./src/index.ts",
-    "./contract": "./src/contract/index.ts"
+    "./contract": "./src/contract/index.ts",
+    "./schemas/*": "./schemas/*"
   },
   "scripts": {
-    "typecheck": "tsc --noEmit -p tsconfig.json",
-    "lint": "eslint src"
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p scripts/tsconfig.json",
+    "lint": "eslint src scripts",
+    "schemas": "node scripts/schemas.ts",
+    "schemas:check": "node scripts/schemas.ts --check"
   },
   "dependencies": {
+    "@hako/config": "workspace:*",
+    "@hako/networks": "workspace:*",
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@types/node": "catalog:",
     "typescript": "catalog:"
   }
 }

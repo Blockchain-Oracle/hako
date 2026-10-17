@@ -1,0 +1,71 @@
+{
+  "$id": "https://usehako.xyz/schemas/cards/jobs.json",
+  "title": "jobs",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "jobs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "company": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "location": {
+            "type": "string"
+          },
+          "department": {
+            "type": "string"
+          },
+          "remote": {
+            "type": "boolean"
+          },
+          "salary": {
+            "type": "string"
+          },
+          "salary_min": {
+            "type": "number"
+          },
+          "salary_max": {
+            "type": "number"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "posted_at": {
+            "type": "string"
+          },
+          "ats": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "company",
+          "url"
+        ],
+        "additionalProperties": {}
+      }
+    },
+    "query": {
+      "type": "string"
+    },
+    "unavailable": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "jobs"
+  ],
+  "additionalProperties": {}
+}

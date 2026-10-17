@@ -1,0 +1,163 @@
+{
+  "$id": "https://usehako.xyz/schemas/cards/tool.json",
+  "title": "tool",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "provider": {
+      "type": "string"
+    },
+    "providerName": {
+      "type": "string"
+    },
+    "slug": {
+      "type": "string"
+    },
+    "displayName": {
+      "type": "string"
+    },
+    "summary": {
+      "type": "string"
+    },
+    "categories": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "render": {
+      "type": "string"
+    },
+    "price": {
+      "type": "object",
+      "properties": {
+        "usd": {
+          "type": "string",
+          "pattern": "^-?\\d+(\\.\\d+)?$"
+        },
+        "atomic": {
+          "type": "string",
+          "pattern": "^\\d+$",
+          "description": "Atomic units, e.g. 1000000 = 1 USDC"
+        },
+        "tier": {
+          "type": "string",
+          "minLength": 1
+        },
+        "network": {
+          "type": "string",
+          "pattern": "^[-a-z0-9]{3,8}:[-_a-zA-Z0-9]{1,64}$",
+          "description": "CAIP-2 chain id, e.g. eip155:8453 (Base) or solana:mainnet"
+        }
+      },
+      "required": [
+        "usd",
+        "atomic",
+        "tier",
+        "network"
+      ],
+      "additionalProperties": false
+    },
+    "method": {
+      "type": "string",
+      "const": "POST"
+    },
+    "path": {
+      "type": "string"
+    },
+    "available": {
+      "type": "boolean"
+    },
+    "description": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "seeAlso": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "deadlineMs": {
+      "type": "number"
+    },
+    "cacheTtlS": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "terms": {
+      "type": "string"
+    },
+    "input": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {}
+    },
+    "output": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {}
+    },
+    "example": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {}
+    },
+    "paidUrl": {
+      "anyOf": [
+        {
+          "type": "string",
+          "format": "uri"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "howToPay": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "provider",
+    "providerName",
+    "slug",
+    "displayName",
+    "summary",
+    "categories",
+    "render",
+    "price",
+    "method",
+    "path",
+    "available",
+    "description",
+    "notes",
+    "seeAlso",
+    "deadlineMs",
+    "cacheTtlS",
+    "terms",
+    "input",
+    "output",
+    "example",
+    "paidUrl",
+    "howToPay"
+  ],
+  "additionalProperties": {}
+}

@@ -1,0 +1,74 @@
+{
+  "$id": "https://usehako.xyz/schemas/cards/definition.json",
+  "title": "definition",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "word": {
+      "type": "string"
+    },
+    "meanings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "part_of_speech": {
+            "type": "string"
+          },
+          "definitions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "definition": {
+                  "type": "string"
+                },
+                "example": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "definition"
+              ],
+              "additionalProperties": {}
+            }
+          },
+          "synonyms": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "antonyms": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "part_of_speech",
+          "definitions"
+        ],
+        "additionalProperties": {}
+      }
+    },
+    "phonetic": {
+      "type": "string"
+    },
+    "audio": {
+      "type": "string"
+    },
+    "origin": {
+      "type": "string"
+    },
+    "source_url": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "word",
+    "meanings"
+  ],
+  "additionalProperties": {}
+}

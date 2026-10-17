@@ -1,0 +1,365 @@
+{
+  "$id": "https://usehako.xyz/schemas/cards/route.json",
+  "title": "route",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "tool": {
+      "type": "string",
+      "minLength": 1
+    },
+    "fromAmountAtomic": {
+      "type": "string",
+      "pattern": "^\\d+$",
+      "description": "Atomic units, e.g. 1000000 = 1 USDC"
+    },
+    "toAmountAtomic": {
+      "type": "string",
+      "pattern": "^\\d+$",
+      "description": "Atomic units, e.g. 1000000 = 1 USDC"
+    },
+    "toAmountMinAtomic": {
+      "type": "string",
+      "pattern": "^\\d+$",
+      "description": "Atomic units, e.g. 1000000 = 1 USDC"
+    },
+    "feeUsd": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^-?\\d+(\\.\\d+)?$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "estimatedDurationS": {
+      "anyOf": [
+        {
+          "type": "number",
+          "minimum": 0
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "approvalAddress": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "quotedAt": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+    },
+    "expiresAt": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+    },
+    "toolName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "toolLogoUrl": {
+      "anyOf": [
+        {
+          "type": "string",
+          "format": "uri"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "fromChain": {
+      "type": "string",
+      "pattern": "^[-a-z0-9]{3,8}:[-_a-zA-Z0-9]{1,64}$",
+      "description": "CAIP-2 chain id, e.g. eip155:8453 (Base) or solana:mainnet"
+    },
+    "toChain": {
+      "type": "string",
+      "pattern": "^[-a-z0-9]{3,8}:[-_a-zA-Z0-9]{1,64}$",
+      "description": "CAIP-2 chain id, e.g. eip155:8453 (Base) or solana:mainnet"
+    },
+    "fromToken": {
+      "type": "object",
+      "properties": {
+        "chain": {
+          "type": "string",
+          "pattern": "^[-a-z0-9]{3,8}:[-_a-zA-Z0-9]{1,64}$",
+          "description": "CAIP-2 chain id, e.g. eip155:8453 (Base) or solana:mainnet"
+        },
+        "address": {
+          "type": "string",
+          "minLength": 1
+        },
+        "symbol": {
+          "type": "string",
+          "minLength": 1
+        },
+        "decimals": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "name": {
+          "type": "string"
+        },
+        "logoUrl": {
+          "type": "string",
+          "format": "uri"
+        }
+      },
+      "required": [
+        "chain",
+        "address",
+        "symbol",
+        "decimals"
+      ],
+      "additionalProperties": false
+    },
+    "toToken": {
+      "type": "object",
+      "properties": {
+        "chain": {
+          "type": "string",
+          "pattern": "^[-a-z0-9]{3,8}:[-_a-zA-Z0-9]{1,64}$",
+          "description": "CAIP-2 chain id, e.g. eip155:8453 (Base) or solana:mainnet"
+        },
+        "address": {
+          "type": "string",
+          "minLength": 1
+        },
+        "symbol": {
+          "type": "string",
+          "minLength": 1
+        },
+        "decimals": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "name": {
+          "type": "string"
+        },
+        "logoUrl": {
+          "type": "string",
+          "format": "uri"
+        }
+      },
+      "required": [
+        "chain",
+        "address",
+        "symbol",
+        "decimals"
+      ],
+      "additionalProperties": false
+    },
+    "fromAddress": {
+      "type": "string",
+      "minLength": 1
+    },
+    "toAddress": {
+      "type": "string",
+      "minLength": 1
+    },
+    "fromAmountUsd": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^-?\\d+(\\.\\d+)?$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "toAmountUsd": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^-?\\d+(\\.\\d+)?$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "gasUsd": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^-?\\d+(\\.\\d+)?$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "fees": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "amount": {
+            "type": "object",
+            "properties": {
+              "token": {
+                "type": "object",
+                "properties": {
+                  "chain": {
+                    "type": "string",
+                    "pattern": "^[-a-z0-9]{3,8}:[-_a-zA-Z0-9]{1,64}$",
+                    "description": "CAIP-2 chain id, e.g. eip155:8453 (Base) or solana:mainnet"
+                  },
+                  "address": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "symbol": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "decimals": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "logoUrl": {
+                    "type": "string",
+                    "format": "uri"
+                  }
+                },
+                "required": [
+                  "chain",
+                  "address",
+                  "symbol",
+                  "decimals"
+                ],
+                "additionalProperties": false
+              },
+              "amountAtomic": {
+                "type": "string",
+                "pattern": "^\\d+$",
+                "description": "Atomic units, e.g. 1000000 = 1 USDC"
+              },
+              "usd": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^-?\\d+(\\.\\d+)?$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "token",
+              "amountAtomic",
+              "usd"
+            ],
+            "additionalProperties": false
+          },
+          "included": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "name",
+          "amount",
+          "included"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "steps": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "rehearsal": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "passed",
+                "failed",
+                "skipped",
+                "unsupported"
+              ]
+            },
+            "key": {
+              "type": "string",
+              "pattern": "^[\\s\\S]{0,}:-?\\d+(?:\\.\\d+)?$"
+            },
+            "chain": {
+              "type": "string",
+              "pattern": "^[-a-z0-9]{3,8}:[-_a-zA-Z0-9]{1,64}$",
+              "description": "CAIP-2 chain id, e.g. eip155:8453 (Base) or solana:mainnet"
+            },
+            "reason": {
+              "type": "string"
+            },
+            "simulatedAt": {
+              "type": "string",
+              "format": "date-time",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+            }
+          },
+          "required": [
+            "status",
+            "key",
+            "chain"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "required": [
+    "tool",
+    "fromAmountAtomic",
+    "toAmountAtomic",
+    "toAmountMinAtomic",
+    "feeUsd",
+    "estimatedDurationS",
+    "approvalAddress",
+    "quotedAt",
+    "expiresAt",
+    "toolName",
+    "toolLogoUrl",
+    "fromChain",
+    "toChain",
+    "fromToken",
+    "toToken",
+    "fromAddress",
+    "toAddress",
+    "fromAmountUsd",
+    "toAmountUsd",
+    "gasUsd",
+    "fees",
+    "steps",
+    "rehearsal"
+  ],
+  "additionalProperties": false
+}

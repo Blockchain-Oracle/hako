@@ -1,0 +1,176 @@
+{
+  "$id": "https://usehako.xyz/schemas/cards/weather.json",
+  "title": "weather",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "anyOf": [
+    {
+      "type": "object",
+      "properties": {
+        "location": {
+          "type": "object",
+          "properties": {
+            "lat": {
+              "type": "number"
+            },
+            "lon": {
+              "type": "number"
+            },
+            "name": {
+              "type": "string"
+            },
+            "state": {
+              "type": "string"
+            },
+            "country": {
+              "type": "string"
+            },
+            "timezone": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "lat",
+            "lon"
+          ],
+          "additionalProperties": {}
+        },
+        "units": {
+          "type": "object",
+          "properties": {
+            "temperature": {
+              "type": "string"
+            },
+            "wind_speed": {
+              "type": "string"
+            },
+            "precipitation": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "temperature",
+            "wind_speed"
+          ],
+          "additionalProperties": {}
+        },
+        "current": {
+          "type": "object",
+          "properties": {
+            "description": {
+              "type": "string"
+            },
+            "temp": {
+              "type": "number"
+            }
+          },
+          "additionalProperties": {}
+        },
+        "days": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "date": {
+                "type": "string"
+              },
+              "temp_min": {
+                "type": "number"
+              },
+              "temp_max": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "date"
+            ],
+            "additionalProperties": {}
+          }
+        },
+        "next_24h": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "time": {
+                "type": "string"
+              },
+              "temp": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "time"
+            ],
+            "additionalProperties": {}
+          }
+        },
+        "dataset": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "location",
+        "units"
+      ],
+      "additionalProperties": {}
+    },
+    {
+      "type": "object",
+      "properties": {
+        "lat": {
+          "type": "number"
+        },
+        "lon": {
+          "type": "number"
+        },
+        "valid_for": {
+          "type": "string"
+        },
+        "readings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "source": {
+                "type": "string"
+              },
+              "valid_for": {
+                "type": "string"
+              },
+              "temperature_c": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "source",
+              "valid_for"
+            ],
+            "additionalProperties": {}
+          }
+        },
+        "place": {
+          "type": "string"
+        },
+        "temperature_c": {
+          "type": "number"
+        },
+        "conditions": {
+          "type": "string"
+        },
+        "alerts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "lat",
+        "lon",
+        "valid_for",
+        "readings"
+      ],
+      "additionalProperties": {}
+    }
+  ]
+}

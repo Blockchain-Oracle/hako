@@ -1,0 +1,110 @@
+{
+  "$id": "https://usehako.xyz/schemas/cards/fx.json",
+  "title": "fx",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "base": {
+      "type": "string"
+    },
+    "provider": {
+      "type": "string"
+    },
+    "rates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "quote": {
+            "type": "string"
+          },
+          "rate": {
+            "type": "number"
+          },
+          "date": {
+            "type": "string"
+          },
+          "base": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          },
+          "converted": {
+            "type": "number"
+          },
+          "providers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "provider": {
+                  "type": "string"
+                },
+                "rate": {
+                  "type": "number"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "date": {
+                  "type": "string"
+                },
+                "rate_type": {
+                  "type": "string"
+                },
+                "issuer": {
+                  "type": "boolean"
+                },
+                "cadence": {
+                  "type": "string"
+                },
+                "business_days_old": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": [
+                "provider",
+                "rate"
+              ],
+              "additionalProperties": {}
+            }
+          }
+        },
+        "required": [
+          "quote",
+          "rate",
+          "date"
+        ],
+        "additionalProperties": {}
+      }
+    },
+    "quote": {
+      "type": "string"
+    },
+    "rate": {
+      "type": "number"
+    },
+    "amount": {
+      "type": "number"
+    },
+    "converted": {
+      "type": "number"
+    },
+    "date": {
+      "type": "string"
+    },
+    "unavailable": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "base"
+  ],
+  "additionalProperties": {}
+}

@@ -1,0 +1,5 @@
+{
+  "$id": "https://usehako.xyz/schemas/cards/json.json",
+  "title": "json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}
