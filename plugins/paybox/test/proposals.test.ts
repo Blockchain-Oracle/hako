@@ -9,8 +9,23 @@ import { erc20ApproveCalldata } from "../../../packages/defi/src/core/index.ts";
 import { LIFI_DIAMOND } from "../../../packages/networks/src/index.ts";
 import { HakoError } from "../src/errors.js";
 import { amountText, executableChain, proposalExpiry, proposeApproveStep, proposeMove, proposeTransferStep } from "../src/proposals.js";
+import { proposeEarnMove } from "../src/tools/earn.js";
 import type { ProposalResponse } from "../src/wire/money.js";
-import { BASE_USDC, EVM_WALLET, MIN_RECEIVED, ONE_USDC, reviewedBaseToSolana, route, SOL_USDC, SOL_WALLET, solanaTx, transfer } from "./fixtures.js";
+import {
+  BASE_USDC,
+  earnDepositBody,
+  earnDepositRoute,
+  EVM_WALLET,
+  MIN_RECEIVED,
+  ONE_USDC,
+  reviewedBaseToSolana,
+  route,
+  SOL_USDC,
+  SOL_WALLET,
+  solanaTx,
+  TOOL,
+  transfer,
+} from "./fixtures.js";
 
 const KEY = "io.paybox/transactionProposal";
 
@@ -142,6 +157,33 @@ describe("R15: the fresh quote binds to the reviewed route or is refused", () =>
   it("refuses a quote that expires before it could be signed", () => {
     const soon = new Date(Date.now() + 5_000).toISOString();
     refusedWith("quote_expired", () => proposeMove(reviewedBaseToSolana(), transfer({ expiresAt: soon }), "hako_bridge", "Bridge"));
+  });
+});
+
+describe("Earn moves: R15 binds the LI.FI tool the person reviewed", () => {
+  it("sends a quote back for review when no tool was reviewed yet, naming its tool", () => {
+    refusedWith(
+      "quote_needs_review",
+      () => proposeEarnMove(earnDepositBody(), "deposit", transfer(earnDepositRoute)),
+      new RegExp(`^No LI\\.FI tool was reviewed yet.*minReceivedAtomic "${MIN_RECEIVED}" \\(tool "${TOOL}"\\)`),
+    );
+    const review: ProposalResponse = { step: "review", route: route(earnDepositRoute), reason: "The minimum dropped." };
+    refusedWith("quote_needs_review", () => proposeEarnMove(earnDepositBody(), "withdraw", review), /No LI\.FI tool was reviewed yet.*hako_earn_withdraw/);
+  });
+
+  it("refuses a quote from a different tool than the reviewed one", () => {
+    refusedWith("r15_refused", () => proposeEarnMove(earnDepositBody("across"), "deposit", transfer(earnDepositRoute)), /tool_mismatch/);
+  });
+
+  it("binds the reviewed tool and proposes the deposit", () => {
+    const result = proposeEarnMove(earnDepositBody(TOOL), "deposit", transfer(earnDepositRoute));
+    assert.equal(result.structuredContent[KEY].kind, "evm");
+    assert.match(result.content[0]!.text, /^Deposit 1 USDC on Base → at least 0\.99 aBasUSDC on Base/);
+  });
+
+  it("still proposes the exact approve first, before any tool is reviewed", () => {
+    const result = proposeEarnMove(earnDepositBody(), "deposit", approve());
+    assert.match(result.content[0]!.text, /^Step 1 of 2: approve exactly 1 USDC.*call hako_earn_deposit again/);
   });
 });
 

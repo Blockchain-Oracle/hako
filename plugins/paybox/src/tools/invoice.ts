@@ -13,7 +13,7 @@ import { amountText } from "../proposals.js";
 import { sameAddress, toAtomic, ZERO_UNITS } from "../shared.js";
 import { idParamsSchema, type InvoiceData, invoiceCreateRequestSchema, invoiceDataSchema } from "../wire/money.js";
 import { decimalAmountSchema } from "../wire/primitives.js";
-import { CREATES, PAYS, READ_ONLY } from "./annotations.js";
+import { CREATES, PROPOSES, READ_ONLY } from "./annotations.js";
 
 const invoiceId = idParamsSchema.shape.id.describe("The invoice id (from hako_invoice_create or the pay link usehako.site/pay/<id>).");
 
@@ -88,7 +88,7 @@ export function registerInvoiceTools(server: McpServer) {
         "with get_request; never re-run to finish it.",
       inputSchema: z.object({ id: invoiceId }).strict(),
       outputSchema: x402OutputSchema,
-      annotations: PAYS,
+      annotations: PROPOSES,
     },
     guarded(async ({ id }) => {
       const invoice = await callGateway("invoiceGet", { params: { id } });

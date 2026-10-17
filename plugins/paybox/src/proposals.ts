@@ -17,17 +17,14 @@ import {
   erc20ApproveCalldata,
   fromAtomic,
   isExecutableCaip2,
-  LIFI_CONTRACT_ALLOWLIST,
   MS_PER_SECOND,
   networkByCaip2,
   type NormalizedQuote,
   parseAtomic,
-  type R15Rules,
-  type R16Rules,
+  r15RulesFor,
+  r16RulesFor,
   type ReviewedRoute,
   sameAddress,
-  SOLANA_TX_MAX_BYTES,
-  SOLANA_TX_REQUIRED_SIGNERS,
   ZERO_UNITS,
 } from "./shared.js";
 import type { ProposalResponse, RouteData } from "./wire/money.js";
@@ -40,30 +37,6 @@ export const moveOutputSchema = z
   .strict();
 /** EVM-only moves (LI.FI Earn). */
 export const evmMoveOutputSchema = evmOutputSchema;
-
-/**
- * R15's rules for a source chain, filled from the one source of each value. Same composition as
- * packages/defi/src/server/rules.ts `r15RulesFor`, which the plugin can't import (it uses bare `@hako/*` imports).
- */
-export function r15RulesFor(fromChain: string): R15Rules | null {
-  const network = networkByCaip2(fromChain);
-  if (!network) return null;
-  return {
-    allowedTargets: network.family === "evm" ? LIFI_CONTRACT_ALLOWLIST[network.key] : [],
-    nativeToken: network.native.address,
-    solanaMaxBytes: SOLANA_TX_MAX_BYTES,
-    solanaRequiredSigners: SOLANA_TX_REQUIRED_SIGNERS,
-    sameAddress,
-    parseAtomic,
-  };
-}
-
-/** R16's rules for an EVM source chain (`r16RulesFor` in packages/defi/src/server/rules.ts); null otherwise. */
-export function r16RulesFor(chain: string): R16Rules | null {
-  const network = networkByCaip2(chain);
-  if (!network || network.family !== "evm") return null;
-  return { allowedSpenders: LIFI_CONTRACT_ALLOWLIST[network.key], sameAddress, parseAtomic };
-}
 
 /** R17: a money tool signs only on an executable source chain (Base, Solana); the canonical CAIP-2 id when it is one. */
 export function executableChain(chain: string): `${string}:${string}` {
@@ -136,8 +109,8 @@ export function normalizedQuote(route: RouteData, tx: Transfer["tx"]): Normalize
   };
 }
 
-/** The new quote in words, for the person to review (R15's lower-minimum case). */
-function reviewError(reviewed: ReviewedRoute, route: RouteData, toolName: string, reason: string): HakoError {
+/** The new quote in words, for the person to review (R15's lower-minimum or unreviewed-tool case). */
+export function reviewError(reviewed: ReviewedRoute, route: RouteData, toolName: string, reason: string): HakoError {
   const { decimals, symbol } = route.toToken;
   return new HakoError(
     "quote_needs_review",

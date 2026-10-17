@@ -13,7 +13,7 @@ import { amountText, proposalExpiry } from "../proposals.js";
 import { BATCH_MAX_CALLS } from "../shared.js";
 import { jsonObjectSchema } from "../wire/primitives.js";
 import { discoverRequestSchema, toolIdSchema } from "../wire/reads.js";
-import { READ_ONLY, PAYS } from "./annotations.js";
+import { PROPOSES, READ_ONLY } from "./annotations.js";
 
 const toolId = toolIdSchema.describe('Tool id from hako_discover, e.g. "openweather/current".');
 /** A tool input is JSON (it becomes the paid request's body): the wire's JSON object, held to JSON values. */
@@ -141,7 +141,7 @@ export function registerCatalogTools(server: McpServer) {
         "lookups that find nothing are never charged. Follow the request id with get_request; never re-run to finish it.",
       inputSchema: z.object({ id: toolId, input: toolInput }).strict(),
       outputSchema: x402OutputSchema,
-      annotations: PAYS,
+      annotations: PROPOSES,
     },
     guarded(async ({ id, input }) => {
       const { url, amountAtomic } = await preflightRun(id, input);
@@ -163,7 +163,7 @@ export function registerCatalogTools(server: McpServer) {
         .object({ calls: z.array(z.object({ id: toolId, input: toolInput }).strict()).min(1).max(BATCH_MAX_CALLS) })
         .strict(),
       outputSchema: x402OutputSchema,
-      annotations: PAYS,
+      annotations: PROPOSES,
     },
     guarded(async ({ calls }) => {
       const batch = await callGateway("batchCreate", { body: { calls } });

@@ -15,6 +15,7 @@
     "../../packages/config/src/**/*.ts",
     "../../packages/networks/src/**/*.ts",
     "../../packages/money/src/**/*.ts",
-    "../../packages/defi/src/core/**/*.ts"
+    "../../packages/defi/src/core/**/*.ts",
+    "../../packages/defi/src/rules.ts"
   ]
 }
