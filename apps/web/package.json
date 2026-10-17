@@ -11,8 +11,10 @@
   },
   "dependencies": {
     "@ai-sdk/react": "catalog:",
+    "@hako/auth": "workspace:*",
     "@hako/brand": "workspace:*",
     "@hako/config": "workspace:*",
+    "@hako/db": "workspace:*",
     "@hako/env": "workspace:*",
     "@hako/model": "workspace:*",
     "ai": "catalog:",
