@@ -14,7 +14,15 @@ export { TokenMark, type TokenMarkProps } from "./token-mark.tsx";
 export { FallbackDisc, fallbackFontSize, fallbackLabel } from "./fallback-disc.tsx";
 export { LogoImage, LogoProxyProvider } from "./logo-image.tsx";
 export { logoProxyUrl } from "./logo-proxy.ts";
-export * from "./identity.config.ts";
+export {
+  FALLBACK_INITIALS_MAX,
+  FALLBACK_LABEL_SHORT,
+  FALLBACK_RATIO_LONG,
+  FALLBACK_RATIO_SHORT,
+  MARK_BADGE_RATIO,
+  MARK_DEFAULT_SIZE,
+  MARK_GLYPH_RATIO,
+} from "./identity.config.ts";
 
 export const getChainIdentity = (caip2: string): Entity | undefined => getEntity(chainKey(caip2));
 export const getTokenIdentity = (caip2: string, address: string): Entity | undefined => getEntity(tokenKey(caip2, address));

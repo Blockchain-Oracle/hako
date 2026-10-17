@@ -14,6 +14,10 @@ export const FALLBACK_LABEL_SHORT = 2;
 export const FALLBACK_RATIO_SHORT = 0.34;
 export const FALLBACK_RATIO_LONG = 0.22;
 
-/** The gateway's allowlisted logo proxy: `GET /v1/logo?src=<url>` (24 h cache, LOGO_CACHE_TTL_S in @hako/config). */
+/**
+ * The gateway's allowlisted logo proxy: `GET /v1/logo?src=<url>` (24 h cache, LOGO_CACHE_TTL_S in @hako/config). Only
+ * `logoProxyUrl` reads these and the package index does not export them: the route's contract is the cards endpoint
+ * table (`endpoints.logo`, W0.4 b-cards). At merge the path moves to @hako/config (hosts) for both, and these go.
+ */
 export const LOGO_PROXY_PATH = "/v1/logo";
 export const LOGO_PROXY_PARAM = "src";
