@@ -1,4 +1,4 @@
-import type { EvmNetworkKey } from "./types.js";
+import type { EvmNetworkKey } from "./types.ts";
 
 /**
  * LI.FI's contract allowlist for R15: a LI.FI proposal is bound only when `transactionRequest.to` is one of these on

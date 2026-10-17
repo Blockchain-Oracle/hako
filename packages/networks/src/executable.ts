@@ -1,5 +1,5 @@
-import { networkByCaip2 } from "./lookup.js";
-import type { NetworkKey } from "./types.js";
+import { networkByCaip2 } from "./lookup.ts";
+import type { NetworkKey } from "./types.ts";
 
 /**
  * R17: executable coverage is not routing coverage. LI.FI routes many chains; only a network on this list gets an

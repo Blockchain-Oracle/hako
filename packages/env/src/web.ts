@@ -1,8 +1,8 @@
 import { LOCAL_GATEWAY_URL, LOCAL_HAKO_API_URL, PAYBOX_OAUTH_REDIRECT_URL } from "@hako/config";
 import { z } from "zod";
 
-import { lifiEnvShape } from "./providers.js";
-import { envLoader, nodeEnv, optionalHexKey32, optionalSecret, optionalText, optionalUrl, urlOr } from "./shared.js";
+import { lifiEnvShape } from "./providers.ts";
+import { envLoader, nodeEnv, optionalHexKey32, optionalSecret, optionalText, optionalUrl, urlOr } from "./shared.ts";
 
 /** Better Auth refuses shorter secrets. */
 const AUTH_SECRET_MIN_CHARS = 32;

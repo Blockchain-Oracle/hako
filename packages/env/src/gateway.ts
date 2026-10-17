@@ -1,8 +1,8 @@
 import { GATEWAY_DEFAULT_PORT } from "@hako/config";
 import { z } from "zod";
 
-import { heliusEnvShape, lifiEnvShape } from "./providers.js";
-import { envLoader, nodeEnv, optionalHexKey32, optionalPem, optionalText, optionalUrl, portOr, requiredUrl } from "./shared.js";
+import { heliusEnvShape, lifiEnvShape } from "./providers.ts";
+import { envLoader, nodeEnv, optionalHexKey32, optionalPem, optionalText, optionalUrl, portOr, requiredUrl } from "./shared.ts";
 
 /**
  * services/gateway (api.usehako.xyz). Only HAKO_API_URL is required; every other feature degrades without its

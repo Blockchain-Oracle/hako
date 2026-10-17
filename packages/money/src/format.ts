@@ -1,4 +1,4 @@
-import { unitScale } from "./atomic.js";
+import { unitScale } from "./atomic.ts";
 
 /**
  * Display formatting for exact amounts. Numbers go to `Intl.NumberFormat` as decimal strings (exact, ES2023 "string"

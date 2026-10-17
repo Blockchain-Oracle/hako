@@ -1,4 +1,4 @@
-import { MS_PER_SECOND } from "./units.js";
+import { MS_PER_SECOND } from "./units.ts";
 
 /**
  * PayBox request status (approval, signature, settlement, confirmation): poll `get_request` from 1 s, backing off to

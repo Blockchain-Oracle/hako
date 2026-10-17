@@ -3,4 +3,4 @@
 // (src/intents/types.ts). Next code imports this root; the gateway and the CLI import `@hako/paybox/node`.
 import "server-only";
 
-export * from "./node.js";
+export * from "./node.ts";

@@ -1,4 +1,4 @@
-import { MS_PER_SECOND, SECONDS_PER_MINUTE } from "./units.js";
+import { MS_PER_SECOND, SECONDS_PER_MINUTE } from "./units.ts";
 
 /** PayBox gives each plugin operation ten seconds (plan §2, plugin limits). */
 export const PLUGIN_OPERATION_BUDGET_MS = 10 * MS_PER_SECOND;

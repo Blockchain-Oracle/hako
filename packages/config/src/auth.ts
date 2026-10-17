@@ -1,5 +1,5 @@
-import { PAYBOX_MCP_URL } from "./hosts.js";
-import { SECONDS_PER_MINUTE } from "./units.js";
+import { PAYBOX_MCP_URL } from "./hosts.ts";
+import { SECONDS_PER_MINUTE } from "./units.ts";
 
 /** Connect PayBox (plan §1 execution rules): PKCE S256, these scopes, this resource, one public client per Hako user. */
 export const PAYBOX_OAUTH_SCOPE = "mcp offline_access";

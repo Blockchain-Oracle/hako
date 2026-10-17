@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { envLoader, optionalText } from "./shared.js";
+import { envLoader, optionalText } from "./shared.ts";
 
 /** LI.FI: quotes, routes and status work keyless at lower limits; Earn answers 401 without a key (plan §10 open items). */
 export const lifiEnvShape = { LIFI_API_KEY: optionalText };

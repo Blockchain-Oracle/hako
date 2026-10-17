@@ -1,4 +1,4 @@
-import { BYTES_PER_MIB } from "./units.js";
+import { BYTES_PER_MIB } from "./units.ts";
 
 /** `hako_run_batch`: up to five tools, one payment, one approval (plan A4). */
 export const BATCH_MAX_CALLS = 5;

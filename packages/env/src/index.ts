@@ -3,5 +3,5 @@
 // gateway and the CLI import `@hako/env/node` (the same exports without the `server-only` guard).
 import "server-only";
 
-export * from "./node.js";
-export * from "./web.js";
+export * from "./node.ts";
+export * from "./web.ts";

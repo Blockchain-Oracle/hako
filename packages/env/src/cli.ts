@@ -1,7 +1,7 @@
 import { HAKO_GATEWAY_URL, PAYBOX_CONFIG_DIR_ENV } from "@hako/config";
 import { z } from "zod";
 
-import { envLoader, optionalText, urlOr } from "./shared.js";
+import { envLoader, optionalText, urlOr } from "./shared.ts";
 
 /**
  * apps/cli (`hako`, `hako mcp`). The CLI holds no Hako secret: PayBox's own config directory keeps the user's tokens

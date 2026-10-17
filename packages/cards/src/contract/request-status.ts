@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import type { CardPhase } from "./phase.js";
+import type { CardPhase } from "./phase.ts";
 
 /**
  * A PayBox request's status, exactly as PayBox reports it: `RequestStatus` in @paybox-sh/sdk 2.2.0

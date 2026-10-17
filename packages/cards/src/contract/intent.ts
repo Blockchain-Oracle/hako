@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import type { CardPhase } from "./phase.js";
+import type { CardPhase } from "./phase.ts";
 
 /**
  * A money intent's states (Kawase's A2A task states, tamion/packages/intents/src/states.ts) and which moves are legal.

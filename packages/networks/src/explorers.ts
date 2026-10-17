@@ -1,4 +1,4 @@
-import type { Network } from "./types.js";
+import type { Network } from "./types.ts";
 
 /** A transaction on the network's explorer (EVM tx hash or Solana signature). */
 export function explorerTxUrl(network: Network, hash: string): string {

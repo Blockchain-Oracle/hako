@@ -1,4 +1,4 @@
-import { SECONDS_PER_DAY, SECONDS_PER_HOUR, SECONDS_PER_MINUTE } from "./units.js";
+import { SECONDS_PER_DAY, SECONDS_PER_HOUR, SECONDS_PER_MINUTE } from "./units.ts";
 
 /** LI.FI quotes are cached by request hash this long (plan §2, data fetching and caching). */
 export const QUOTE_CACHE_TTL_S = 15;

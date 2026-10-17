@@ -1,4 +1,4 @@
-import { MS_PER_SECOND } from "./units.js";
+import { MS_PER_SECOND } from "./units.ts";
 
 /**
  * Kawase's state rules (plan §2 States, §1 card flow): how long the interface waits before it says something.

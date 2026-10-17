@@ -1,4 +1,4 @@
-import type { EvmNetwork, EvmNetworkKey, Explorer, Network, NetworkKey, SolanaNetwork, TokenInfo } from "./types.js";
+import type { EvmNetwork, EvmNetworkKey, Explorer, Network, NetworkKey, SolanaNetwork, TokenInfo } from "./types.ts";
 
 /**
  * The chain registry (plan §5b `@hako/networks`). Sources, fetched 2026-10-17:

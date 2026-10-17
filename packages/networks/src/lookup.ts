@@ -1,5 +1,5 @@
-import { NETWORK_KEYS, NETWORKS } from "./registry.js";
-import type { Caip2, EvmNetwork, Network, NetworkKey } from "./types.js";
+import { NETWORK_KEYS, NETWORKS } from "./registry.ts";
+import type { Caip2, EvmNetwork, Network, NetworkKey } from "./types.ts";
 
 const ALL: readonly Network[] = NETWORK_KEYS.map((key) => NETWORKS[key]);
 
