@@ -93,8 +93,13 @@ def network(chain: str) -> EvmNetwork:
     return _BY_ALIAS[chain]
 
 
+def lookup(value: str) -> EvmNetwork | None:
+    """The network any accepted spelling names ('eip155:8453', 'base', '8453'), or None."""
+    return _BY_ALIAS.get(value.strip().lower())
+
+
 def _to_caip2(value: str) -> str:
-    found = _BY_ALIAS.get(value.strip().lower())
+    found = lookup(value)
     if found is None:
         raise ValueError(f"unsupported EVM chain {value!r}; use one of {CHAIN_IDS}")
     return found.caip2
