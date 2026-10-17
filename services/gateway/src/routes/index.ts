@@ -29,6 +29,7 @@ import { forwardRead, forwardRun } from "../forward.js";
 import type { Forwarded } from "../forward.js";
 import { startCatalogRefresh, state } from "./catalog-state.js";
 import { registerMoneyRoutes } from "./money.js";
+import { registerX402Routes } from "./x402/index.js";
 
 const catalogLoading = (c: Context) =>
   jsonError(c, HTTP_UNAVAILABLE, "catalog_unavailable", "The tool catalog has not loaded yet; nothing was charged.");
@@ -154,4 +155,6 @@ export function registerRoutes(app: Hono): void {
     }
     return response;
   });
+
+  registerX402Routes(app);
 }

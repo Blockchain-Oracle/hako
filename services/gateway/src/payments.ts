@@ -1,14 +1,18 @@
 /** x402 seller: one exact-price route per catalog endpoint, settled only when the run returns < 400. */
 
-import { HTTPFacilitatorClient } from "@x402/core/server";
-import type { FacilitatorConfig, RouteConfig } from "@x402/core/server";
+import { HTTPFacilitatorClient, x402ResourceServer } from "@x402/core/server";
+import type { FacilitatorClient, FacilitatorConfig, RouteConfig } from "@x402/core/server";
 import { ExactEvmScheme } from "@x402/evm/exact/server";
-import { paymentMiddleware, x402ResourceServer } from "@x402/hono";
+import { paymentMiddleware } from "@x402/hono";
+
+import type { Pool } from "@hako/db/node";
 
 import type { Catalog } from "./catalog.js";
 import { cdpAuthHeaders } from "./cdp-auth.js";
 import type { MainnetConfig } from "./config.js";
 import { PAYMENT_TIMEOUT_S, RUN_PREFIX, RUN_V2_PREFIX, SERVICE_NAME } from "./constants.js";
+import { gatewayPool } from "./routes/x402/db.js";
+import { recordSettlement } from "./routes/x402/settlement.js";
 import { SerialFacilitator } from "./serial-facilitator.js";
 
 type Rail = { prefix: string; network: `${string}:${string}`; payTo: `0x${string}` };
@@ -50,10 +54,22 @@ function facilitatorFor(url: string, createAuthHeaders?: FacilitatorConfig["crea
   return facilitator;
 }
 
+/** The CDP facilitator's one settlement queue: every paid route (runs, batches, invoices) settles through it. */
+export function mainnetFacilitator(mainnet: MainnetConfig): SerialFacilitator {
+  return facilitatorFor(mainnet.facilitatorUrl, cdpAuthHeaders(mainnet));
+}
+
+/**
+ * A resource server for `exact` payments on `network` that records a receipt in `pool` (`@hako/db`; only logged
+ * without one) for every settlement. Paid routes add their own settle hooks on top (claims for batches and invoices).
+ */
+export function resourceServer(facilitator: FacilitatorClient, network: `${string}:${string}`, pool: Pool | null): x402ResourceServer {
+  return new x402ResourceServer(facilitator).register(network, new ExactEvmScheme()).onAfterSettle(recordSettlement(pool));
+}
+
 /** The paid route: every catalog tool on Base mainnet USDC through the CDP facilitator, payable from PayBox. */
 export function paymentLayer(catalog: Catalog, publicBaseUrl: string, mainnet: MainnetConfig) {
-  const facilitator = facilitatorFor(mainnet.facilitatorUrl, cdpAuthHeaders(mainnet));
-  const server = new x402ResourceServer(facilitator).register(mainnet.network, new ExactEvmScheme());
+  const server = resourceServer(mainnetFacilitator(mainnet), mainnet.network, gatewayPool());
   const rail = { prefix: RUN_V2_PREFIX, network: mainnet.network, payTo: mainnet.payTo };
   return paymentMiddleware(runRoutes(catalog, publicBaseUrl, rail), server);
 }
