@@ -430,6 +430,9 @@ importers:
       '@hako/config':
         specifier: workspace:*
         version: link:../config
+      '@hako/money':
+        specifier: workspace:*
+        version: link:../money
       '@hako/networks':
         specifier: workspace:*
         version: link:../networks
@@ -443,6 +446,9 @@ importers:
       '@types/node':
         specifier: 'catalog:'
         version: 24.12.3
+      tsx:
+        specifier: 4.23.15
+        version: 4.23.15
       typescript:
         specifier: 'catalog:'
         version: 5.9.3

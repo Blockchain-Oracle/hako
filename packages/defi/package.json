@@ -1,0 +1,28 @@
+{
+  "name": "@hako/defi",
+  "version": "0.0.0",
+  "private": true,
+  "description": "LI.FI for Hako. ./core: the R15 binding check, the R16 approve sequence and proposal shapes over plain objects (no runtime imports; the PayBox plugin bundles it by relative path). ./server: the LI.FI SDK client, quote/route/status/token/chain helpers and the Earn REST client (gateway and CLI only).",
+  "type": "module",
+  "exports": {
+    "./core": "./src/core/index.ts",
+    "./server": "./src/server/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint": "eslint src test",
+    "test": "tsx --test test/*.test.ts"
+  },
+  "dependencies": {
+    "@hako/config": "workspace:*",
+    "@hako/money": "workspace:*",
+    "@hako/networks": "workspace:*",
+    "@lifi/sdk": "catalog:",
+    "@lifi/types": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "tsx": "4.23.15",
+    "typescript": "catalog:"
+  }
+}
