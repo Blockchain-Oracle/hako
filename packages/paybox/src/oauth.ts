@@ -47,7 +47,7 @@ export interface PayboxTokenSet {
   sub: string | null;
 }
 
-async function post(url: string, body: BodyInit, contentType: string, fetchImpl: Fetch): Promise<Record<string, unknown>> {
+async function post(url: string, body: string | URLSearchParams, contentType: string, fetchImpl: Fetch): Promise<Record<string, unknown>> {
   const response = await fetchImpl(url, {
     method: "POST",
     headers: { "content-type": contentType, accept: "application/json" },
