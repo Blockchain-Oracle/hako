@@ -23,6 +23,7 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Next's own assets keep their paths on every host (the sandbox page loads them too).
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|icon.svg).*)"],
+  // Next's own assets and the favicon (`app/icon.ts`, served at `/icon?<hash>`) keep their paths on every host (the
+  // sandbox page loads them too).
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|icon).*)"],
 };

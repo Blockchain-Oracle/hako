@@ -1,3 +1,4 @@
+import { HAKO_LOGO_PROXY_PATH } from "@hako/config";
 import { z } from "zod";
 
 import { invoiceDataSchema } from "../kinds/account.ts";
@@ -187,7 +188,7 @@ export const GATEWAY_ENDPOINTS = {
     auth: "none",
   },
   file: { method: "GET", path: "/v1/files/:id", summary: "Generated audio bytes stored by hako-api (24 h)", params: idParamsSchema, response: noResponse, responseType: "binary", auth: "none" },
-  logo: { method: "GET", path: "/v1/logo", summary: "Allowlisted logo proxy (24 h cache)", query: logoQuerySchema, response: noResponse, responseType: "binary", auth: "none" },
+  logo: { method: "GET", path: HAKO_LOGO_PROXY_PATH, summary: "Allowlisted logo proxy (24 h cache)", query: logoQuerySchema, response: noResponse, responseType: "binary", auth: "none" },
 
   // Money (B13, L1).
   quote: {
