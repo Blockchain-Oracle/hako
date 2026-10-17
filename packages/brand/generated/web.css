@@ -1,0 +1,493 @@
+/* GENERATED from tokens.json by scripts/build.mjs. Do not edit; change tokens.json and rebuild. */
+/*
+ * Senryo · Hako: light is the default, dark is an adaptation (`.dark` on <html>). Accent: asagi (浅葱) #009CA8,
+ * a fill with a black label for selected controls, the focus ring and badges; text in its family is `link`.
+ */
+:root {
+  color-scheme: light;
+  --background: #F5F5F5;
+  --foreground: #000000;
+  --card: #FFFFFF;
+  --card-foreground: #000000;
+  --popover: #F5F5F5;
+  --popover-foreground: #000000;
+  --primary: #000000;
+  --primary-foreground: #FFFFFF;
+  --secondary: #ECECEC;
+  --secondary-foreground: #000000;
+  --muted: #ECECEC;
+  --muted-foreground: #666666;
+  --accent: #009CA8;
+  --accent-foreground: #000000;
+  --destructive: #C83225;
+  --destructive-foreground: #FFFFFF;
+  --success: #2F7A00;
+  --border: #D4D4D4;
+  --input: #ECECEC;
+  --ring: #009CA8;
+  --glass: #ECECECEB;
+  --glass-border: #FFFFFFB3;
+  --scrim: #000000B3;
+  --texture: #0000000F;
+  --silver: #999999;
+  --silver-deep: #666666;
+  --text-3: #6E6E6E;
+  --link: #006B74;
+  --up: #2F7A00;
+  --down: #C8283F;
+  --warn: #8A5800;
+  --raised-2: #ECECEC;
+  --row-pressed: #E2E2E2;
+  --selected-row: #DDF3F5;
+  --skeleton: #DEDEDE;
+  --primary-pressed: #252525;
+  --up-fill: #B5F543;
+  --down-fill: #FF647C;
+  --up-fill-edge: #7FB224;
+  --down-fill-edge: #D9435C;
+  --on-fill: #000000;
+  --up-foreground: #FFFFFF;
+  --down-foreground: #FFFFFF;
+  --up-surface: #EEF9DC;
+  --down-surface: #FDE7EA;
+  --warn-surface: #FFF0D5;
+  --destructive-surface: #FBE8E5;
+  --glass-opaque: #ECECEC;
+  --sheet-handle: #999999;
+  --radius: 20px;
+}
+
+.dark {
+  color-scheme: dark;
+  --background: #111111;
+  --foreground: #F5F5F5;
+  --card: #1C1C1C;
+  --card-foreground: #F5F5F5;
+  --popover: #171717;
+  --popover-foreground: #F5F5F5;
+  --primary: #F5F5F5;
+  --primary-foreground: #000000;
+  --secondary: #292929;
+  --secondary-foreground: #F5F5F5;
+  --muted: #292929;
+  --muted-foreground: #B8B8B8;
+  --accent: #009CA8;
+  --accent-foreground: #000000;
+  --destructive: #FF5A48;
+  --destructive-foreground: #000000;
+  --success: #B5F543;
+  --border: #414141;
+  --input: #292929;
+  --ring: #009CA8;
+  --glass: #292929EB;
+  --glass-border: #FFFFFF24;
+  --scrim: #000000B3;
+  --texture: #FFFFFF14;
+  --silver: #A0A0A0;
+  --silver-deep: #B8B8B8;
+  --text-3: #A0A0A0;
+  --link: #5FD6E0;
+  --up: #B5F543;
+  --down: #FF647C;
+  --warn: #F2B85C;
+  --raised-2: #292929;
+  --row-pressed: #363636;
+  --selected-row: #163A3D;
+  --skeleton: #363636;
+  --primary-pressed: #DEDEDE;
+  --up-fill: #B5F543;
+  --down-fill: #FF647C;
+  --up-fill-edge: #7FB224;
+  --down-fill-edge: #D9435C;
+  --on-fill: #000000;
+  --up-foreground: #000000;
+  --down-foreground: #000000;
+  --up-surface: #1E2A0C;
+  --down-surface: #3A1A20;
+  --warn-surface: #332719;
+  --destructive-surface: #35201F;
+  --glass-opaque: #292929;
+  --sheet-handle: #999999;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-glass: var(--glass);
+  --color-glass-border: var(--glass-border);
+  --color-scrim: var(--scrim);
+  --color-texture: var(--texture);
+  --color-silver: var(--silver);
+  --color-silver-deep: var(--silver-deep);
+  --color-text-3: var(--text-3);
+  --color-link: var(--link);
+  --color-up: var(--up);
+  --color-down: var(--down);
+  --color-warn: var(--warn);
+  --color-raised-2: var(--raised-2);
+  --color-row-pressed: var(--row-pressed);
+  --color-selected-row: var(--selected-row);
+  --color-skeleton: var(--skeleton);
+  --color-primary-pressed: var(--primary-pressed);
+  --color-up-fill: var(--up-fill);
+  --color-down-fill: var(--down-fill);
+  --color-up-fill-edge: var(--up-fill-edge);
+  --color-down-fill-edge: var(--down-fill-edge);
+  --color-on-fill: var(--on-fill);
+  --color-up-foreground: var(--up-foreground);
+  --color-down-foreground: var(--down-foreground);
+  --color-up-surface: var(--up-surface);
+  --color-down-surface: var(--down-surface);
+  --color-warn-surface: var(--warn-surface);
+  --color-destructive-surface: var(--destructive-surface);
+  --color-glass-opaque: var(--glass-opaque);
+  --color-sheet-handle: var(--sheet-handle);
+  --radius-sm: 16px;
+  --radius-md: 18px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
+  --radius-step-none: 0px;
+  --radius-step-xs: 8px;
+  --radius-step-sm: 12px;
+  --radius-step-md: 16px;
+  --radius-step-lg: 24px;
+  --radius-step-xl: 32px;
+  --font-sans: var(--font-inter), Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: var(--font-roboto-condensed), "Roboto Condensed", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --shadow-button: 0px 2px 4px 0px #00000029;
+  --shadow-dock: 0px 8px 24px 0px #00000033;
+  --shadow-sheet: 0px -4px 16px 0px #0000001F;
+  --shadow-receipt: 0px 8px 24px 0px #0000001F;
+  --ease-senryo: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-sheet: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-overshoot: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --container-measure: 680px;
+}
+
+/* Money: Roboto Condensed Black with tabular lining figures (amounts, balances, prices). */
+@utility money {
+  font-family: var(--font-roboto-condensed), "Roboto Condensed", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums lining-nums;
+  letter-spacing: -0.02em;
+}
+
+@utility type-micro {
+  font-family: var(--font-inter), Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+@utility type-label {
+  font-family: var(--font-inter), Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+@utility type-caption {
+  font-family: var(--font-inter), Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+@utility type-body {
+  font-family: var(--font-inter), Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+@utility type-body-strong {
+  font-family: var(--font-inter), Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+@utility type-title {
+  font-family: var(--font-inter), Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 20px;
+  line-height: 24px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+@utility type-num-sm {
+  font-family: var(--font-inter), Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 16px;
+  line-height: 20px;
+  font-weight: 500;
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+@utility type-num-md {
+  font-family: var(--font-inter), Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 20px;
+  line-height: 24px;
+  font-weight: 600;
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+@utility type-num-lg {
+  font-family: var(--font-roboto-condensed), "Roboto Condensed", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 40px;
+  line-height: 44px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+@utility type-num-hero {
+  font-family: var(--font-roboto-condensed), "Roboto Condensed", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 52px;
+  line-height: 56px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+@utility type-display-balance {
+  font-family: var(--font-roboto-condensed), "Roboto Condensed", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 52px;
+  line-height: 56px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+@utility type-display-margin {
+  font-family: var(--font-roboto-condensed), "Roboto Condensed", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 64px;
+  line-height: 68px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+@utility type-display-price {
+  font-family: var(--font-roboto-condensed), "Roboto Condensed", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 40px;
+  line-height: 44px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+@utility type-page-title {
+  font-family: var(--font-roboto-condensed), "Roboto Condensed", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 32px;
+  line-height: 38px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+@utility type-sheet-title {
+  font-family: var(--font-inter), Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 24px;
+  line-height: 28px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+@utility type-step-title {
+  font-family: var(--font-inter), Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 28px;
+  line-height: 34px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+@utility type-field {
+  font-family: var(--font-inter), Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 17px;
+  line-height: 22px;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+@utility type-section-title {
+  font-family: var(--font-inter), Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 20px;
+  line-height: 24px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+@utility type-row {
+  font-family: var(--font-inter), Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 16px;
+  line-height: 20px;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+@utility type-row-strong {
+  font-family: var(--font-inter), Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 16px;
+  line-height: 20px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+@utility type-row-amount {
+  font-family: var(--font-inter), Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 16px;
+  line-height: 20px;
+  font-weight: 600;
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+@utility type-row-title {
+  font-family: var(--font-inter), Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 17px;
+  line-height: 22px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+@utility type-row-price {
+  font-family: var(--font-inter), Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 17px;
+  line-height: 22px;
+  font-weight: 600;
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+@utility type-row-change {
+  font-family: var(--font-inter), Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 14px;
+  line-height: 18px;
+  font-weight: 500;
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+@utility type-row-detail {
+  font-family: var(--font-inter), Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 14px;
+  line-height: 18px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+@utility type-meta {
+  font-family: var(--font-inter), Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+@utility type-money-meta {
+  font-family: var(--font-inter), Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+@utility type-button-label {
+  font-family: var(--font-inter), Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 17px;
+  line-height: 22px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+@utility type-button-compact {
+  font-family: var(--font-inter), Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 15px;
+  line-height: 20px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+@utility type-tab-label {
+  font-family: var(--font-inter), Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+@utility type-chip-label {
+  font-family: var(--font-inter), Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+@utility type-chip-category {
+  font-family: var(--font-inter), Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 14px;
+  line-height: 18px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+@utility type-sheet-heading {
+  font-family: var(--font-inter), Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 22px;
+  line-height: 28px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+@utility type-position-pnl {
+  font-family: var(--font-roboto-condensed), "Roboto Condensed", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 24px;
+  line-height: 28px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+@utility type-position-total {
+  font-family: var(--font-roboto-condensed), "Roboto Condensed", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 32px;
+  line-height: 36px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+@utility type-hero-title {
+  font-family: var(--font-roboto-condensed), "Roboto Condensed", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 64px;
+  line-height: 64px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}

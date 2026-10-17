@@ -2,7 +2,7 @@
 
 import { type ReactNode, useId, useRef, useState } from "react";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@hako/ui/lib/utils";
 
 import { formatCount } from "../format";
 import { hostOf, num, pickRecords, pickStr, type Rec, rowKey, str, strings } from "../parse";
@@ -51,7 +51,7 @@ function Inline({ text, cited, jump }: { text: string; cited: Set<number>; jump:
                   event.preventDefault();
                   jump.go(n);
                 }}
-                className="rounded-sm bg-brand/[0.07] px-1 font-mono text-[0.625rem] font-medium text-brand no-underline hover:bg-brand hover:text-background"
+                className="rounded-sm bg-selected-row px-1 font-mono text-[0.625rem] font-medium text-link no-underline hover:bg-primary hover:text-background"
                 aria-label={`Source ${n}`}
               >
                 {n}
@@ -126,7 +126,7 @@ export function AnswerCard({ data }: { data: Rec }) {
       {answer ? <AnswerText text={answer} cited={cited} jump={jump} /> : <p className="text-sm text-muted-foreground">No answer text.</p>}
       {keyPoints.length > 0 && (
         <Section label="Key points">
-          <ul className="list-disc space-y-1 pl-5 text-[0.875rem] text-ink-2">
+          <ul className="list-disc space-y-1 pl-5 text-[0.875rem] text-muted-foreground">
             {keyPoints.map((point, i) => (
               <li key={i}>{point}</li>
             ))}
@@ -143,7 +143,7 @@ export function AnswerCard({ data }: { data: Rec }) {
         {sourceChars !== null && `${formatCount(sourceChars)} characters summarised`}
       </Meta>
       {citations.length > 0 && (
-        <section className="mt-4 border-t border-line pt-3">
+        <section className="mt-4 border-t border-border pt-3">
           <Label>Citations</Label>
           <ol ref={listRef} className="mt-2 space-y-1">
             {citations.map((c, index) => (
@@ -153,12 +153,12 @@ export function AnswerCard({ data }: { data: Rec }) {
                 data-cite={c.n}
                 className={cn(
                   "flex min-w-0 items-baseline gap-2 rounded-sm px-1.5 py-1 text-[0.8125rem] transition-colors",
-                  active === c.n && "bg-brand/[0.07]",
+                  active === c.n && "bg-selected-row",
                 )}
               >
                 <span className="w-5 shrink-0 font-mono text-[0.6875rem] text-muted-foreground">{c.n}</span>
                 <span className="min-w-0">
-                  <ExtLink href={c.url} className="text-foreground hover:text-brand">
+                  <ExtLink href={c.url} className="text-foreground hover:text-link">
                     {c.title}
                   </ExtLink>
                   {hostOf(c.url) && <span className="ml-1.5 text-xs text-muted-foreground">{hostOf(c.url)}</span>}

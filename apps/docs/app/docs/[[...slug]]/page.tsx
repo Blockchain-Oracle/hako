@@ -16,8 +16,8 @@ import { source } from "@/lib/source";
 
 type Props = { params: Promise<{ slug?: string[] }> };
 
-/** Page titles in the display face (Outfit 600), like the prose headings. */
-const TITLE = "text-balance font-display text-[2.125rem] leading-[1.1] font-semibold tracking-[-0.03em]";
+/** Page titles in the display face (Roboto Condensed Black), like the prose headings. */
+const TITLE = "text-balance font-display text-[2.125rem] leading-[1.1] font-black tracking-[-0.02em]";
 const DESCRIPTION = "mb-0 text-pretty";
 
 export default async function Page({ params }: Props) {

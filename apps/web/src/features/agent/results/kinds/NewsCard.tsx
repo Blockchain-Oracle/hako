@@ -22,7 +22,7 @@ function Article({ item }: { item: Rec }) {
   return (
     <li className="py-3 first:pt-0 last:pb-0">
       <Meta>
-        {publisher && <span className="font-medium text-ink-2">{publisher}</span>}
+        {publisher && <span className="font-medium text-muted-foreground">{publisher}</span>}
         {str(when) && <TimeAgo value={when} />}
         {feed && <Pill tone="outline">{feed}</Pill>}
         {points !== null && (
@@ -33,11 +33,11 @@ function Article({ item }: { item: Rec }) {
         {alsoIn.length > 0 && `also in ${alsoIn.join(", ")}`}
       </Meta>
       <h4 className="mt-0.5 text-[0.9375rem] leading-snug font-medium">
-        <ExtLink href={url} className="text-foreground hover:text-brand">
+        <ExtLink href={url} className="text-foreground hover:text-link">
           {pickStr(item, "title", "headline") ?? url ?? "Untitled"}
         </ExtLink>
       </h4>
-      {snippet && <ClampText text={snippet} chars={SNIPPET_CLAMP_CHARS} className="mt-1 text-[0.8125rem] leading-relaxed text-ink-2" />}
+      {snippet && <ClampText text={snippet} chars={SNIPPET_CLAMP_CHARS} className="mt-1 text-[0.8125rem] leading-relaxed text-muted-foreground" />}
     </li>
   );
 }
@@ -58,7 +58,7 @@ export function NewsCard({ data }: { data: Rec }) {
         <Empty>No stories matched.</Empty>
       ) : (
         <>
-          <ol className="divide-y divide-line">
+          <ol className="divide-y divide-border">
             {shown.map((item, index) => (
               <Article key={rowKey(item, index)} item={item} />
             ))}

@@ -100,11 +100,11 @@ function Hourly({ steps, units }: { steps: Rec[]; units: Units }) {
         {steps.slice(0, HOURLY_PREVIEW).map((step, index) => {
           const chance = pickNum(step, "precip_chance_pct");
           return (
-            <li key={rowKey(step, index, "time")} className="min-w-[4.25rem] shrink-0 rounded-sm bg-subtle px-2 py-1.5 text-center">
+            <li key={rowKey(step, index, "time")} className="min-w-[4.25rem] shrink-0 rounded-sm bg-card px-2 py-1.5 text-center">
               <p className="font-mono text-[0.6875rem] text-muted-foreground">{wallClock(step.time) ?? "—"}</p>
               <p className="mt-0.5 font-mono text-sm font-semibold text-foreground">{temp(pickNum(step, "temp"), units) ?? "—"}</p>
               {chance !== null && (
-                <p className="inline-flex items-center gap-0.5 text-[0.6875rem] text-ink-2">
+                <p className="inline-flex items-center gap-0.5 text-[0.6875rem] text-muted-foreground">
                   <Droplets className="size-2.5" aria-hidden /> {chance}%
                 </p>
               )}
@@ -119,14 +119,14 @@ function Hourly({ steps, units }: { steps: Rec[]; units: Units }) {
 function Daily({ days, units }: { days: Rec[]; units: Units }) {
   return (
     <Section label="Days ahead">
-      <ol className="divide-y divide-line">
+      <ol className="divide-y divide-border">
         {days.map((day, index) => {
           const chance = pickNum(day, "precip_chance_max_pct");
           const wind = pickNum(day, "wind_max");
           return (
             <li key={rowKey(day, index, "date")} className="grid grid-cols-[6.5rem_1fr_auto] items-baseline gap-3 py-1.5 text-[0.8125rem]">
               <span className="font-medium text-foreground">{formatDay(day.date) ?? "—"}</span>
-              <span className="min-w-0 truncate text-ink-2">
+              <span className="min-w-0 truncate text-muted-foreground">
                 {pickStr(day, "description") ? humanize(pickStr(day, "description") ?? "") : ""}
                 {chance !== null && <span className="text-muted-foreground"> · {chance}% rain</span>}
                 {wind !== null && <span className="text-muted-foreground"> · wind {formatNumber(wind, 1)} {units.wind}</span>}

@@ -4,7 +4,7 @@ import { Moon, Sun } from "lucide-react";
 import { useSyncExternalStore } from "react";
 
 import { currentTheme, serverTheme, setTheme, subscribeTheme } from "@/lib/theme";
-import { cn } from "@/lib/utils";
+import { cn } from "@hako/ui/lib/utils";
 
 /** Switch between light and dark; the choice is remembered in this browser. */
 export function ThemeToggle({ className }: { className?: string }) {

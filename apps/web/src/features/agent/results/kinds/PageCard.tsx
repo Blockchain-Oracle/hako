@@ -20,11 +20,11 @@ export function PageCard({ data }: { data: Rec }) {
       <div className="flex items-start gap-3">
         <div className="min-w-0 flex-1">
           <h4 className="font-display text-lg leading-tight font-semibold tracking-[-0.02em]">
-            <ExtLink href={url} className="text-foreground hover:text-brand">
+            <ExtLink href={url} className="text-foreground hover:text-link">
               {title}
             </ExtLink>
           </h4>
-          {str(data.description) && <p className="mt-1 text-[0.8125rem] text-ink-2">{str(data.description)}</p>}
+          {str(data.description) && <p className="mt-1 text-[0.8125rem] text-muted-foreground">{str(data.description)}</p>}
           <Meta className="mt-1.5">
             {hostOf(url) && <span>{hostOf(url)}</span>}
             {pickStr(data, "language", "lang")?.toUpperCase()}
@@ -35,7 +35,7 @@ export function PageCard({ data }: { data: Rec }) {
         </div>
         <Thumb src={data.thumbnail ?? data.image} alt="" width={THUMB_PX} height={THUMB_PX} className="size-14" />
       </div>
-      <div className="mt-3 border-t border-line pt-2">
+      <div className="mt-3 border-t border-border pt-2">
         {body ? <Markdown clampChars={MARKDOWN_CLAMP_CHARS}>{body}</Markdown> : <Empty>The page had no readable text.</Empty>}
       </div>
     </div>

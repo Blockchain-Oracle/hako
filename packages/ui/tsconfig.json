@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    // The shadcn CLI resolves components.json's aliases through these paths; Next and Vite resolve the same names
+    // through package.json "exports" (the package imports itself by name, as Kawase's ui-web does).
+    "paths": {
+      "@hako/ui/*": ["./src/*"]
+    }
+  },
+  "include": ["src"]
+}

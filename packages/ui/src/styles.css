@@ -1,0 +1,23 @@
+/*
+ * @hako/ui's stylesheet: what the installed components read beyond Tailwind's utilities (the shadcn CLI writes its
+ * additions here). Colours are never defined here: each author's variable points at an @hako/brand token
+ * (`@hako/brand/paint.css`, imported by each app before this file). The CLI also wrote overrides of `--success` and
+ * `--destructive-foreground` and a second dark variant; those are the brand's and the app's, so they were removed.
+ */
+
+/* The radix-nova style base (ui.shadcn.com/r/styles/radix-nova/index.json): the `data-open`/`data-closed`/
+ * `data-horizontal`… variants mapped onto Radix's `data-state`/`data-orientation`, the accordion keyframes and the
+ * `shimmer` and `scroll-fade-*` utilities the installed chat components use. The app imports tailwindcss first. */
+@import "shadcn/tailwind.css";
+
+/* 21st unlumen/sidebar-001 (21517): the active row's indicator reads --accent-pro; on Hako that is the accent. */
+@theme inline {
+  --color-accent-pro: var(--accent-pro);
+}
+
+:root {
+  --accent-pro: var(--accent);
+  /* 21st serafimcloud/text-shimmer (12336): its sweep runs from the quiet silver to the secondary text. */
+  --an-foreground-subtle: var(--silver);
+  --an-foreground-muted: var(--muted-foreground);
+}

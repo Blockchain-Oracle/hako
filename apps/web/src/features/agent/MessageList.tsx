@@ -34,7 +34,7 @@ export function MessageList({ messages, live }: { messages: UIMessage[]; live: b
           const text = message.parts.map((p) => (p.type === "text" ? p.text : "")).join("");
           return (
             <li key={message.id} className="flex justify-end">
-              <p className="max-w-[80%] rounded-lg bg-dark px-4 py-2.5 text-[0.9375rem] whitespace-pre-wrap text-white">{text}</p>
+              <p className="max-w-[80%] rounded-lg bg-muted px-4 py-2.5 text-[0.9375rem] whitespace-pre-wrap text-foreground">{text}</p>
             </li>
           );
         }

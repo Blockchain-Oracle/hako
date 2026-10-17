@@ -14,7 +14,7 @@ function Listen({ src, word }: { src: unknown; word: string }) {
       type="button"
       onClick={() => void new Audio(safe).play().catch(() => undefined)}
       aria-label={`Hear “${word}”`}
-      className="inline-flex size-7 items-center justify-center rounded-full border border-line text-ink-2 transition-colors hover:border-line-default hover:text-brand"
+      className="inline-flex size-7 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:border-border hover:text-link"
     >
       <Volume2 className="size-3.5" aria-hidden />
     </button>
@@ -25,7 +25,7 @@ function WordList({ label, words }: { label: string; words: string[] }) {
   if (words.length === 0) return null;
   return (
     <p className="mt-1.5 text-xs text-muted-foreground">
-      <span className="font-medium text-ink-2">{label}:</span> {words.slice(0, CHIPS_PREVIEW).join(", ")}
+      <span className="font-medium text-muted-foreground">{label}:</span> {words.slice(0, CHIPS_PREVIEW).join(", ")}
     </p>
   );
 }
@@ -58,12 +58,12 @@ function Entry({ entry }: { entry: Rec }) {
     <div>
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
         <h4 className="font-display text-2xl font-semibold tracking-[-0.03em] text-foreground">{word}</h4>
-        {pickStr(entry, "phonetic", "pronunciation") && <span className="font-mono text-[0.875rem] text-ink-2">{pickStr(entry, "phonetic", "pronunciation")}</span>}
+        {pickStr(entry, "phonetic", "pronunciation") && <span className="font-mono text-[0.875rem] text-muted-foreground">{pickStr(entry, "phonetic", "pronunciation")}</span>}
         <Listen src={entry.audio} word={word} />
       </div>
       {str(entry.origin) && <p className="mt-1 text-[0.8125rem] text-muted-foreground">Origin: {str(entry.origin)}</p>}
       {meanings.length > 0 ? (
-        <ol className="mt-3 divide-y divide-line">
+        <ol className="mt-3 divide-y divide-border">
           {meanings.map((meaning, index) => (
             <Meaning key={rowKey(meaning, index, "part_of_speech")} meaning={meaning} />
           ))}

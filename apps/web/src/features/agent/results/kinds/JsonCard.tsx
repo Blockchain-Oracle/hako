@@ -11,16 +11,16 @@ type Entry = [key: string, value: unknown];
 function Primitive({ value }: { value: unknown }) {
   if (value === null || value === undefined) return <span className="text-muted-foreground">null</span>;
   if (typeof value === "string") {
-    return <ClampText text={JSON.stringify(value)} chars={JSON_STRING_CLAMP_CHARS} className="min-w-0 break-all text-ink-2" />;
+    return <ClampText text={JSON.stringify(value)} chars={JSON_STRING_CLAMP_CHARS} className="min-w-0 break-all text-muted-foreground" />;
   }
-  if (typeof value === "number" || typeof value === "boolean") return <span className="text-brand">{String(value)}</span>;
+  if (typeof value === "number" || typeof value === "boolean") return <span className="text-link">{String(value)}</span>;
   return <span className="text-muted-foreground">{typeof value}</span>;
 }
 
 function Entries({ entries, depth }: { entries: Entry[]; depth: number }) {
   const { shown, expanded, toggle, total } = usePreview(entries, JSON_CHILDREN_PREVIEW);
   return (
-    <div className="ml-1.5 border-l border-line pl-3">
+    <div className="ml-1.5 border-l border-border pl-3">
       {shown.map(([key, value]) => (
         <Node key={key} name={key} value={value} depth={depth + 1} />
       ))}
@@ -69,7 +69,7 @@ function Node({ name, value, depth }: { name?: string; value: unknown; depth: nu
 /** Anything without a dedicated card: a collapsible tree, mono on the subtle surface. */
 export function JsonCard({ data }: { data: unknown }) {
   return (
-    <div className="overflow-x-auto rounded-sm border border-line bg-subtle p-3 font-mono text-xs leading-relaxed">
+    <div className="overflow-x-auto rounded-sm border border-border bg-card p-3 font-mono text-xs leading-relaxed">
       <Node value={data} depth={0} />
     </div>
   );

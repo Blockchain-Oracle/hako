@@ -67,11 +67,11 @@ function Paper({ paper }: { paper: Rec }) {
   return (
     <li className="py-3 first:pt-0 last:pb-0">
       <h4 className="text-[0.9375rem] leading-snug font-medium">
-        <ExtLink href={href} className="text-foreground hover:text-brand">
+        <ExtLink href={href} className="text-foreground hover:text-link">
           {title}
         </ExtLink>
       </h4>
-      {authorsOf(paper.authors) && <p className="mt-0.5 text-[0.8125rem] text-ink-2">{authorsOf(paper.authors)}</p>}
+      {authorsOf(paper.authors) && <p className="mt-0.5 text-[0.8125rem] text-muted-foreground">{authorsOf(paper.authors)}</p>}
       <Meta className="mt-1">
         {parsed && !parsed.dateOnly ? <span title={date ?? undefined}>{formatAbsolute(date)}</span> : yearOf(paper)}
         {venue && <span className="italic">{venue}</span>}
@@ -82,7 +82,7 @@ function Paper({ paper }: { paper: Rec }) {
         {pickStr(paper, "paper_id", "id", "scholar_id") && <span className="font-mono">{pickStr(paper, "paper_id", "id", "scholar_id")}</span>}
       </Meta>
       <Retraction paper={paper} />
-      {abstract && <ClampText text={abstract} chars={ABSTRACT_CLAMP_CHARS} className="mt-1.5 text-[0.8125rem] leading-relaxed text-ink-2" />}
+      {abstract && <ClampText text={abstract} chars={ABSTRACT_CLAMP_CHARS} className="mt-1.5 text-[0.8125rem] leading-relaxed text-muted-foreground" />}
       {str(paper.topic) && <p className="mt-1 text-xs text-muted-foreground">Topic: {str(paper.topic)}</p>}
       {categories.length > 0 && (
         <ul className="mt-1.5 flex flex-wrap gap-1">
@@ -104,8 +104,8 @@ function Passages({ passages }: { passages: Rec[] }) {
     <Section label="Passages">
       <ul className="space-y-2">
         {shown.map((passage, i) => (
-          <li key={i} className="border-l-2 border-line pl-3">
-            <ClampText text={pickStr(passage, "text", "content") ?? ""} chars={SNIPPET_CLAMP_CHARS} className="text-[0.8125rem] text-ink-2" />
+          <li key={i} className="border-l-2 border-border pl-3">
+            <ClampText text={pickStr(passage, "text", "content") ?? ""} chars={SNIPPET_CLAMP_CHARS} className="text-[0.8125rem] text-muted-foreground" />
             {num(passage.score) !== null && (
               <p className="mt-0.5 font-mono text-[0.6875rem] text-muted-foreground">score {formatNumber(num(passage.score) ?? 0, SCORE_DECIMALS)}</p>
             )}
@@ -139,7 +139,7 @@ export function PapersCard({ data }: { data: Rec }) {
         <Empty>No papers.</Empty>
       ) : (
         <>
-          <ol className="divide-y divide-line">
+          <ol className="divide-y divide-border">
             {shown.map((paper, index) => (
               <Paper key={rowKey(paper, index, "doi", "paper_id")} paper={paper} />
             ))}

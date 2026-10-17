@@ -36,7 +36,7 @@ export default async function ProviderPage({ params }: Props) {
           <ArrowLeft className="size-3.5" aria-hidden /> Back to all tools
         </Link>
         <div className="mt-8">
-          <p className="inline-flex rounded-full border border-line px-3 py-1 font-mono text-[0.6875rem] tracking-[0.12em] text-muted-foreground uppercase">
+          <p className="inline-flex rounded-full border border-border px-3 py-1 font-mono text-[0.6875rem] tracking-[0.12em] text-muted-foreground uppercase">
             {endpoints.length} endpoint{endpoints.length === 1 ? "" : "s"}
           </p>
         </div>
@@ -54,7 +54,7 @@ export default async function ProviderPage({ params }: Props) {
             )}
           </span>
         </div>
-        <p className="mt-4 max-w-[640px] text-lg text-ink-2">{provider.summary}</p>
+        <p className="mt-4 max-w-[640px] text-lg text-muted-foreground">{provider.summary}</p>
         {provider.attribution && (
           <p className="mt-2 font-mono text-xs text-muted-foreground">
             Data: {provider.attribution}
@@ -77,7 +77,7 @@ export default async function ProviderPage({ params }: Props) {
             <ul className="mt-4 flex flex-wrap gap-2">
               {related.map((c) => (
                 <li key={c}>
-                  <Link href={`/tools?category=${c}`} className="rounded-full border border-line px-3 py-1.5 text-sm hover:bg-subtle">
+                  <Link href={`/tools?category=${c}`} className="rounded-full border border-border px-3 py-1.5 text-sm hover:bg-card">
                     {labels.get(c) ?? c}
                   </Link>
                 </li>

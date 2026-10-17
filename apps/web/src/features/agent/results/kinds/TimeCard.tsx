@@ -38,7 +38,7 @@ function Clockface({ data }: { data: Rec }) {
       </div>
       {str(data.matched) && <p className="mt-2 text-xs text-muted-foreground">Matched {str(data.matched)}</p>}
       {str(transition.at) && (
-        <p className="mt-2 inline-flex flex-wrap items-center gap-1.5 text-[0.8125rem] text-ink-2">
+        <p className="mt-2 inline-flex flex-wrap items-center gap-1.5 text-[0.8125rem] text-muted-foreground">
           <Clock className="size-3.5" aria-hidden /> Clocks change <TimeAgo value={transition.at} className="font-medium text-foreground" />:
           <span className="font-mono">{str(transition.offset_before)}</span>
           <ArrowRight className="size-3" aria-hidden />
@@ -47,7 +47,7 @@ function Clockface({ data }: { data: Rec }) {
       )}
       {conversions.length > 0 && (
         <Section label="Same moment elsewhere">
-          <ul className="divide-y divide-line">
+          <ul className="divide-y divide-border">
             {conversions.map((c, index) => {
               const time = pickStr(c, "local_time", "time");
               const otherDay = time?.slice(0, DATE_PART_LENGTH) !== day;
@@ -90,14 +90,14 @@ function Holidays({ data, holidays }: { data: Rec; holidays: Rec[] }) {
       <p className="mb-3 text-[0.8125rem] text-muted-foreground">
         {heading && <span className="font-mono text-foreground">{heading}</span>} · {count} {count === 1 ? "holiday" : "holidays"}
       </p>
-      <ol className="divide-y divide-line">
+      <ol className="divide-y divide-border">
         {shown.map((h, index) => {
           const others = strings(h.other_names);
           const provenance = rec(h.provenance);
           const listedBy = strings(h.listed_by);
           return (
             <li key={rowKey(h, index, "date", "name")} className="grid grid-cols-[6.5rem_1fr] gap-3 py-1.5 text-[0.8125rem]">
-              <span className="font-mono text-xs text-ink-2">{formatDay(h.date) ?? "—"}</span>
+              <span className="font-mono text-xs text-muted-foreground">{formatDay(h.date) ?? "—"}</span>
               <span className="min-w-0">
                 <span className="font-medium text-foreground">{pickStr(h, "name", "local_name") ?? "Holiday"}</span>
                 {h === next && <Pill tone="brand" className="ml-2">next</Pill>}
@@ -133,7 +133,7 @@ function BusinessDays({ data }: { data: Rec }) {
         <p className="font-display text-5xl leading-none font-semibold tracking-[-0.04em] text-foreground">{days ?? "—"}</p>
         <p className="pb-1 text-[0.9375rem] font-medium text-foreground">business {days === 1 ? "day" : "days"}</p>
       </div>
-      <p className="mt-2 inline-flex flex-wrap items-center gap-1.5 text-[0.8125rem] text-ink-2">
+      <p className="mt-2 inline-flex flex-wrap items-center gap-1.5 text-[0.8125rem] text-muted-foreground">
         <CalendarDays className="size-3.5" aria-hidden />
         {formatDay(start) ?? "—"} <ArrowRight className="size-3" aria-hidden /> {formatDay(end) ?? "—"}
         {end && <span>{end.slice(0, YEAR_LENGTH)}</span>}
@@ -145,7 +145,7 @@ function BusinessDays({ data }: { data: Rec }) {
       </Meta>
       {skipped.length > 0 && (
         <Section label="Holidays skipped">
-          <ul className="space-y-0.5 text-[0.8125rem] text-ink-2">
+          <ul className="space-y-0.5 text-[0.8125rem] text-muted-foreground">
             {skipped.map((h) => (
               <li key={h}>{h}</li>
             ))}

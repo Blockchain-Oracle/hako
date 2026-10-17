@@ -2,7 +2,7 @@
 
 import { ArrowDownRight, ArrowUpRight } from "lucide-react";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@hako/ui/lib/utils";
 
 import { LIST_PREVIEW, MONEY_DECIMALS } from "../constants";
 import { formatCount, formatMoney, formatNumber, formatPercent, formatSigned } from "../format";
@@ -19,7 +19,7 @@ function Change({ quote }: { quote: Rec }) {
   const up = (pct ?? change ?? 0) >= 0;
   const Icon = up ? ArrowUpRight : ArrowDownRight;
   return (
-    <span className={cn("inline-flex items-center gap-0.5 font-mono text-[0.8125rem]", up ? "text-success" : "text-ink-2")}>
+    <span className={cn("inline-flex items-center gap-0.5 font-mono text-[0.8125rem]", up ? "text-success" : "text-muted-foreground")}>
       <Icon className="size-3.5" aria-hidden />
       {change !== null && formatSigned(change, MONEY_DECIMALS)}
       {pct !== null && <span>({formatPercent(pct)})</span>}
@@ -82,7 +82,7 @@ export function QuoteCard({ data }: { data: Rec }) {
   if (quotes.length === 0) return <Empty>No quotes.</Empty>;
   return (
     <div>
-      <ol className="divide-y divide-line">
+      <ol className="divide-y divide-border">
         {shown.map((quote, index) => (
           <Quote key={rowKey(quote, index, "symbol")} quote={quote} large={quotes.length === 1} />
         ))}

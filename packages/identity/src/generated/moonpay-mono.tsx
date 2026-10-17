@@ -1,0 +1,8 @@
+// GENERATED from svg/ by build.mjs. Do not edit; replace the SVG and rebuild.
+import type { SVGProps } from "react";
+
+const MarkMoonpayMono = (props: SVGProps<SVGSVGElement>) => (
+  <svg viewBox="1.5 -0.5 18.2 18.2" fill="currentColor" width="100%" height="100%" {...props}><path fill="currentColor" d="M2 10.6645C2 7.127 4.897 4.24513 8.45312 4.24513C12.0092 4.24513 14.9062 7.127 14.9062 10.6645C14.9062 14.2021 12.0092 17.084 8.45312 17.084C4.897 17.084 2 14.2021 2 10.6645ZM16.5368 0C15.0797 0 13.8999 1.17359 13.8999 2.62311C13.8999 4.07263 15.0797 5.24622 16.5368 5.24622C17.9939 5.24622 19.1737 4.07263 19.1737 2.62311C19.1737 1.17359 17.9939 0 16.5368 0Z" /></svg>
+);
+
+export default MarkMoonpayMono;

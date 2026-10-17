@@ -11,9 +11,9 @@ export function ErrorCard({ status, error, note }: { status: number; error: unkn
   const { code, message, details } = readError(error);
   const label = code ? humanize(code) : "The run failed";
   return (
-    <article className="w-full min-w-0 rounded-md border border-line bg-background p-4 shadow-card sm:p-5">
+    <article className="w-full min-w-0 rounded-md border border-border bg-background p-4 sm:p-5">
       <div className="flex items-start gap-3">
-        <span className="mt-0.5 inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-muted text-ink-2">
+        <span className="mt-0.5 inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
           <CircleSlash className="size-4" aria-hidden />
         </span>
         <div className="min-w-0 flex-1">
@@ -22,7 +22,7 @@ export function ErrorCard({ status, error, note }: { status: number; error: unkn
             {Number.isFinite(status) && status > 0 && <Pill tone="outline">HTTP {status}</Pill>}
             {code && <span className="font-mono text-[0.6875rem] text-muted-foreground">{code}</span>}
           </div>
-          {message && <p className="mt-1 text-[0.875rem] break-words text-ink-2">{message}</p>}
+          {message && <p className="mt-1 text-[0.875rem] break-words text-muted-foreground">{message}</p>}
           {details.length > 0 && (
             <ul className="mt-1.5 list-disc space-y-0.5 pl-4 text-xs break-words text-muted-foreground">
               {details.map((detail) => (
