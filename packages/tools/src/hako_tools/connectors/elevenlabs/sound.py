@@ -40,10 +40,10 @@ class SoundInput(ToolInput):
 )
 async def sound_effect(inp: SoundInput, ctx: RunContext) -> AudioOutput:
     estimate = round(inp.duration_s * CREDITS_PER_S)
-    budget.reserve(estimate)
-    audio, headers = await ctx.post_bytes(ELEVENLABS, "/sound-generation", params={"output_format": OUTPUT_FORMAT},
-                                          json={"text": inp.text, "duration_seconds": inp.duration_s,
-                                                "prompt_influence": PROMPT_INFLUENCE})
+    with budget.held(estimate):
+        audio, headers = await ctx.post_bytes(ELEVENLABS, "/sound-generation", params={"output_format": OUTPUT_FORMAT},
+                                              json={"text": inp.text, "duration_seconds": inp.duration_s,
+                                                    "prompt_influence": PROMPT_INFLUENCE})
     budget.record(headers, estimate)
     if not audio:
         raise ProviderError("ElevenLabs returned no audio")

@@ -4,7 +4,15 @@ import asyncio
 
 from pydantic import Field
 
-from hako_tools.connectors.chain_evm.erc20 import BALANCE_OF, Erc20, eth_call, int_result, known_token, resolve
+from hako_tools.connectors.chain_evm.erc20 import (
+    BALANCE_OF,
+    Erc20,
+    eth_call,
+    ether_hint,
+    int_result,
+    known_token,
+    resolve,
+)
 from hako_tools.connectors.chain_evm.networks import EvmChain, network
 from hako_tools.connectors.chain_evm.provider import CHAIN_EVM
 from hako_tools.connectors.chain_evm.rpc import EvmAddress, RpcError, batch, hex_int, units
@@ -87,6 +95,7 @@ async def balance(inp: BalanceInput, ctx: RunContext) -> BalanceOutput:
             continue
         rows.append(_row(token, atomic))
     if missing:
-        ctx.note(f"Not read on {net.name}: {', '.join(missing)} (unknown token or not an ERC-20 there).")
+        hint = "".join(dict.fromkeys(ether_hint(net, m) for m in missing))
+        ctx.note(f"Not read on {net.name}: {', '.join(missing)} (unknown token or not an ERC-20 there).{hint}")
     block = None if isinstance(head, RpcError) else hex_int(head)
     return BalanceOutput(chain=net.caip2, address=inp.address, balances=rows, block_number=block)

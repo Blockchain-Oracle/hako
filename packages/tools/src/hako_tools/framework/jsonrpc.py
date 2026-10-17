@@ -22,6 +22,7 @@ RPC_MIN_REMAINING_S = 0.6
 LIMIT_EXCEEDED_CODE = -32005
 NODE_ERROR_WORDS = ("limit", "rate", "internal", "timeout", "busy", "capacity", "unavailable", "too many")
 ERROR_DETAIL_CHARS = 200
+ERROR_DETAILS_MAX = 2  # the last RPC's status line and its body: enough to act on, short enough for a card
 
 
 @dataclass(frozen=True, slots=True)
@@ -83,7 +84,11 @@ async def batch_on(ctx: RunContext, upstreams: tuple[Rpc, ...], label: str,
     if isinstance(last, RunDeadlineExceeded | ProviderRateLimited):
         raise last
     detail = str(getattr(last, "message", last))[:ERROR_DETAIL_CHARS] if last else ""
-    raise ProviderError(f"No {label} RPC answered right now; retry shortly", details=[detail] if detail else [])
+    # Keep the upstream's own body (ctx._check puts it in details): "ranges over 10000 blocks are not supported" tells
+    # the caller what to change, where the status line alone reads as an outage.
+    upstream: list[str] = list(getattr(last, "details", None) or [])
+    raise ProviderError(f"No {label} RPC answered right now; retry shortly",
+                        details=[d for d in [detail, *upstream] if d][:ERROR_DETAILS_MAX])
 
 
 def units(atomic: int, decimals: int) -> str:

@@ -5,7 +5,7 @@ from hako_tools.framework.auth import Bearer, Header, NoAuth, Query
 from hako_tools.framework.context import RunContext
 from hako_tools.framework.endpoint import Endpoint, tool
 from hako_tools.framework.errors import ProviderError, ToolNotFoundResult
-from hako_tools.framework.models import Citation, Link, ToolInput, ToolOutput
+from hako_tools.framework.models import Citation, Link, ToolInput, ToolOutput, to_float
 from hako_tools.framework.pricing import FREE, LOCAL, PREMIUM, STANDARD, Price
 from hako_tools.framework.provider import Provider, Terms
 
@@ -31,5 +31,6 @@ __all__ = [
     "ToolInput",
     "ToolNotFoundResult",
     "ToolOutput",
+    "to_float",
     "tool",
 ]

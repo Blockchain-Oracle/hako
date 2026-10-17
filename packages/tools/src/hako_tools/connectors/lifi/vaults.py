@@ -5,10 +5,20 @@ from typing import Any
 
 from pydantic import Field
 
-from hako_tools.connectors.lifi.earn import EarnChain, EarnToken, chain_id, number, percent
+from hako_tools.connectors.lifi.earn import EarnChain, EarnToken, chain_id, percent
 from hako_tools.connectors.lifi.provider import LIFI_EARN
 from hako_tools.constants import TTL_SEARCH_S
-from hako_tools.framework import FREE, Category, Render, RunContext, ToolInput, ToolNotFoundResult, ToolOutput, tool
+from hako_tools.framework import (
+    FREE,
+    Category,
+    Render,
+    RunContext,
+    ToolInput,
+    ToolNotFoundResult,
+    ToolOutput,
+    to_float,
+    tool,
+)
 
 # @hako/cards contract.config.ts: VAULTS_LIMIT_DEFAULT, VAULTS_LIMIT_MAX.
 LIMIT_DEFAULT = 10
@@ -66,7 +76,7 @@ def _vault(row: dict[str, Any]) -> Vault | None:
                         decimals=int(underlying.get("decimals") or 0)),
         apy=apy, apy_base=percent((analytics.get("apy") or {}).get("base")),
         apy_reward=percent((analytics.get("apy") or {}).get("reward")), apy_7d=percent(analytics.get("apy7d")),
-        tvl_usd=number((analytics.get("tvl") or {}).get("usd")), url=protocol.get("url"),
+        tvl_usd=to_float((analytics.get("tvl") or {}).get("usd")), url=protocol.get("url"),
         logo_url=protocol.get("logoUri"), tags=list(row.get("tags") or []) or None,
         deposit_only=row.get("isRedeemable") is False or None,
     )

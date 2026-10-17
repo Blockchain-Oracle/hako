@@ -1,4 +1,7 @@
-"""Base models for tool inputs and outputs, and the shared shapes result cards understand."""
+"""Base models for tool inputs and outputs, the shared shapes result cards understand, and the parser for the
+numbers upstreams send as strings."""
+
+from typing import Any
 
 from pydantic import BaseModel, ConfigDict
 
@@ -26,3 +29,11 @@ class Citation(BaseModel):
     index: int
     title: str
     url: str
+
+
+def to_float(value: Any) -> float | None:
+    """A number an upstream sent as a number or a numeric string ("1523.45"); None when it is absent or not a number."""
+    try:
+        return float(value) if value not in (None, "") else None
+    except (TypeError, ValueError):
+        return None

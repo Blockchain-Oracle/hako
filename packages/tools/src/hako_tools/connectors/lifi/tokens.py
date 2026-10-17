@@ -2,10 +2,9 @@
 add a logo, a USD price and LI.FI's verification to what the chain itself says."""
 
 from dataclasses import dataclass
-from typing import Any
 
 from hako_tools.connectors.lifi.provider import LIFI
-from hako_tools.framework import ProviderError, RunContext, ToolNotFoundResult
+from hako_tools.framework import ProviderError, RunContext, ToolNotFoundResult, to_float
 
 _HTTP_BAD_REQUEST = "HTTP 400"  # LI.FI answers an unknown symbol or address with 400 (code 1011), not 404
 VERIFIED = "verified"
@@ -20,13 +19,6 @@ class LifiToken:
     logo_url: str | None
     price_usd: float | None
     verified: bool | None
-
-
-def _price(value: Any) -> float | None:
-    try:
-        return float(value) if value not in (None, "") else None
-    except (TypeError, ValueError):
-        return None
 
 
 async def lifi_token(ctx: RunContext, chain: int | str, token: str) -> LifiToken | None:
@@ -45,5 +37,5 @@ async def lifi_token(ctx: RunContext, chain: int | str, token: str) -> LifiToken
     return LifiToken(
         address=str(data["address"]), symbol=str(data.get("symbol") or ""), name=str(data.get("name") or ""),
         decimals=int(data.get("decimals") or 0), logo_url=data.get("logoURI") or None,
-        price_usd=_price(data.get("priceUSD")), verified=(status == VERIFIED) if status else None,
+        price_usd=to_float(data.get("priceUSD")), verified=(status == VERIFIED) if status else None,
     )

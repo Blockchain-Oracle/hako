@@ -4,7 +4,7 @@ import asyncio
 
 from pydantic import Field
 
-from hako_tools.connectors.chain_evm.erc20 import is_address, read_tokens, resolve
+from hako_tools.connectors.chain_evm.erc20 import ether_hint, is_address, read_tokens, resolve
 from hako_tools.connectors.chain_evm.networks import EvmChain, network
 from hako_tools.connectors.chain_evm.provider import CHAIN_EVM
 from hako_tools.connectors.lifi.tokens import lifi_token
@@ -57,7 +57,8 @@ async def token(inp: TokenInput, ctx: RunContext) -> TokenOutput:
     net = network(inp.chain)
     found = await resolve(ctx, net, inp.token)
     if found is None:
-        raise ToolNotFoundResult(f"No token {inp.token!r} on {net.name} (not an ERC-20 there, or not on LI.FI's list)")
+        raise ToolNotFoundResult(f"No token {inp.token!r} on {net.name} (not an ERC-20 there, or not on LI.FI's "
+                                 f"list).{ether_hint(net, inp.token)}")
     if found.native:
         return TokenOutput(chain=net.caip2, address=found.address, symbol=found.symbol, name=found.name,
                            decimals=found.decimals, standard=NATIVE)

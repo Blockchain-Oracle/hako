@@ -5,10 +5,26 @@ from typing import Any
 from pydantic import Field
 
 from hako_tools.connectors.chain_evm.rpc import EvmAddress
-from hako_tools.connectors.lifi.earn import EarnChain, EarnToken, number
+from hako_tools.connectors.lifi.earn import EarnChain, EarnToken
 from hako_tools.connectors.lifi.provider import LIFI_EARN
 from hako_tools.constants import TTL_LIVE_S
-from hako_tools.framework import FREE, Category, Render, RunContext, ToolInput, ToolOutput, tool
+from hako_tools.framework import (
+    FREE,
+    Category,
+    ProviderError,
+    Render,
+    RunContext,
+    ToolInput,
+    ToolOutput,
+    to_float,
+    tool,
+)
+
+# The page size the OpenAPI document allows at most (earn.li.fi/docs-json, /v1/portfolio/{userAddress}/positions,
+# 2026-10-17): one page holds a whole ordinary wallet, and nextCursor continues past it.
+POSITIONS_PAGE_MAX = 500
+# Below this much run time left, another page cannot come back in time: answer with the pages read, and say so.
+PAGE_MIN_REMAINING_S = 1.0
 
 
 class PositionsInput(ToolInput):
@@ -46,7 +62,7 @@ def _position(row: dict[str, Any]) -> Position | None:
         chain=f"eip155:{row['chainId']}",
         vault=PositionVault(address=str(row.get("address") or asset["address"]),
                             name=str(asset.get("name") or asset.get("symbol") or ""), protocol=row.get("protocolName")),
-        token=token, amount_atomic=amount, usd=number(row.get("balanceUsd")),
+        token=token, amount_atomic=amount, usd=to_float(row.get("balanceUsd")),
     )
 
 
@@ -67,8 +83,22 @@ def _position(row: dict[str, Any]) -> Position | None:
     cache_ttl_s=TTL_LIVE_S,
 )
 async def positions(inp: PositionsInput, ctx: RunContext) -> PositionsOutput:
-    data = await ctx.get_json(LIFI_EARN, f"/portfolio/{inp.address}/positions")
-    rows = [p for p in (_position(r) for r in (data or {}).get("positions") or [] if isinstance(r, dict)) if p]
+    rows: list[Position] = []
+    params: dict[str, Any] = {"limit": POSITIONS_PAGE_MAX}
+    while True:
+        data = await ctx.get_json(LIFI_EARN, f"/portfolio/{inp.address}/positions", params=params)
+        if not isinstance(data, dict):
+            raise ProviderError("LI.FI Earn answered the portfolio in a shape Hako cannot read")
+        # The OpenAPI document pages rows under `data`; the prose guide shows `positions`. Read either.
+        page = data.get("data") or data.get("positions") or []
+        rows += [p for p in (_position(r) for r in page if isinstance(r, dict)) if p]
+        cursor = data.get("nextCursor")
+        if not cursor:
+            break
+        if ctx.deadline.remaining() < PAGE_MIN_REMAINING_S:
+            ctx.note(f"LI.FI Earn has more positions than fit in the time; only the first {len(rows)} were read.")
+            break
+        params = {"limit": POSITIONS_PAGE_MAX, "cursor": cursor}
     if inp.chain:
         rows = [p for p in rows if p.chain == inp.chain]
     if not rows:

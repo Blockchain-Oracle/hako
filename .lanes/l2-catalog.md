@@ -116,3 +116,36 @@ Catalog: 80 → 103 endpoints.
   now also has `free`, `media-small`, `media-medium`, `media-large` (type-only, nothing parses it at runtime).
 - **Keys:** `EXA_API_KEY`, `ARTIFICIAL_ANALYSIS_API_KEY`, `LIFI_API_KEY` (Abu's free signups) turn those tools on
   with no code change; `ELEVENLABS_API_KEY` must be on hako-api in Coolify for the audio tools.
+
+## Review fixes (2026-10-17, ~22:45 WAT, branch fix-l2-catalog → lane/l2-catalog)
+
+1. **Native aliases are chain-aware** (`chain_evm/erc20.py` `known_token`): `native`, `gas`, the chain's own symbol
+   and the zero address mean the native coin everywhere; `eth`/`ether` only where the native coin is ETH. Live:
+   Polygon `ETH` no longer returns POL. LI.FI has no `ETH` on chain 137 (`/token?chain=137&token=ETH` → 1003, so
+   the review's "resolves to WETH" does not hold): the answer is `found: false` with "Polygon's native coin is POL;
+   Ether there is the WETH token." (`ether_hint`, also in the balance note). Base `ETH`/`ether` → native ETH.
+2. **LI.FI Earn positions follow the OpenAPI shape** (`lifi/positions.py`): reads `data` (falls back to
+   `positions`), asks `limit=500` (spec max) and follows `nextCursor` while ≥ 1 s of run time is left (a note says
+   when it stopped early); a non-object answer is a `ProviderError`, never "no positions". Checked against the
+   docs-json example payload over two pages; not run live (LIFI_API_KEY still empty) — run
+   `check_samples.py lifi-earn/positions` once it is set.
+3. **Discover "cheaper" hint** (`framework/discover.py`): a free tool counts only when it renders the same card.
+   Live: "bitcoin price", "crypto news", "token price coingecko", "stock quote" carry no free-tool hint; paid → paid
+   hints unchanged ("scrape a web page" → wayback/snapshot).
+4. **RPC failures keep the reason** (`framework/jsonrpc.py` `batch_on`): details = the last RPC's status line plus
+   its body (`ERROR_DETAILS_MAX = 2`). `chain-evm/logs` wraps `eth_getLogs` and says "Base RPCs refused this log
+   query; narrow from_block/to_block or add an event/topic filter" instead of "retry shortly". Live (Base USDC,
+   blocks 36,000,000–36,005,000): details carry drpc's "ranges over 10000 blocks are not supported on free plan".
+5. **ElevenLabs R18 ceiling holds before the call** (`elevenlabs/budget.py`): `reserve()` checks and adds the
+   estimate with no await in between; `record()` settles by `actual − estimate`; `held()` wraps `post_bytes` and
+   releases the hold when ElevenLabs refused (ProviderError / rate limit / not found / unavailable), keeps it on a
+   deadline or cancellation (the audio may have been made). Checked: at 12,000 spent the second concurrent 2,000
+   hold is refused.
+6. **No magic 200** (`chain_evm/call.py`, `chain_evm/logs.py`): `ERROR_DETAIL_CHARS` from `framework.jsonrpc`.
+7. **One float parser** (`framework.to_float`, exported from `hako_tools.framework`): replaces `lifi/earn.number`,
+   `lifi/tokens._price`, `polymarket/markets._number`. Not touched (pre-existing on main, same behaviour):
+   `serper/common.as_float`, `nasa/asteroids._float` — could move to `to_float` later.
+
+Gates: `uv sync --all-packages && uv run ruff check . && uv run pyright` green; `pnpm install --frozen-lockfile &&
+pnpm lint && pnpm typecheck && pnpm build && pnpm -r --if-present test` green; plugin gate green.
+`check_samples.py` on chain-evm/{token,balance,logs,call}, polymarket/markets → OK; lifi-earn/* UNAVAILABLE (no key).

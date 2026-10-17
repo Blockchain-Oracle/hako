@@ -22,6 +22,7 @@ from hako_tools.framework import (
     tool,
 )
 from hako_tools.framework.errors import InvalidToolInput
+from hako_tools.framework.jsonrpc import ERROR_DETAIL_CHARS
 
 # @hako/cards CONTRACT_ARGS_MAX (contract.config.ts): the most arguments one call takes.
 CONTRACT_ARGS_MAX = 16
@@ -75,11 +76,12 @@ async def contract_call(inp: CallInput, ctx: RunContext) -> CallOutput:
         data = encode_call(sig, inp.args)
     except (SignatureError, EncodingError, ValueError, TypeError) as exc:
         raise InvalidToolInput("the function signature or its arguments could not be encoded",
-                               details=[str(exc)[:200]]) from exc
+                               details=[str(exc)[:ERROR_DETAIL_CHARS]]) from exc
     raw, head = await batch(ctx, net, [("eth_call", [{"to": inp.address, "data": data}, block_tag(inp.block)]),
                                        ("eth_blockNumber", [])])
     if isinstance(raw, RpcError):
-        raise ProviderError(f"The call reverted or failed on {net.name}: {raw.message}", details=[str(raw.data)[:200]])
+        raise ProviderError(f"The call reverted or failed on {net.name}: {raw.message}",
+                            details=[str(raw.data)[:ERROR_DETAIL_CHARS]])
     if sig.outputs and raw in (None, "0x"):
         raise ToolNotFoundResult(f"Empty answer: no contract at {inp.address} on {net.name}, or no such function")
     if sig.outputs:
@@ -87,7 +89,7 @@ async def contract_call(inp: CallInput, ctx: RunContext) -> CallOutput:
             values = decode_values([p.type for p in sig.outputs], bytes.fromhex(str(raw)[2:]))
         except (DecodingError, OverflowError, ValueError) as exc:
             raise ProviderError(f"The answer does not decode as ({','.join(p.type for p in sig.outputs)}); "
-                                "check the returns types", details=[str(raw)[:200]]) from exc
+                                "check the returns types", details=[str(raw)[:ERROR_DETAIL_CHARS]]) from exc
         result: Any = values[0] if len(values) == 1 else values
     else:
         result = raw

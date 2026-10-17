@@ -9,7 +9,7 @@ from eth_abi.exceptions import DecodingError
 from eth_utils.address import to_checksum_address
 
 from hako_tools.connectors.chain_evm.abi import Signature, encode_call, parse
-from hako_tools.connectors.chain_evm.networks import EVM_NATIVE_ADDRESS, EvmNetwork
+from hako_tools.connectors.chain_evm.networks import ETH, EVM_NATIVE_ADDRESS, EvmNetwork
 from hako_tools.connectors.chain_evm.rpc import ADDRESS_PATTERN, RpcError, batch, block_tag, hex_int
 from hako_tools.connectors.lifi.tokens import lifi_token
 from hako_tools.framework import RunContext
@@ -22,7 +22,10 @@ BALANCE_OF = parse("balanceOf(address) returns (uint256)")
 TOKEN_FACTS = (SYMBOL, NAME, DECIMALS, TOTAL_SUPPLY)
 WORD_BYTES = 32
 _ADDRESS = re.compile(ADDRESS_PATTERN)
-_NATIVE_ALIASES = frozenset({"native", "eth", "ether", "gas"})
+# Any chain's native coin: these words, its own symbol, or LI.FI's zero address. "eth"/"ether" name the native coin
+# only where it is ETH; on Polygon "ETH" is the bridged WETH token, resolved through LI.FI like any other symbol.
+_NATIVE_ALIASES = frozenset({"native", "gas", EVM_NATIVE_ADDRESS})
+_ETHER_ALIASES = frozenset({"eth", "ether"})
 
 
 @dataclass(frozen=True, slots=True)
@@ -73,12 +76,20 @@ def native_token(net: EvmNetwork) -> Erc20:
 def known_token(net: EvmNetwork, token: str) -> Erc20 | None:
     """The chain's native coin or USDC, by symbol or address, without a network call."""
     word = token.strip().lower()
-    if word in _NATIVE_ALIASES or word == net.native.symbol.lower() or word == EVM_NATIVE_ADDRESS:
+    symbol = net.native.symbol.lower()
+    if word in _NATIVE_ALIASES or word == symbol or (symbol == ETH.symbol.lower() and word in _ETHER_ALIASES):
         return native_token(net)
     if word in ("usdc", net.usdc.address.lower()):
         u = net.usdc
         return Erc20(address=u.address, symbol=u.symbol, name=u.name, decimals=u.decimals)
     return None
+
+
+def ether_hint(net: EvmNetwork, token: str) -> str:
+    """Why 'ETH' found nothing on a chain whose native coin is not Ether (LI.FI lists bridged Ether as WETH only)."""
+    if net.native.symbol != ETH.symbol and token.strip().lower() in _ETHER_ALIASES:
+        return f" {net.name}'s native coin is {net.native.symbol}; Ether there is the WETH token."
+    return ""
 
 
 async def read_tokens(ctx: RunContext, net: EvmNetwork, addresses: list[str]) -> dict[str, Erc20]:

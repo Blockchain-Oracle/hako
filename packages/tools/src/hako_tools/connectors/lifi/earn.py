@@ -6,7 +6,7 @@ from typing import Annotated, Any
 from pydantic import AfterValidator, Field
 
 from hako_tools.connectors.chain_evm.networks import CHAIN_IDS, lookup
-from hako_tools.framework import ToolOutput
+from hako_tools.framework import ToolOutput, to_float
 
 _EIP155 = re.compile(r"^eip155:(\d+)$")
 PERCENT = 100  # Earn reports APY as a fraction (0.0534 = 5.34 %, earn-openapi.yaml); cards show percent
@@ -40,13 +40,6 @@ class EarnToken(ToolOutput):
     logo_url: str | None = None
 
 
-def number(value: Any) -> float | None:
-    try:
-        return float(value) if value not in (None, "") else None
-    except (TypeError, ValueError):
-        return None
-
-
 def percent(fraction: Any) -> float | None:
-    value = number(fraction)
+    value = to_float(fraction)
     return round(value * PERCENT, APY_PLACES) if value is not None else None

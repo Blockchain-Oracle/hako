@@ -12,6 +12,7 @@ from hako_tools.connectors.chain_evm.provider import CHAIN_EVM
 from hako_tools.connectors.chain_evm.rpc import EvmAddress, RpcError, batch, hex_int
 from hako_tools.framework import FREE, Category, ProviderError, Render, RunContext, ToolInput, ToolOutput, tool
 from hako_tools.framework.errors import InvalidToolInput
+from hako_tools.framework.jsonrpc import ERROR_DETAIL_CHARS
 
 # @hako/cards LOGS_MAX_ROWS (contract.config.ts): one card shows at most 200 logs.
 LOGS_MAX_ROWS = 200
@@ -104,7 +105,8 @@ async def logs(inp: LogsInput, ctx: RunContext) -> LogsOutput:
     try:
         sig = parse(inp.event) if inp.event else None
     except SignatureError as exc:
-        raise InvalidToolInput("the event signature could not be read", details=[str(exc)[:200]]) from exc
+        raise InvalidToolInput("the event signature could not be read",
+                               details=[str(exc)[:ERROR_DETAIL_CHARS]]) from exc
     topics = list(inp.topics or [])
     if sig:
         topics = [sig.topic, *topics[1:]]
@@ -125,7 +127,11 @@ async def logs(inp: LogsInput, ctx: RunContext) -> LogsOutput:
         flt["address"] = inp.address
     if topics:
         flt["topics"] = [t.lower() if t else None for t in topics]
-    found, = await batch(ctx, net, [("eth_getLogs", [flt])])
+    try:
+        found, = await batch(ctx, net, [("eth_getLogs", [flt])])
+    except ProviderError as exc:  # the head block came back, so the RPCs are up: they refused this query's size
+        raise ProviderError(f"{net.name} RPCs refused this log query; narrow from_block/to_block or add an "
+                            "event/topic filter", details=exc.details) from exc
     if isinstance(found, RpcError):
         raise ProviderError(f"{net.name} RPC refused the log query: {found.message}; narrow the range or filters")
     rows = found or []

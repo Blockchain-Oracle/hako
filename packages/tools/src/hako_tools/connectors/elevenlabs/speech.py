@@ -68,10 +68,10 @@ class AudioOutput(ToolOutput):
 
 async def _speak(text: str, voice: Voice, ctx: RunContext) -> AudioOutput:
     estimate = len(text) * CREDITS_PER_CHAR
-    budget.reserve(estimate)
-    audio, headers = await ctx.post_bytes(ELEVENLABS, f"/text-to-speech/{VOICE_IDS[voice]}",
-                                          params={"output_format": OUTPUT_FORMAT},
-                                          json={"text": text, "model_id": MODEL})
+    with budget.held(estimate):
+        audio, headers = await ctx.post_bytes(ELEVENLABS, f"/text-to-speech/{VOICE_IDS[voice]}",
+                                              params={"output_format": OUTPUT_FORMAT},
+                                              json={"text": text, "model_id": MODEL})
     budget.record(headers, estimate)
     if not audio:
         raise ProviderError("ElevenLabs returned no audio")

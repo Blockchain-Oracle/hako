@@ -8,7 +8,17 @@ from pydantic import Field
 
 from hako_tools.connectors.polymarket.provider import POLYMARKET
 from hako_tools.constants import TTL_LIVE_S
-from hako_tools.framework import FREE, Category, Render, RunContext, ToolInput, ToolNotFoundResult, ToolOutput, tool
+from hako_tools.framework import (
+    FREE,
+    Category,
+    Render,
+    RunContext,
+    ToolInput,
+    ToolNotFoundResult,
+    ToolOutput,
+    to_float,
+    tool,
+)
 
 # @hako/cards contract.config.ts: MARKET_QUERY_MAX_CHARS, MARKETS_LIMIT_DEFAULT, MARKETS_LIMIT_MAX.
 QUERY_MAX_CHARS = 200
@@ -69,16 +79,9 @@ def _json_list(value: Any) -> list[Any]:
     return parsed if isinstance(parsed, list) else []
 
 
-def _number(value: Any) -> float | None:
-    try:
-        return float(value) if value not in (None, "") else None
-    except (TypeError, ValueError):
-        return None
-
-
 def _market(event: dict[str, Any], market: dict[str, Any]) -> PredictionMarket | None:
     names = [str(n) for n in _json_list(market.get("outcomes"))]
-    prices = [_number(p) for p in _json_list(market.get("outcomePrices"))]
+    prices = [to_float(p) for p in _json_list(market.get("outcomePrices"))]
     if not names or len(names) != len(prices) or any(p is None for p in prices):
         return None
     outcomes = [Outcome(name=n, probability=min(max(p or 0.0, 0.0), 1.0), price_usd=p)
@@ -91,8 +94,8 @@ def _market(event: dict[str, Any], market: dict[str, Any]) -> PredictionMarket |
     return PredictionMarket(
         id=str(market["id"]), provider=POLYMARKET.id, title=str(market.get("question") or event.get("title")),
         outcomes=outcomes, status=status, url=EVENT_URL.format(slug=event.get("slug")) if event.get("slug") else None,
-        end_date=market.get("endDate") or event.get("endDate"), volume_usd=_number(market.get("volumeNum")),
-        liquidity_usd=_number(market.get("liquidityNum")), category=tags[0] if tags else None,
+        end_date=market.get("endDate") or event.get("endDate"), volume_usd=to_float(market.get("volumeNum")),
+        liquidity_usd=to_float(market.get("liquidityNum")), category=tags[0] if tags else None,
         image_url=market.get("image") or event.get("image"), resolved_outcome=winner,
         event=str(event.get("title")) if several else None,
     )
@@ -102,7 +105,7 @@ def rows(events: list[dict[str, Any]], limit: int, status: MarketStatus) -> list
     """Events in Gamma's order; within each, its markets by volume; then cut to `limit`."""
     out: list[PredictionMarket] = []
     for event in events:
-        markets = sorted(event.get("markets") or [], key=lambda m: -(_number(m.get("volumeNum")) or 0.0))
+        markets = sorted(event.get("markets") or [], key=lambda m: -(to_float(m.get("volumeNum")) or 0.0))
         for market in markets:
             row = _market(event, market)
             if row and (status is MarketStatus.all or (row.status == "open") == (status is MarketStatus.open)):
