@@ -29,7 +29,7 @@
     "lucide-react": "catalog:",
     "motion": "catalog:",
     "next-themes": "catalog:",
-    "radix-ui": "^1.6.7",
+    "radix-ui": "1.6.7",
     "shiki": "catalog:",
     "sonner": "catalog:"
   },
@@ -38,6 +38,7 @@
     "@types/react-dom": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
+    "shadcn": "4.21.4",
     "typescript": "catalog:"
   },
   "peerDependencies": {

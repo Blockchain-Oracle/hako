@@ -5,6 +5,11 @@
  * `--destructive-foreground` and a second dark variant; those are the brand's and the app's, so they were removed.
  */
 
+/* The radix-nova style base (ui.shadcn.com/r/styles/radix-nova/index.json): the `data-open`/`data-closed`/
+ * `data-horizontal`… variants mapped onto Radix's `data-state`/`data-orientation`, the accordion keyframes and the
+ * `shimmer` and `scroll-fade-*` utilities the installed chat components use. The app imports tailwindcss first. */
+@import "shadcn/tailwind.css";
+
 /* 21st unlumen/sidebar-001 (21517): the active row's indicator reads --accent-pro; on Hako that is the accent. */
 @theme inline {
   --color-accent-pro: var(--accent-pro);
