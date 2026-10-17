@@ -12,14 +12,22 @@
   },
   "dependencies": {
     "@coinbase/cdp-sdk": "catalog:",
+    "@hako/cards": "workspace:*",
     "@hako/config": "workspace:*",
+    "@hako/defi": "workspace:*",
     "@hako/env": "workspace:*",
+    "@hako/money": "workspace:*",
+    "@hako/networks": "workspace:*",
     "@hono/node-server": "catalog:",
+    "@lifi/sdk": "catalog:",
+    "@lifi/types": "catalog:",
     "@modelcontextprotocol/sdk": "^1.31.0",
     "@x402/core": "catalog:",
     "@x402/evm": "catalog:",
     "@x402/hono": "catalog:",
     "hono": "catalog:",
+    "ioredis": "catalog:",
+    "viem": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
