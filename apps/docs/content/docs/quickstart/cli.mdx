@@ -1,0 +1,35 @@
+---
+title: For humans (CLI)
+description: Run the Hako CLI from npm with npx. Find a tool and read its contract from a terminal, for free; pay its runs with your PayBox wallet.
+---
+
+## 1. Run it
+
+The CLI needs Node.js 20 or later. `npx` runs it without installing anything:
+
+```bash
+npx -y usehako
+```
+
+With no command it prints its help. To keep the `hako` command around, install it once with `npm install -g usehako`.
+
+## 2. Find and read a tool (free)
+
+```bash
+npx -y usehako discover "weather in Lagos"
+npx -y usehako inspect openweather/current
+```
+
+`discover` prints ranked candidates. `inspect` prints the tool's description, input JSON Schema, output schema, price and example, plus `paidUrl` and `howToPay`. Output is JSON, so you can pipe it to `jq`:
+
+```bash
+npx -y usehako inspect openweather/current | jq '{price, example, paidUrl}'
+```
+
+## 3. Pay for a run
+
+The CLI holds no key and pays nothing itself. A run is paid from your PayBox wallet: in any agent with PayBox connected, ask it to call PayBox's `use_service` with the tool's `paidUrl`, method `POST` and the tool's input as the body. PayBox pays the exact price in USDC on Base and returns the answer. `hako login` and paid runs from the CLI itself, with your PayBox wallet, are being built.
+
+## Next
+
+The [CLI reference](/docs/cli) covers every command and environment variable. To connect an AI agent through MCP, see [For AI agents (MCP)](/docs/quickstart/mcp).

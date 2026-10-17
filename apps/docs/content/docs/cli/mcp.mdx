@@ -1,0 +1,40 @@
+---
+title: mcp
+description: Serve Hako to an AI agent as a local MCP server over stdio, with hako_discover and hako_inspect. Free.
+---
+
+This page covers the **local MCP server** built into the npm CLI. Your MCP client starts it as a command over stdio. The same two tools are also available from the **hosted MCP server** at `https://api.usehako.xyz/mcp` over Streamable HTTP. [Choose a connection and set it up](/docs/quickstart/mcp).
+
+```bash
+npx -y usehako mcp
+```
+
+The server speaks MCP over stdio, so an MCP client starts it as a command. Setup for Claude Code, Claude Desktop, Cursor and Codex is in [For AI agents (MCP)](/docs/quickstart/mcp).
+
+## Tools
+
+### `hako_discover`
+
+Free. Ranks the catalog for a job.
+
+| Input | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `query` | string | yes | At least 2 characters |
+| `limit` | integer | no | 1 to 25; default 5 |
+
+### `hako_inspect`
+
+Free. One tool's contract: description, input JSON Schema, output schema, price, example, and the `paidUrl` and `howToPay` that [`inspect`](/docs/cli/inspect) prints.
+
+| Input | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `id` | string | yes | e.g. `firecrawl/search` |
+
+## Paid runs
+
+The local server holds no key and pays for nothing. A run is paid from your PayBox wallet: with PayBox connected to the same agent, the agent calls PayBox's `use_service` with the tool's `paidUrl`, method `POST` and the input as body.
+
+## Behaviour
+
+- Results are JSON text. A result longer than 12,000 characters is cut and ends with `…[truncated]`.
+- A call that cannot complete (a network error, or `hako_inspect` on an unknown id) comes back as an MCP tool error with the message.

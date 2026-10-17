@@ -1,0 +1,87 @@
+---
+title: Discover
+description: POST /v1/discover ranks the whole catalog for a job described in plain words, with price, health and hints. Free.
+---
+
+```http
+POST /v1/discover
+content-type: application/json
+```
+
+## Body
+
+| Field | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `query` | string | yes | | The job, in plain words. 1–500 characters. |
+| `category` | string | no | | Only tools in this category, by id: `web-search`, `weather`, `research`… ([all categories](/docs/tools#categories)) |
+| `limit` | integer | no | `8` | How many candidates, 1–25 |
+| `include_unavailable` | boolean | no | `false` | Also list tools that are not configured on this server |
+
+```bash
+curl -s -X POST https://api.usehako.xyz/v1/discover \
+  -H 'content-type: application/json' \
+  -d '{"query": "weather in Lagos", "category": "weather", "limit": 2}'
+```
+
+## Response
+
+```json
+{
+  "query": "weather in Lagos",
+  "count": 2,
+  "candidates": [
+    {
+      "id": "openweather/current",
+      "provider": "openweather",
+      "providerName": "OpenWeather",
+      "slug": "current",
+      "displayName": "OpenWeather Current Weather",
+      "summary": "Weather right now for a city or coordinates: temperature, feels-like, humidity, wind, rain, sunrise.",
+      "categories": ["weather"],
+      "render": "weather",
+      "price": { "usd": "0.005", "atomic": "5000", "tier": "standard", "network": "eip155:8453" },
+      "method": "POST",
+      "path": "/v1/run/openweather/current",
+      "available": true,
+      "score": 1.0,
+      "health": { "status": "healthy", "runs": 42, "successRate": 1.0, "p50Ms": 410, "p95Ms": 980, "lastOkAt": 1791374400 }
+    },
+    { "id": "hako/weather", "…": "…" }
+  ],
+  "hints": [
+    "POST /v1/inspect with {\"id\": \"openweather/current\"} for its input schema, then pay POST /v2/run/openweather/current with PayBox use_service.",
+    "Related: openweather/forecast",
+    "Related: openweather/air-quality",
+    "Related: openweather/geocode"
+  ]
+}
+```
+
+| Field | Meaning |
+| --- | --- |
+| `count` | How many candidates were returned |
+| `candidates[].id` | The tool id to inspect and run |
+| `candidates[].price` | `{usd, atomic, tier, network}` per call |
+| `candidates[].path` | The tool's catalog key. Its paid route is the same tool under `/v2/run` ([Run](/docs/api/run)) |
+| `candidates[].available` | `false` if the tool is not configured on this server (only listed with `include_unavailable`) |
+| `candidates[].score` | Relevance, relative to the best match (1.0) |
+| `candidates[].health` | Hako's record of this tool's recent runs (below) |
+| `hints` | What to call next, a cheaper tool for the same kind of job if there is one, and related tools. When nothing matches, a suggestion to rephrase. |
+
+## Health
+
+Health comes from Hako's own recent runs of each tool (up to the last 200). The first row that applies wins:
+
+| `health.status` | Meaning |
+| --- | --- |
+| `outage` | The 5 most recent runs all failed |
+| `degraded` | Fewer than 80% of recent runs succeeded |
+| `healthy` | A run succeeded in the last 15 minutes |
+| `stable` | At least 20 runs, and 95% or more succeeded |
+| `unknown` | None of the above, for example no runs yet |
+
+`p50Ms` and `p95Ms` are the median and 95th-percentile run times of successful runs, `successRate` is the share of runs that succeeded, and `lastOkAt` is the Unix time of the last success. A tool with no runs yet shows `"status": "unknown"` and `null` figures.
+
+## Ranking
+
+Discover matches the query against each tool's name, summary, categories, provider and description, and expands common synonyms ("scrape" also matches "extract", "currency" matches "fx"). Ties on relevance go to the healthier, then the cheaper tool. Use health to break ties, not to filter: a tool marked `unknown` may simply be new.

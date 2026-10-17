@@ -1,0 +1,23 @@
+# Context for deploy/next-app/Dockerfile (BuildKit reads this instead of the root .dockerignore, which drops apps/).
+.git
+**/node_modules
+**/.next
+**/.turbo
+**/.venv
+**/__pycache__
+**/.ruff_cache
+.research
+.schemathesis
+.hypothesis
+data
+docs
+plugins
+# Local secrets (the root .env holds provider keys; each app's .env.local its own), never in an image
+.env
+.env.*
+**/.env.local
+# Local working material (never in the repo, so never in a CI build either)
+refs
+context
+.claude
+.firecrawl

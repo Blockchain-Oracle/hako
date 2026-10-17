@@ -1,0 +1,76 @@
+---
+title: Pricing and payments
+description: Discover and inspect are free. Each run has a fixed price of $0.001, $0.005 or $0.01, paid in USDC on Base with your PayBox wallet over x402, and only a successful run is charged.
+---
+
+## Prices
+
+| Tier | Price per call | Atomic units | Used for |
+| --- | --- | --- | --- |
+| `local` | $0.001 | `1000` | Keyless or local tools: Wikipedia, arXiv, package registries, time zones |
+| `standard` | $0.005 | `5000` | Standard keyed tools: Google results, page reads, weather, text AI |
+| `premium` | $0.01 | `10000` | Live search with page content, cited answers |
+
+Every tool shows its price in `discover`, `inspect` and the catalog as `price: {usd, atomic, tier, network}`. USDC has 6 decimals, so `1000` atomic units are $0.001. The list of tools per tier is in [Tools](/docs/tools#how-prices-work).
+
+`discover`, `inspect`, `GET /v1/catalog`, `GET /v1/version` and `GET /v1/health` are free and need no account.
+
+## Payment
+
+| Setting | Value |
+| --- | --- |
+| Paid route | `POST /v2/run/{provider}/{endpoint}` |
+| Protocol | x402 v2, scheme `exact` |
+| Network | `eip155:8453` (Base mainnet) |
+| Asset | USDC, `0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913` |
+| Facilitator | Coinbase CDP |
+| Who pays | You, from your PayBox wallet (PayBox's `use_service`). Hako holds no key and pays for no one. |
+
+### The handshake
+
+<Steps>
+<Step>
+
+PayBox's `use_service` sends `POST /v2/run/{provider}/{endpoint}` without a payment. The gateway answers `402 Payment Required`; the `PAYMENT-REQUIRED` header (base64 JSON) carries the scheme, network, asset, exact `amount` and `payTo`.
+
+</Step>
+<Step>
+
+PayBox asks for your approval when your grant requires it, signs the payment with your wallet and sends the same request again, with the tool's input as the body and a `PAYMENT-SIGNATURE` header.
+
+</Step>
+<Step>
+
+The gateway verifies the payment and runs the tool.
+
+</Step>
+<Step>
+
+If the run returns `200`, the gateway settles the payment. The `PAYMENT-RESPONSE` header carries the settlement, including the Base transaction hash (view it on `https://basescan.org/tx/<hash>`). PayBox returns the tool's answer as the request's output.
+
+</Step>
+</Steps>
+
+## When you are not charged
+
+Settlement happens only after a `2xx` answer. Any other status cancels it, so the signed authorization is never submitted:
+
+| Outcome | Status | Code |
+| --- | --- | --- |
+| The lookup found nothing (`found: false`) | 404 | (an envelope, not an error) |
+| The input does not match the tool's schema | 422 | `invalid_input` |
+| The body is not JSON | 400 | `invalid_json` |
+| The provider failed or answered something unreadable | 502 | `provider_error`, `output_contract` |
+| The provider rate-limited Hako | 429 | `provider_rate_limited` |
+| The tool did not finish in time | 504 | `deadline_exceeded` |
+| The tool is not configured on this server | 503 | `tool_unavailable` |
+| The gateway could not reach the tool backend | 502 | `api_unreachable`, `gateway_error` |
+| The gateway has not loaded the tool catalog yet | 503 | `catalog_unavailable` |
+
+An id that is not in the catalog answers `404 unknown_endpoint` before any payment is asked for. A request that carries an input is checked first: a bad input answers `400` or `422` for free, before any `402`.
+
+A result served from cache (`cached: true`) is a successful run and costs the tool's normal price.
+
+## Capping what you spend
+
+Price each call before you pay: `inspect` and the `402` state the exact amount. Your limits live in PayBox, not in Hako: your PayBox grant decides whether each payment needs your approval, and PayBox's own limits apply to every request.

@@ -1,0 +1,86 @@
+---
+title: Introduction
+description: Hako gives an AI agent one catalog of paid tools. Finding and reading a tool is free. Each run costs a fixed price, paid in USDC on Base with your own PayBox wallet.
+---
+
+Hako is a box of agent tools behind one gateway: 80 tools from 33 providers, covering web search and page reading, cited answers, research papers, news, weather (16-day forecasts and history since 1940), maps and geocoding, crypto prices and FX, GitHub and packages, time zones and holidays, dictionaries and more.
+
+Your agent finds a tool, reads its contract and runs it. Finding and reading are free and need no account. A run is paid per call in USDC on Base mainnet over x402, from **your PayBox wallet**: Hako never holds a key and never pays on your behalf.
+
+## How it works
+
+Three verbs. The first two are free.
+
+<Steps>
+<Step>
+
+**Discover** (free). Describe the job in plain words. Hako ranks the catalog and returns candidates, each with its id, price, health (status, p50 and p95 run time) and hints on what to call next.
+
+</Step>
+<Step>
+
+**Inspect** (free). Read one tool's contract: what it does and what it will not do, its input JSON Schema, its output schema, its price and a working example.
+
+</Step>
+<Step>
+
+**Run** (paid per call). The tool's paid URL is `POST https://api.usehako.xyz/v2/run/<provider>/<endpoint>`. Unpaid, it answers `402 Payment Required` with the exact price. PayBox's `use_service` reads that price, gets your approval as your PayBox grant requires, pays from your wallet and fetches the answer. A failed run is never charged.
+
+</Step>
+</Steps>
+
+```bash title="Discover, then inspect (no account needed)"
+curl -s -X POST https://api.usehako.xyz/v1/discover \
+  -H 'content-type: application/json' \
+  -d '{"query": "weather in Lagos", "limit": 3}'
+
+curl -s -X POST https://api.usehako.xyz/v1/inspect \
+  -H 'content-type: application/json' \
+  -d '{"id": "openweather/current"}'
+```
+
+```json title="Run: ask your PayBox agent to call use_service with"
+{
+  "url": "https://api.usehako.xyz/v2/run/openweather/current",
+  "method": "POST",
+  "body": { "city": "Lagos,NG" }
+}
+```
+
+## What happens to a run
+
+The public gateway at `https://api.usehako.xyz` checks the input for free, then asks for the price with a `402`. When PayBox retries with the payment, the gateway verifies it through Coinbase's CDP facilitator on Base (`eip155:8453`), runs the tool and settles the payment only when the run succeeds. See [Pricing and payments](/docs/pricing).
+
+## The tools
+
+Each tool has an id of the form `provider/endpoint`, such as `firecrawl/search` or `openweather/current`. Prices are $0.001, $0.005 or $0.01 per call. Browse them in [Tools](/docs/tools), or ask `discover`.
+
+## Ways to connect
+
+<Cards>
+  <Card title="Skill" href="/docs/quickstart/skill">
+    Tell your agent `set up https://usehako.xyz/SKILL.md`.
+  </Card>
+  <Card title="MCP" href="/docs/quickstart/mcp">
+    `hako_discover` and `hako_inspect`, hosted or local. Free.
+  </Card>
+  <Card title="CLI" href="/docs/quickstart/cli">
+    `npx -y usehako discover` and `inspect` from a terminal.
+  </Card>
+  <Card title="HTTP" href="/docs/quickstart/http">
+    Free JSON reads, and the `/v2` URL your PayBox wallet pays.
+  </Card>
+  <Card title="Agent chat" href="/docs/quickstart/agent-chat">
+    Find and read tools in the browser.
+  </Card>
+</Cards>
+
+## What is being built
+
+Hako's PayBox plugin (`hako_discover`, `hako_inspect`, `hako_run` inside PayBox), **Connect PayBox** in the web app and in hosted MCP cards, and `hako login` in the CLI are being built. These docs describe what works today and are updated as each one ships.
+
+## Next steps
+
+- [Pricing and payments](/docs/pricing): the three prices, the x402 handshake, and when you are not charged.
+- [API reference](/docs/api): base URL, the result envelope, errors and limits.
+- Machine-readable: [`https://usehako.xyz/llms.txt`](https://usehako.xyz/llms.txt) and [`https://usehako.xyz/SKILL.md`](https://usehako.xyz/SKILL.md).

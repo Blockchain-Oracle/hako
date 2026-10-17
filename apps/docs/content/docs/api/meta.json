@@ -1,0 +1,4 @@
+{
+  "title": "API reference",
+  "pages": ["index", "discover", "inspect", "run", "catalog"]
+}

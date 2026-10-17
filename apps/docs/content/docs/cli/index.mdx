@@ -1,0 +1,40 @@
+---
+title: CLI overview
+description: Run the Hako CLI from npm to discover and inspect tools for free, or start its local MCP server.
+---
+
+## Run it
+
+```bash
+npx -y usehako --version
+```
+
+It needs Node.js 20 or later. `npm install -g usehako` installs the `hako` command, so `hako <command>` works too; the examples below use `npx -y usehako`.
+
+## Commands
+
+| Command | Cost | What it does |
+| --- | --- | --- |
+| [`discover "<what you need>" [--limit N]`](/docs/cli/discover) | free | Rank tools for a job |
+| [`inspect <provider/endpoint>`](/docs/cli/inspect) | free | A tool's description, input schema, output schema, price, example and paid URL |
+| [`catalog`](/docs/cli/catalog) | free | Every tool as JSON |
+| [`mcp`](/docs/cli/mcp) | free | A local MCP server over stdio with `hako_discover` and `hako_inspect` |
+| `version`, `--version` | free | Print the CLI version |
+
+Any other command, or none, prints the help.
+
+The CLI holds no key and pays for nothing. A run is paid from your PayBox wallet with PayBox's `use_service` on the `paidUrl` that `inspect` prints ([Pricing and payments](/docs/pricing)). `hako login` and paid runs from the CLI with your PayBox wallet are being built.
+
+## Environment
+
+| Variable | Default | Meaning |
+| --- | --- | --- |
+| `HAKO_API_URL` | `https://api.usehako.xyz` | The gateway to call |
+
+## Output and exit codes
+
+Every command prints JSON to stdout, formatted with two-space indentation, so it pipes into `jq`. Errors go to stderr as `hako: <message>` with exit code 1.
+
+## Request timeout
+
+Each HTTP request times out after 20 seconds.

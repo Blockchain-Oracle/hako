@@ -1,0 +1,16 @@
+{
+  "title": "Hako",
+  "pages": [
+    "---Guide---",
+    "index",
+    "quickstart",
+    "pricing",
+    "---CLI reference---",
+    "...cli",
+    "---API reference---",
+    "...api",
+    "---Tools---",
+    "...tools",
+    "become-a-provider"
+  ]
+}

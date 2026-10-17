@@ -1,0 +1,51 @@
+"""Plain-language aliases for the Wikidata properties agents ask about most. Any PID is accepted too."""
+
+from typing import Final
+
+from hako_now.constants import HEAD_ALIAS
+
+PROPERTY_ALIASES: Final = {
+    "head of state": "P35",
+    "president": "P35",
+    "head of government": "P6",
+    "prime minister": "P6",
+    "capital": "P36",
+    "population": "P1082",
+    "currency": "P38",
+    "official language": "P37",
+    "ceo": "P169",
+    "chief executive officer": "P169",
+    "chairperson": "P488",
+    "founded": "P571",
+    "inception": "P571",
+    "headquarters": "P159",
+    "official website": "P856",
+    "website": "P856",
+    "area": "P2046",
+    "gdp": "P2131",
+    "mayor": "P6",
+    "country": "P17",
+    "continent": "P30",
+    "number of employees": "P1128",
+    "employees": "P1128",
+    "owned by": "P127",
+    "parent organization": "P749",
+    "stock exchange": "P414",
+    "ticker": "P249",
+    "date of birth": "P569",
+    "date of death": "P570",
+    "spouse": "P26",
+    "position held": "P39",
+    "member of": "P463",
+    "time zone": "P421",
+    # resolved by facts.service: the first of HEAD_PROPERTIES with a value, else the office's current holder
+    "head": HEAD_ALIAS,
+    "leader": HEAD_ALIAS,
+    "head of organization": HEAD_ALIAS,
+    "head of the organization": HEAD_ALIAS,
+    "secretary-general": HEAD_ALIAS,
+    "secretary general": HEAD_ALIAS,
+    "director-general": HEAD_ALIAS,
+    "director general": HEAD_ALIAS,
+    "director": "P1037",
+}

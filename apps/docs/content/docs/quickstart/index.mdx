@@ -1,0 +1,28 @@
+---
+title: Quickstart
+description: Five ways to start, from no install at all to your own code. Pick the one that matches how your agent works.
+---
+
+Every way reaches the same catalog and the same prices. Finding and reading a tool is free; a run is paid per call in USDC on Base with your own PayBox wallet, and an error or a lookup that finds nothing is not charged.
+
+<Cards>
+  <Card title="In the browser (agent chat)" href="/docs/quickstart/agent-chat">
+    Nothing to install. Ask the chat agent to find and read tools for a job.
+  </Card>
+  <Card title="For AI agents (Skill)" href="/docs/quickstart/skill">
+    One line in your agent's chat. It reads SKILL.md and learns discover, inspect and how to pay a run.
+  </Card>
+  <Card title="For AI agents (MCP)" href="/docs/quickstart/mcp">
+    Add Hako to Claude, Cursor or Codex: `hako_discover` and `hako_inspect`, free.
+  </Card>
+  <Card title="For humans (CLI)" href="/docs/quickstart/cli">
+    `npx -y usehako`: find and inspect any tool from a terminal.
+  </Card>
+  <Card title="From code (HTTP)" href="/docs/quickstart/http">
+    Plain JSON for the free routes, and the `/v2` URL your PayBox wallet pays.
+  </Card>
+</Cards>
+
+## Paying for a run
+
+Every tool's paid URL is `https://api.usehako.xyz/v2/run/<provider>/<endpoint>`. With PayBox connected to your agent (Claude, ChatGPT, Cursor or any PayBox host), ask it to run the tool: it calls PayBox's `use_service` with that URL, method `POST` and the tool's input as the body. PayBox pays the exact price in USDC on Base from your wallet, after your approval when your grant asks for one, and returns the answer.

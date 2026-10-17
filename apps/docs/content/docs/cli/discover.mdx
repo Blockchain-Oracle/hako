@@ -1,0 +1,54 @@
+---
+title: discover
+description: Rank the catalog for a job described in plain words. Free.
+---
+
+```bash
+npx -y usehako discover "<what you need>" [--limit N]
+```
+
+All words that are not flags form the query, so quotes are optional: `discover weather in Lagos` and `discover "weather in Lagos"` are the same.
+
+| Flag | Default | Meaning |
+| --- | --- | --- |
+| `--limit N` | `5` | How many candidates to return (the API accepts 1 to 25) |
+
+It calls [`POST /v1/discover`](/docs/api/discover) with `{query, limit}` and prints the response.
+
+## Example
+
+```bash
+npx -y usehako discover "weather in Lagos" --limit 2
+```
+
+```json
+{
+  "query": "weather in Lagos",
+  "count": 2,
+  "candidates": [
+    {
+      "id": "openweather/current",
+      "provider": "openweather",
+      "providerName": "OpenWeather",
+      "slug": "current",
+      "displayName": "OpenWeather Current Weather",
+      "summary": "Weather right now for a city or coordinates: temperature, feels-like, humidity, wind, rain, sunrise.",
+      "categories": ["weather"],
+      "render": "weather",
+      "price": { "usd": "0.005", "atomic": "5000", "tier": "standard", "network": "eip155:8453" },
+      "method": "POST",
+      "path": "/v1/run/openweather/current",
+      "available": true,
+      "score": 1.0,
+      "health": { "status": "healthy", "runs": 42, "successRate": 1.0, "p50Ms": 410, "p95Ms": 980, "lastOkAt": 1791374400 }
+    },
+    { "id": "hako/weather", "…": "…" }
+  ],
+  "hints": [
+    "POST /v1/inspect with {\"id\": \"openweather/current\"} for its input schema, then pay POST /v2/run/openweather/current with PayBox use_service.",
+    "Related: openweather/forecast"
+  ]
+}
+```
+
+`path` is the tool's catalog key; its paid URL is the same tool under `/v2/run`, paid with your PayBox wallet (see [inspect](/docs/cli/inspect)). To filter by category, call the API directly; the CLI sends only `query` and `limit`. See [Discover](/docs/api/discover) for every field.

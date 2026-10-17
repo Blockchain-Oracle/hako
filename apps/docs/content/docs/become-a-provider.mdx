@@ -1,0 +1,86 @@
+---
+title: Become a provider
+description: Add a tool to the catalog by writing a connector, one provider plus typed async endpoints. The engine does validation, deadlines, caching, size caps, health, billing flags and the envelope.
+---
+
+A connector is one **provider** plus typed async **endpoints**, written in Python in the Hako repository (`packages/tools`). The engine around it validates input, enforces the deadline, caches, caps the output size, records health, sets the billing flags and builds the [run envelope](/docs/api#the-run-envelope). A handler only calls the upstream and maps its answer.
+
+Once merged and deployed, the new endpoints appear in `GET /v1/catalog`, in discover and as paid routes on the gateway. The gateway re-reads the catalog every minute, so a new tool becomes payable without a gateway restart.
+
+A worked example is `src/hako_tools/connectors/firecrawl/`.
+
+## Layout
+
+```text
+src/hako_tools/connectors/<provider>/
+├── __init__.py      # one-line docstring
+├── provider.py      # PROVIDER = Provider(...)
+└── <group>.py       # @tool endpoints (≤ 400 lines per file; split by theme)
+```
+
+`connectors.load()` imports every module. Nothing else needs registering.
+
+## The provider
+
+```python title="provider.py"
+SERPER = Provider(
+    id="serper", display_name="Serper", summary="Google results as JSON: web, news, scholar, places.",
+    homepage="https://serper.dev", docs_url="https://serper.dev/playground", base_url="https://google.serper.dev",
+    categories=(Category.web_search, Category.news), terms=Terms.value_added,
+    auth=Header("X-API-KEY", "SERPER_API_KEY"),   # or Bearer("ENV"), Query("param", "ENV"), NoAuth()
+    rate="5/second", max_concurrency=4,              # the provider's published limits, never guesses
+    licence=None, attribution=None,                  # set both for open data (e.g. "CC BY 4.0", "© OpenStreetMap")
+)
+```
+
+Credentials are environment variable names only (`hako/.env` locally, the deployment's environment in production). A handler never reads a key itself. A provider whose key is missing is listed with `available: false`, and the gateway offers no paid route for its endpoints.
+
+## An endpoint
+
+```python title="search.py"
+class SearchInput(ToolInput):           # extra="forbid": a typo fails before anyone pays
+    query: str = Field(min_length=1, max_length=500, description="What to search for.")
+
+class SearchOutput(ToolOutput):
+    query: str
+    results: list[Link]
+
+@tool(provider=SERPER, slug="search", name="Serper Google Search",
+      summary="One line an agent ranks on.",
+      description="Written for an agent: what it does, what it will NOT do, and which endpoint to use instead.",
+      categories=(Category.web_search,), render=Render.search_results, price=STANDARD,
+      example={"query": "x402 payments"}, see_also=("firecrawl/search",), cache_ttl_s=TTL_SEARCH_S)
+async def search(inp: SearchInput, ctx: RunContext) -> SearchOutput:
+    data = await ctx.post_json(SERPER, "/search", json={"q": inp.query})
+    return SearchOutput(query=inp.query, results=[Link(title=r["title"], url=r["link"], snippet=r.get("snippet"))
+                                                  for r in data.get("organic", [])])
+```
+
+The endpoint's id is `<provider>/<slug>` (here `serper/search`) and its paid route is `POST /v2/run/serper/search`. `summary` and `description` are what discover ranks on and what an agent reads in inspect, so write them for an agent.
+
+## Rules
+
+- **Use `ctx` only.** `ctx.get_json`, `ctx.post_json` and `ctx.get_text(provider, path, params=…, json=…, headers=…)` inject credentials, apply rate limits and the deadline, record the source and map errors: an upstream 404 becomes a "not found" answer, 429 becomes `provider_rate_limited`, and other 4xx and 5xx become `provider_error`. `ctx.call("<id>", {...})` runs another endpoint (for composites). `ctx.note("…")` adds a note for the agent.
+- **Not found is an answer.** Raise `ToolNotFoundResult("…")` when the thing does not exist. The engine returns the envelope with `found: false` and `billable: false`; the gateway passes it on as `404` and does not settle the payment.
+- **Pick the price tier.** `LOCAL` ($0.001) for keyless upstreams or local compute. `STANDARD` ($0.005) for keyed, cheap upstreams. `PREMIUM` ($0.01) when the upstream costs $0.005 or more per call, or the endpoint chains several calls.
+- **Pick the render.** It selects the result card; match `data` to its shape (`categories.py` documents each).
+- **Pick the cache TTL** from `constants.py` (`TTL_SEARCH_S`, `TTL_PAGE_S`, `TTL_REFERENCE_S`, `TTL_LIVE_S`), or `None`.
+- **No magic numbers** (ruff PLR2004): name limits as module constants, with the reason.
+- **Inputs are JSON bodies** (never query strings), under 64 KiB.
+- **Finish in time.** The default deadline is 8 s; an endpoint may set `deadline_s` up to 9 s, never more.
+- **Keep outputs lean**: only the fields an agent uses. The engine trims anything past 60 KB, but do not rely on it.
+- **The example must be valid input and should succeed live.** It is checked against the input model at import, it is the health probe, and it is the example these docs show.
+
+## Check it
+
+```bash
+uv run hako-tools probe --provider <id>     # runs every example live through the engine
+uv run ruff check packages/tools && uv run pyright packages/tools
+uv run hako-tools catalog | jq '.endpoints[] | select(.provider == "<id>") | .id'
+```
+
+When the connector is deployed, refresh these docs' snapshot so the [Tools](/docs/tools) pages include it:
+
+```bash
+cd apps/docs && pnpm catalog:snapshot https://api.usehako.xyz
+```

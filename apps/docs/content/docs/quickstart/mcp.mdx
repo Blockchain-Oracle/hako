@@ -1,0 +1,78 @@
+---
+title: For AI agents (MCP)
+description: Connect to the hosted MCP URL or run Hako's npm CLI as a local stdio server. Both serve hako_discover and hako_inspect for free; runs are paid with your PayBox wallet.
+---
+
+Hako exposes the same two free tools in two standard MCP ways:
+
+| Connection | How the client connects | Cost |
+| --- | --- | --- |
+| Hosted | Streamable HTTP at `https://api.usehako.xyz/mcp` | free |
+| Local | Starts `npx -y usehako mcp` over stdio | free |
+
+Neither server holds a key or pays for anything. A run is paid from your PayBox wallet ([below](#paying-for-a-run)).
+
+## Hosted MCP: connect by URL
+
+No install is needed. Add `https://api.usehako.xyz/mcp` as a Streamable HTTP server in your MCP client. For example:
+
+```bash
+codex mcp add hako --url https://api.usehako.xyz/mcp
+claude mcp add --transport http hako https://api.usehako.xyz/mcp
+```
+
+## Local MCP: run the npm CLI
+
+The CLI runs an MCP server on your machine over stdio. Node.js 20 or later is required. `npx -y usehako mcp` works without a global install; after `npm install -g usehako` you may launch `hako mcp` instead.
+
+<Tabs items={["JSON (Claude Desktop, Cursor)", "Claude Code", "Codex"]}>
+<Tab value="JSON (Claude Desktop, Cursor)">
+
+```json
+{
+  "mcpServers": {
+    "hako": {
+      "command": "npx",
+      "args": ["-y", "usehako", "mcp"]
+    }
+  }
+}
+```
+
+</Tab>
+<Tab value="Claude Code">
+
+```bash
+claude mcp add hako -- npx -y usehako mcp
+```
+
+</Tab>
+<Tab value="Codex">
+
+```toml title="~/.codex/config.toml"
+[mcp_servers.hako]
+command = "npx"
+args = ["-y", "usehako", "mcp"]
+```
+
+</Tab>
+</Tabs>
+
+`HAKO_API_URL` points the local server at another gateway (default `https://api.usehako.xyz`).
+
+## The tools
+
+| Tool | Cost | Input | Returns |
+| --- | --- | --- | --- |
+| `hako_discover` | free | `query` (at least 2 characters), `limit` (1–25, default 5) | Ranked candidates with id, price, health and hints |
+| `hako_inspect` | free | `id`, e.g. `firecrawl/search` | Description, input JSON Schema, output schema, price and an example; both servers add `paidUrl` and `howToPay` (on the hosted server, `paidUrl` is `null` when the tool cannot be paid for there, and `howToPay` says why) |
+
+A local tool result longer than 12,000 characters is cut, and ends with `…[truncated]`.
+
+## Paying for a run
+
+Connect PayBox to the same agent (PayBox's own MCP connector). The agent inspects the tool with Hako, then calls PayBox's `use_service` with `https://api.usehako.xyz/v2/run/<provider>/<endpoint>`, method `POST` and the tool's input as the body. PayBox pays the exact price in USDC on Base from your wallet and returns the answer.
+
+## Try it
+
+With Hako and PayBox both connected, ask your agent: "Use Hako to find the latest release of astral-sh/uv." It should call `hako_discover`, then `hako_inspect` on `github/latest-release`, then PayBox's `use_service` on `https://api.usehako.xyz/v2/run/github/latest-release` with `{"repo": "astral-sh/uv"}` ($0.001).

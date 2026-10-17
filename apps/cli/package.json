@@ -1,0 +1,44 @@
+{
+  "name": "usehako",
+  "version": "0.1.1",
+  "description": "Hako CLI and local MCP server: discover and inspect agent tools for free; paid runs are paid with your PayBox wallet.",
+  "type": "module",
+  "bin": {
+    "hako": "dist/hako.mjs"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json --noEmit && esbuild src/main.ts --bundle --platform=node --target=node20 --format=esm --outfile=dist/hako.mjs --banner:js=\"#!/usr/bin/env node\nimport{createRequire}from'module';const require=createRequire(import.meta.url);\" && node -e \"require('node:fs').chmodSync('dist/hako.mjs', 0o755)\"",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "prepack": "pnpm build"
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/sdk": "^1.31.0",
+    "zod": "4.6.5",
+    "@types/node": "24.12.3",
+    "esbuild": "^0.28.2",
+    "typescript": "5.9.3"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Blockchain-Oracle/hako.git",
+    "directory": "apps/cli"
+  },
+  "homepage": "https://docs.usehako.xyz/docs/cli",
+  "bugs": "https://github.com/Blockchain-Oracle/hako/issues",
+  "keywords": [
+    "hako",
+    "cli",
+    "mcp",
+    "x402",
+    "agent-tools",
+    "paybox"
+  ],
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,98 @@
+---
+title: Run
+description: POST /v2/run/{provider}/{endpoint} runs one tool with its input as the JSON body. Paid per call in USDC on Base with your PayBox wallet over x402; settled only on success.
+---
+
+```http
+POST /v2/run/{provider}/{endpoint}
+content-type: application/json
+```
+
+The body is the tool's input, exactly as its input schema describes ([inspect](/docs/api/inspect) returns it). There is no wrapper object.
+
+```bash
+# returns 402 with the price until it is paid
+curl -si -X POST https://api.usehako.xyz/v2/run/openweather/current
+```
+
+## Paying with PayBox
+
+Pay a run from your PayBox wallet with PayBox's `use_service`: `url` is this route, `method` is `POST`, `body` is the tool's input, and `credential_id` is your Base wallet from `list_credentials`. PayBox probes the price, asks for your approval when your grant requires it, pays and re-sends the request with the payment. On `success`, its `output.value.response` holds the gateway's `status`, `content_type` and `body`.
+
+```json title="use_service arguments"
+{
+  "credential_id": "<your Base wallet, from list_credentials>",
+  "url": "https://api.usehako.xyz/v2/run/wikipedia/summary",
+  "method": "POST",
+  "body": { "title": "Alan Turing" }
+}
+```
+
+## Payment flow
+
+| Step | Request | Response |
+| --- | --- | --- |
+| 1 | No payment header (with or without the input) | `402` with `PAYMENT-REQUIRED`: x402 v2, scheme `exact`, network `eip155:8453`, asset USDC (`0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913`), the exact `amount` and `payTo` |
+| 2 | The same request with the input and `PAYMENT-SIGNATURE` | The gateway verifies the payment through Coinbase's CDP facilitator, then runs the tool |
+| 3 | | `200`: the [run envelope](/docs/api#the-run-envelope), and `PAYMENT-RESPONSE` with the settlement on Base |
+| 3 | | Any other status: an error or a not-found envelope. The payment is not settled. |
+
+An unpaid request that carries an input is checked first: a bad input answers `400 invalid_json` or `422 invalid_input` for free, before any `402`. An unpaid request without a body goes straight to the `402`, which is how PayBox reads the price.
+
+The same check runs on its own, free and without running the tool, at `POST /v1/validate/{provider}/{endpoint}`: it answers `{"valid": true}`, or the same `400` or `422`.
+
+## Responses
+
+| Status | Body | Charged |
+| --- | --- | --- |
+| `200` | The run envelope, `found: true` | yes |
+| `402` | `{}`; the price is in `PAYMENT-REQUIRED` | no |
+| `404` | The run envelope with `found: false` (the thing does not exist), or an `unknown_endpoint` error | no |
+| `400`, `413`, `422` | An error: `invalid_json`, `payload_too_large`, `invalid_input` | no |
+| `429`, `502`, `503`, `504` | An error: `provider_rate_limited`, `provider_error`, `output_contract`, `api_unreachable`, `tool_unavailable`, `catalog_unavailable`, `deadline_exceeded` | no |
+
+An id that is not in the catalog answers `404 unknown_endpoint` straight away, without a `402`.
+
+## Response headers
+
+| Header | Value |
+| --- | --- |
+| `PAYMENT-RESPONSE` | On a settled run: base64 JSON with `success`, `transaction` (the Base hash), `network` and `payer` |
+| `X-Hako-Endpoint` | The tool id that ran, e.g. `openweather/current` |
+
+## Example
+
+The `body` of a paid `wikipedia/summary` run with `{"title": "Alan Turing"}`:
+
+```json
+{
+  "service": "tool-router",
+  "endpoint": "wikipedia/summary",
+  "provider": "wikipedia",
+  "status": "ok",
+  "found": true,
+  "billable": true,
+  "cached": false,
+  "as_of": "2026-10-07T12:07:17+00:00",
+  "elapsed_ms": 1418,
+  "price": { "usd": "0.001", "atomic": "1000", "tier": "local", "network": "eip155:8453" },
+  "render": "page",
+  "notes": [],
+  "sources": [{ "name": "wikipedia", "status": "ok", "url": "https://en.wikipedia.org/api/rest_v1/page/summary/Alan_Turing", "licence": "CC BY-SA 4.0" }],
+  "data": {
+    "title": "Alan Turing",
+    "description": "English computer scientist (1912–1954)",
+    "markdown": "Alan Mathison Turing was an English mathematician and logician…",
+    "url": "https://en.wikipedia.org/wiki/Alan_Turing",
+    "wikidata_id": "Q7251",
+    "lang": "en"
+  }
+}
+```
+
+## Good practice
+
+- Inspect before the first run of a tool, and copy its `example`.
+- Split multi-source jobs into several small runs; run independent ones in parallel.
+- Retry only errors with `retryable: true`, after a pause.
+- Tell the user what a run cost when it matters (`price.usd`).

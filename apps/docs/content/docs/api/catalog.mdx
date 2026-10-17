@@ -1,0 +1,68 @@
+---
+title: Catalog, version and health
+description: The free GET routes, the full catalog, the gateway's identity, a readiness check and the x402 resource list.
+---
+
+## GET /v1/catalog [#catalog]
+
+Every provider and tool, with input and output schemas and prices.
+
+```bash
+curl -s https://api.usehako.xyz/v1/catalog | jq '{hash, providers: (.providers | length), tools: (.endpoints | length)}'
+```
+
+| Field | Meaning |
+| --- | --- |
+| `service` | `tool-router` |
+| `title` | `Hako Tool Router` |
+| `catalogVersion` | The catalog format version |
+| `network` | The payment network, `eip155:8453` (Base) |
+| `categories` | `{id, label, endpointCount}` for each category in use |
+| `providers` | `{id, displayName, summary, homepage, docsUrl, categories, terms, licence, attribution, logoDomain, endpointCount, available}` |
+| `endpoints` | One object per tool, the same shape as [inspect](/docs/api/inspect) |
+| `hash` | A content hash. It changes whenever a tool is added, removed, repriced or edited. |
+
+The gateway re-reads the catalog from the backend every minute, so a new tool becomes runnable without a gateway restart.
+
+## GET /v1/version [#version]
+
+The gateway's identity.
+
+```bash
+curl -s https://api.usehako.xyz/v1/version
+```
+
+It includes `catalog`, the catalog hash, and `endpoints`, the number of runnable tools.
+
+## GET /v1/health [#health]
+
+Readiness. Answers `200` with:
+
+```json
+{ "status": "ok" }
+```
+
+## GET /.well-known/x402 [#well-known-x402]
+
+x402 discovery: every paid resource on this gateway.
+
+```bash
+curl -s https://api.usehako.xyz/.well-known/x402
+```
+
+```json
+{
+  "version": 1,
+  "resources": [
+    "https://api.usehako.xyz/v2/run/hako/answer",
+    "https://api.usehako.xyz/v2/run/hako/business-days",
+    "…"
+  ]
+}
+```
+
+Each resource is a `POST` route on Base mainnet, paid with your PayBox wallet. Its price is in the `402` it returns, and in the catalog.
+
+## GET /v1/endpoints/\{provider\}/\{endpoint\} [#endpoints]
+
+The same object as [`POST /v1/inspect`](/docs/api/inspect), addressed by URL. See [GET form](/docs/api/inspect#get-form).

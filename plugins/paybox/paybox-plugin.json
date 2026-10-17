@@ -1,0 +1,7 @@
+{
+  "tool": "hako_discover",
+  "arguments": {
+    "query": "weather in a city",
+    "limit": 3
+  }
+}

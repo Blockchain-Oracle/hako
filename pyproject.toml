@@ -1,0 +1,34 @@
+[project]
+name = "hako-workspace"
+version = "0.0.0"
+description = "Hako — paid agent tools and money moves for PayBox wallets (uv workspace root)"
+requires-python = ">=3.13,<3.14"
+
+[tool.uv.workspace]
+members = ["packages/core", "packages/now", "packages/tools", "services/api"]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.16",
+    "pyright>=1.1.414",
+    "jsonschema>=4.25",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "ASYNC", "RUF", "PLR2004"]  # PLR2004 = no magic numbers
+# Brand copy intentionally uses 証, en dashes and the non-breaking hyphen.
+ignore = ["RUF001", "RUF002", "RUF003"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["hako_core", "hako_now", "hako_tools", "hako_api"]
+
+[tool.pyright]
+pythonVersion = "3.13"
+typeCheckingMode = "standard"
+# packages/brand/scripts runs standalone with `uv run --with fonttools` (not a workspace member); the JS
+# workspace is not Python either.
+exclude = ["**/node_modules", "**/.venv", "**/__pycache__", "packages/brand/scripts", "apps"]

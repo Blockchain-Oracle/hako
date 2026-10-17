@@ -1,0 +1,84 @@
+---
+title: Inspect
+description: POST /v1/inspect returns one tool's full contract, its description, input JSON Schema, output schema, price and a working example. Free.
+---
+
+```http
+POST /v1/inspect
+content-type: application/json
+```
+
+## Body
+
+| Field | Type | Required | Meaning |
+| --- | --- | --- | --- |
+| `id` | string | yes | The tool id, e.g. `openweather/current` (3–120 characters) |
+
+```bash
+curl -s -X POST https://api.usehako.xyz/v1/inspect \
+  -H 'content-type: application/json' \
+  -d '{"id": "openweather/current"}'
+```
+
+## Response
+
+Every field `discover` returns for a candidate (except `score` and `health`), plus the contract:
+
+```json
+{
+  "id": "openweather/current",
+  "provider": "openweather",
+  "providerName": "OpenWeather",
+  "slug": "current",
+  "displayName": "OpenWeather Current Weather",
+  "summary": "Weather right now for a city or coordinates: temperature, feels-like, humidity, wind, rain, sunrise.",
+  "categories": ["weather"],
+  "render": "weather",
+  "price": { "usd": "0.005", "atomic": "5000", "tier": "standard", "network": "eip155:8453" },
+  "method": "POST",
+  "path": "/v1/run/openweather/current",
+  "available": true,
+  "description": "Current conditions from OpenWeather's station and model blend, refreshed about every 10 minutes: … Give a city ('Lagos,NG') or lat + lon. For the days ahead use openweather/forecast; for pollution use openweather/air-quality.",
+  "notes": [],
+  "seeAlso": ["openweather/forecast", "openweather/air-quality", "openweather/geocode"],
+  "deadlineMs": 8000,
+  "cacheTtlS": 60,
+  "terms": "open",
+  "input": {
+    "type": "object",
+    "title": "WeatherInput",
+    "additionalProperties": false,
+    "properties": {
+      "city": { "anyOf": [{ "type": "string", "minLength": 2, "maxLength": 100 }, { "type": "null" }], "default": null, "description": "City name, optionally with state and ISO country code: 'Lagos,NG', 'Springfield,IL,US', 'Paris,FR'." },
+      "lat": { "anyOf": [{ "type": "number", "minimum": -90, "maximum": 90 }, { "type": "null" }], "default": null, "description": "Latitude, with lon (instead of city)." },
+      "lon": { "anyOf": [{ "type": "number", "minimum": -180, "maximum": 180 }, { "type": "null" }], "default": null, "description": "Longitude, with lat." },
+      "units": { "$ref": "#/$defs/Units", "default": "metric", "description": "metric (°C, m/s), imperial (°F, mph) or standard (K)." }
+    },
+    "$defs": { "Units": { "enum": ["metric", "imperial", "standard"], "type": "string" } }
+  },
+  "output": { "type": "object", "title": "…", "properties": { "…": "…" } },
+  "example": { "city": "Lagos,NG", "units": "metric" }
+}
+```
+
+| Field | Meaning |
+| --- | --- |
+| `description` | What the tool does, what it will not do, and which tool to use instead. Written for an agent. |
+| `notes` | Extra notes for the agent |
+| `seeAlso` | Related tool ids |
+| `deadlineMs` | The run deadline for this tool |
+| `cacheTtlS` | How long a result is cached, in seconds; `null` means not cached |
+| `terms` | How the provider's terms classify its data |
+| `input` | The input JSON Schema. `additionalProperties: false`: unknown fields are rejected with `422`. |
+| `output` | The JSON Schema of `data` in a successful run |
+| `example` | A valid input. Hako also runs it as the tool's live probe. |
+
+Never guess field names: read `input`. An unknown id answers `404 unknown_endpoint`.
+
+## GET form [#get-form]
+
+`GET /v1/endpoints/{provider}/{endpoint}` returns the same object, for clients that prefer a URL per tool:
+
+```bash
+curl -s https://api.usehako.xyz/v1/endpoints/openweather/current
+```

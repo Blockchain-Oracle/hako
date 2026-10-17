@@ -1,0 +1,16 @@
+# hako-gateway (Coolify "Docker Compose" resource, base /deploy/gateway). Coolify routes
+# https://api.usehako.xyz → gateway:8080, and the gateway forwards every read and run to hako-api at HAKO_API_URL.
+# CDP_API_KEY_ID and CDP_API_KEY_SECRET are Coolify secret envs; nothing in this file is a secret.
+services:
+  gateway:
+    image: ghcr.io/blockchain-oracle/hako-gateway:main
+    environment:
+      HAKO_API_URL: ${HAKO_API_URL}
+      HAKO_PAY_TO: ${HAKO_PAY_TO}
+      HAKO_PUBLIC_URL: ${HAKO_PUBLIC_URL:-https://api.usehako.xyz}
+      HAKO_CORS_ORIGINS: ${HAKO_CORS_ORIGINS:-*}
+      CDP_API_KEY_ID: ${CDP_API_KEY_ID}
+      CDP_API_KEY_SECRET: ${CDP_API_KEY_SECRET}
+    expose: ["8080"]
+    mem_limit: 192m
+    restart: unless-stopped
