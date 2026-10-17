@@ -8,7 +8,7 @@ import { CopyCommand } from "@/components/common/CopyCommand";
 import { ProviderLogo } from "@/components/common/ProviderLogo";
 import { SiteFooter } from "@/components/shell/SiteFooter";
 import { SiteHeader } from "@/components/shell/SiteHeader";
-import { EndpointGrid } from "@/features/tools/EndpointGrid";
+import { EndpointGrid } from "@/features/tools";
 import { getCatalog, getProvider } from "@/lib/catalog/catalog.server";
 import { providerPrompt } from "@/lib/catalog/format";
 import { AGENT_MARKS } from "@/lib/constants/landing";

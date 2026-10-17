@@ -2,6 +2,10 @@
 @import "tw-animate-css";
 @import "@hako/brand/paint.css";
 
+/* Tailwind scans the shared React packages too: the card library and the installed UI components (plan §3). */
+@source "../../../../packages/cards/src";
+@source "../../../../packages/ui/src";
+
 /*
  * Dark mode: `.dark` on <html>, set before the first paint by the script in app/layout.tsx (the visitor's choice,
  * else the system's). The palette matches the docs' dark theme (apps/docs/app/global.css): a near-black page,

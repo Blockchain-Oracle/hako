@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 
-import { AgentApp } from "@/features/agent/AgentApp";
-import { chatEndpoints } from "@/features/agent/endpoints.server";
+import { AgentApp, chatEndpoints } from "@/features/agent";
 
 // Rendered per request: the catalog comes from the live api (its fetch is cached for CATALOG_REVALIDATE_S), never
 // from whatever the api answered at image build time.

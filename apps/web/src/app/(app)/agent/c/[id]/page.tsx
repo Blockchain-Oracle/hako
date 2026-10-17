@@ -1,5 +1,4 @@
-import { AgentApp } from "@/features/agent/AgentApp";
-import { chatEndpoints } from "@/features/agent/endpoints.server";
+import { AgentApp, chatEndpoints } from "@/features/agent";
 
 export default async function AgentChatPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

@@ -1,12 +1,6 @@
 import { SiteFooter } from "@/components/shell/SiteFooter";
 import { SiteHeader } from "@/components/shell/SiteHeader";
-import { BecomeProvider } from "@/features/landing/BecomeProvider";
-import { Connect } from "@/features/landing/Connect";
-import { CtaBand } from "@/features/landing/CtaBand";
-import { Faq } from "@/features/landing/Faq";
-import { Hero } from "@/features/landing/Hero";
-import { NoSubscriptions } from "@/features/landing/NoSubscriptions";
-import { Steps } from "@/features/landing/Steps";
+import { BecomeProvider, Connect, CtaBand, Faq, Hero, NoSubscriptions, Steps } from "@/features/landing";
 import { getCatalog } from "@/lib/catalog/catalog.server";
 
 // Rendered per request: the catalog comes from the live api (its fetch is cached for CATALOG_REVALIDATE_S), never

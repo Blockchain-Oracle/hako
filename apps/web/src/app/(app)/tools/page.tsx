@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { SiteFooter } from "@/components/shell/SiteFooter";
 import { SiteHeader } from "@/components/shell/SiteHeader";
-import { ToolsBrowser } from "@/features/tools/ToolsBrowser";
+import { ToolsBrowser } from "@/features/tools";
 import { getCatalog } from "@/lib/catalog/catalog.server";
 
 // Rendered per request: the catalog comes from the live api (its fetch is cached for CATALOG_REVALIDATE_S), never
