@@ -76,3 +76,4 @@ class Render(StrEnum):
     market = "market"  # data.markets[] of prediction markets with outcome odds
     yield_ = "yield"  # data.vaults[] (LI.FI Earn)
     positions = "positions"  # data.positions[] (LI.FI Earn)
+    audio = "audio"  # data.url of generated audio kept 24 h (ElevenLabs)

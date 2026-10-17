@@ -53,15 +53,20 @@ console.log(JSON.stringify({ aliases: read.READ_ALIAS_CONNECTORS, bodies, networ
 """
 
 
+def _is_free_read(endpoint_id: str) -> bool:
+    return endpoint_id.split("/", 1)[0] in L2_PROVIDERS or endpoint_id in L2_EXTRA_IDS
+
+
 def _l2_ids() -> list[str]:
-    return sorted(e.id for e in REGISTRY.values() if e.provider.id in L2_PROVIDERS or e.id in L2_EXTRA_IDS)
+    """The free reads. Paid media (elevenlabs/*) spends credits: pass those ids explicitly."""
+    return sorted(e.id for e in REGISTRY.values() if _is_free_read(e.id))
 
 
 async def _samples(ids: list[str]) -> list[str]:
     failures: list[str] = []
     for endpoint_id in ids:
         endpoint = REGISTRY[endpoint_id]
-        if not endpoint.price.free:
+        if _is_free_read(endpoint_id) and not endpoint.price.free:
             failures.append(f"{endpoint_id}: priced {endpoint.price.usd}, must be free")
         if not endpoint.available:
             print(f"UNAVAILABLE {endpoint_id:24} (key not set: reports tool_unavailable)")

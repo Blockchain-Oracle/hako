@@ -8,6 +8,9 @@ from hako_tools.constants import (
     PAYMENT_NETWORK,
     PRICE_FREE_USD,
     PRICE_LOCAL_USD,
+    PRICE_MEDIA_LARGE_USD,
+    PRICE_MEDIA_MEDIUM_USD,
+    PRICE_MEDIA_SMALL_USD,
     PRICE_PREMIUM_USD,
     PRICE_STANDARD_USD,
     USDC_DECIMALS,
@@ -21,6 +24,9 @@ class PriceTier(StrEnum):
     local = "local"
     standard = "standard"
     premium = "premium"
+    media_small = "media-small"
+    media_medium = "media-medium"
+    media_large = "media-large"
 
 
 _TIER_USD = {
@@ -28,6 +34,9 @@ _TIER_USD = {
     PriceTier.local: PRICE_LOCAL_USD,
     PriceTier.standard: PRICE_STANDARD_USD,
     PriceTier.premium: PRICE_PREMIUM_USD,
+    PriceTier.media_small: PRICE_MEDIA_SMALL_USD,
+    PriceTier.media_medium: PRICE_MEDIA_MEDIUM_USD,
+    PriceTier.media_large: PRICE_MEDIA_LARGE_USD,
 }
 
 
@@ -55,3 +64,6 @@ FREE = Price(PriceTier.free)
 LOCAL = Price(PriceTier.local)
 STANDARD = Price(PriceTier.standard)
 PREMIUM = Price(PriceTier.premium)
+MEDIA_SMALL = Price(PriceTier.media_small)
+MEDIA_MEDIUM = Price(PriceTier.media_medium)
+MEDIA_LARGE = Price(PriceTier.media_large)
