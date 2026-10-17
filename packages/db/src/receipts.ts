@@ -1,0 +1,154 @@
+import type { Queryable } from "./pool.ts";
+import { newId, pageLimit, type AtomicString, type PageOptions, type Surface } from "./shared.ts";
+
+/**
+ * What a receipt records (plan add-ons, Activity ledger): an x402 settlement the gateway saw (paid runs, batches,
+ * invoice payments, including plugin payments from other hosts), a LI.FI move (bridge, swap, earn) or a PayBox
+ * transfer (a send).
+ */
+export const RECEIPT_KINDS = ["x402_settlement", "lifi_move", "paybox_transfer"] as const;
+export type ReceiptKind = (typeof RECEIPT_KINDS)[number];
+
+/** pending until confirmed on-chain (a LI.FI move: until the destination arrived), or failed. */
+export const RECEIPT_STATUSES = ["pending", "confirmed", "failed"] as const;
+export type ReceiptStatus = (typeof RECEIPT_STATUSES)[number];
+
+export interface ReceiptRow {
+  id: string;
+  kind: ReceiptKind;
+  status: ReceiptStatus;
+  surface: Surface;
+  userId: string | null;
+  chain: string;
+  asset: string;
+  amountAtomic: AtomicString;
+  payer: string | null;
+  payTo: string | null;
+  txHash: string | null;
+  toChain: string | null;
+  toAsset: string | null;
+  toAmountAtomic: AtomicString | null;
+  destTxHash: string | null;
+  lifiTool: string | null;
+  toolId: string | null;
+  batchId: string | null;
+  invoiceId: string | null;
+  payboxRequestId: string | null;
+  payboxClientId: string | null;
+  draftId: string | null;
+  draftVersion: number | null;
+  feeUsd: string | null;
+  isPublic: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+/** Required fields plus whatever the recording surface knows. */
+export type NewReceipt = Pick<ReceiptRow, "kind" | "status" | "surface" | "chain" | "asset" | "amountAtomic"> &
+  Partial<Omit<ReceiptRow, "id" | "kind" | "status" | "surface" | "chain" | "asset" | "amountAtomic" | "createdAt" | "updatedAt">>;
+
+const COLUMNS = `id, kind, status, surface, user_id as "userId", chain, asset, amount_atomic::text as "amountAtomic",
+  payer, pay_to as "payTo", tx_hash as "txHash", to_chain as "toChain", to_asset as "toAsset",
+  to_amount_atomic::text as "toAmountAtomic", dest_tx_hash as "destTxHash", lifi_tool as "lifiTool",
+  tool_id as "toolId", batch_id as "batchId", invoice_id as "invoiceId", paybox_request_id as "payboxRequestId",
+  paybox_client_id as "payboxClientId", draft_id as "draftId", draft_version as "draftVersion",
+  fee_usd::text as "feeUsd", is_public as "isPublic", created_at as "createdAt", updated_at as "updatedAt"`;
+
+/**
+ * Records a receipt once. A second call for the same settlement transaction (kind, chain, tx hash) or the same
+ * PayBox request returns the row already there and changes nothing, so retries and replays are harmless.
+ */
+export async function recordReceipt(q: Queryable, input: NewReceipt): Promise<{ receipt: ReceiptRow; created: boolean }> {
+  const { rows } = await q.query<ReceiptRow>(
+    `insert into receipts (id, kind, status, surface, user_id, chain, asset, amount_atomic, payer, pay_to, tx_hash,
+       to_chain, to_asset, to_amount_atomic, dest_tx_hash, lifi_tool, tool_id, batch_id, invoice_id,
+       paybox_request_id, paybox_client_id, draft_id, draft_version, fee_usd, is_public)
+     values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25)
+     on conflict do nothing returning ${COLUMNS}`,
+    [
+      newId(), input.kind, input.status, input.surface, input.userId ?? null, input.chain, input.asset, input.amountAtomic,
+      input.payer ?? null, input.payTo ?? null, input.txHash ?? null, input.toChain ?? null, input.toAsset ?? null,
+      input.toAmountAtomic ?? null, input.destTxHash ?? null, input.lifiTool ?? null, input.toolId ?? null,
+      input.batchId ?? null, input.invoiceId ?? null, input.payboxRequestId ?? null, input.payboxClientId ?? null,
+      input.draftId ?? null, input.draftVersion ?? null, input.feeUsd ?? null, input.isPublic ?? false,
+    ],
+  );
+  if (rows[0]) return { receipt: rows[0], created: true };
+  const existing =
+    (input.payboxRequestId ? await findReceiptByRequestId(q, input.payboxRequestId) : null) ??
+    (input.txHash ? await findReceiptByTx(q, input.kind, input.chain, input.txHash) : null);
+  if (!existing) throw new Error("recordReceipt: the insert conflicted but no matching receipt was found");
+  return { receipt: existing, created: false };
+}
+
+export async function getReceipt(q: Queryable, id: string): Promise<ReceiptRow | null> {
+  const { rows } = await q.query<ReceiptRow>(`select ${COLUMNS} from receipts where id = $1`, [id]);
+  return rows[0] ?? null;
+}
+
+export async function findReceiptByRequestId(q: Queryable, payboxRequestId: string): Promise<ReceiptRow | null> {
+  const { rows } = await q.query<ReceiptRow>(`select ${COLUMNS} from receipts where paybox_request_id = $1`, [payboxRequestId]);
+  return rows[0] ?? null;
+}
+
+export async function findReceiptByTx(q: Queryable, kind: ReceiptKind, chain: string, txHash: string): Promise<ReceiptRow | null> {
+  const { rows } = await q.query<ReceiptRow>(`select ${COLUMNS} from receipts where kind = $1 and chain = $2 and tx_hash = $3`, [kind, chain, txHash]);
+  return rows[0] ?? null;
+}
+
+export interface ReceiptUpdate {
+  status?: ReceiptStatus;
+  txHash?: string;
+  destTxHash?: string;
+  toAmountAtomic?: AtomicString;
+  feeUsd?: string;
+  isPublic?: boolean;
+}
+
+/** Moves a receipt forward (pending → confirmed/failed, the destination hash once LI.FI reports it). */
+export async function updateReceipt(q: Queryable, id: string, update: ReceiptUpdate): Promise<ReceiptRow | null> {
+  const { rows } = await q.query<ReceiptRow>(
+    `update receipts set
+       status = coalesce($2, status), tx_hash = coalesce($3, tx_hash), dest_tx_hash = coalesce($4, dest_tx_hash),
+       to_amount_atomic = coalesce($5, to_amount_atomic), fee_usd = coalesce($6, fee_usd),
+       is_public = coalesce($7, is_public), updated_at = now()
+     where id = $1 returning ${COLUMNS}`,
+    [id, update.status ?? null, update.txHash ?? null, update.destTxHash ?? null, update.toAmountAtomic ?? null, update.feeUsd ?? null, update.isPublic ?? null],
+  );
+  return rows[0] ?? null;
+}
+
+/** The user's own receipts, newest first. */
+export async function listReceiptsForUser(q: Queryable, userId: string, page: PageOptions = {}): Promise<ReceiptRow[]> {
+  const { rows } = await q.query<ReceiptRow>(
+    `select ${COLUMNS} from receipts where user_id = $1 and ($2::timestamptz is null or created_at < $2)
+     order by created_at desc, id desc limit $3`,
+    [userId, page.before ?? null, pageLimit(page.limit)],
+  );
+  return rows;
+}
+
+/**
+ * Receipts paid from or to any of these addresses (the connected user's PayBox wallets): plugin payments made in
+ * other hosts and invoices paid to them carry no Hako account, so Activity matches them by address.
+ */
+export async function listReceiptsForAddresses(q: Queryable, addresses: readonly string[], page: PageOptions = {}): Promise<ReceiptRow[]> {
+  if (addresses.length === 0) return [];
+  const { rows } = await q.query<ReceiptRow>(
+    `select ${COLUMNS} from receipts
+     where (lower(payer) = any($1::text[]) or lower(pay_to) = any($1::text[])) and ($2::timestamptz is null or created_at < $2)
+     order by created_at desc, id desc limit $3`,
+    [addresses.map((address) => address.toLowerCase()), page.before ?? null, pageLimit(page.limit)],
+  );
+  return rows;
+}
+
+/** Shared receipts (`/r/<id>`, the landing proof), newest first. */
+export async function listPublicReceipts(q: Queryable, page: PageOptions = {}): Promise<ReceiptRow[]> {
+  const { rows } = await q.query<ReceiptRow>(
+    `select ${COLUMNS} from receipts where is_public and ($1::timestamptz is null or created_at < $1)
+     order by created_at desc, id desc limit $2`,
+    [page.before ?? null, pageLimit(page.limit)],
+  );
+  return rows;
+}
