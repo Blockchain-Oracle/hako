@@ -13,12 +13,12 @@ Branch `w04/a-brand`, cut from `origin/w04/foundation` (ff56034). Commits, in or
 - Kawase's Senryo pipeline: `tokens.json` (+ `mark.json`) → `scripts/build.mjs` → `generated/web.css` (`:root` light,
   `.dark` dark, shadcn variable names, Tailwind 4 `@theme inline`, a `type-<role>` utility per Senryo type role,
   `money` utility, `--shadow-{button,dock,sheet,receipt}`, `--ease-*`, `--container-measure`), `generated/tokens.ts`,
-  `generated/mark.ts` and the five mark assets. `scripts/check-contrast.mjs` runs in the package's `build`, so turbo
+  `generated/mark.ts` and the six mark assets. `scripts/check-contrast.mjs` runs in the package's `build`, so turbo
   runs it before web and docs (`^build`) and in the Docker build: it exits 1 when a text pair drops below 4.5:1 or the
   ring/accent fill below 3:1 on a card. `packages/brand/turbo.json` declares the generated outputs.
 - Same export names as before: `.` (BRAND, `tokens`, `MARK`, `MARK_SVG`), `./react` (`HakoMark`, `HakoLockup`),
-  `./paint.css` (now `generated/web.css`), `./assets/*` (`hako-mark.svg`, `hako-mark-ink.svg`, `hako-mark-inverse.svg`,
-  `app-icon.svg`, `favicon.svg`).
+  `./paint.css` (now `generated/web.css`), `./assets/*` (`hako-mark.svg`, `hako-mark-adaptive.svg`, `hako-mark-ink.svg`,
+  `hako-mark-inverse.svg`, `app-icon.svg`, `favicon.svg`).
 - Token names are Kawase's (shadcn's variables plus Senryo's): `accent` is the hue, as in Kawase, so Kawase code ports
   without renames. Dropped Kawase-only tokens: `network*` (testnet capsule; Hako is mainnet only), orb and story fields.
   Senryo's corner steps ride along as `--radius-step-*` (`rounded-step-lg`): Kawase's `--radius-s-*` reads as Tailwind's
@@ -55,12 +55,12 @@ PayBox plugin — "once submitted for review, installable privately under Unoffi
 in AI hosts), each in words and shape. L6 finishes it (captures, ecosystem, proof).
 
 ## @hako/identity (`packages/identity`)
-- 116 SVGs in `svg/` + the Hako mark read from `packages/brand/assets` → `build.mjs` (dependency-free: no SVGR/SVGO, as
+- 111 SVGs in `svg/` + the Hako mark (adaptive) and its ink file read from `packages/brand/assets` → `build.mjs` (dependency-free: no SVGR/SVGO, as
   those are not §3 pins) → `src/generated/*.tsx` DOM components + `MARKS`. It inlines `<style>` class rules, maps
   attributes and `style` to JSX, prefixes every id with the stem, and turns black/white into `currentColor` in `-mono`
   files. Every generated mark was rendered (react-dom/server) and compared with its source raster: identical.
   `build` runs in turbo after `@hako/brand` (devDependency).
-- `PROVENANCE.md`: one row per file (117 incl. the Hako mark) + a "Not delivered yet" table. Kawase rows reused for
+- `PROVENANCE.md`: one row per file (112 incl. the Hako mark) + a "Not delivered yet" table. Kawase rows reused for
   its marks (chains, USDC, ETH, Aave, Morpho, Aero, Merkl, Exa, DefiLlama, Circle, Coinbase, Across, Relay, LI.FI,
   KyberSwap, Gas.zip, 28 currency flags). New: PayBox (first-party lockup paths, black as its app icon), MoonPay
   (first-party symbol, `--mp-brand-500 #7D00FF`), `@web3icons/react@4.1.24` (Jupiter, SOL, POL), `simple-icons@16.34.0`
@@ -87,7 +87,7 @@ in AI hosts), each in words and shape. L6 finishes it (captures, ecosystem, proo
   `hooks/use-highlighted-code.ts`), marker, item, questionnaire, attachment; button, input, textarea, dialog, sheet,
   tooltip, accordion, collapsible, separator, skeleton (= 21st 1588), sonner (= 21st 886), empty.
 - 21st (registry key from `.env`, never written to the repo): sidebar-001 21517 (split under 400 lines into
-  `sidebar-001-utils/context.tsx`, moved unchanged), task-steps 23569, stepper primitive of 29815 (its demo file with
+  `sidebar-001-utils/{context,parts}.tsx`, moved unchanged), task-steps 23569, stepper primitive of 29815 (its demo file with
   sample steps dropped), skeleton-swap 23557, drawer 31360 (tabler `IconX` → lucide `X`, bundled `cn` → ours,
   `@base-ui/react` pinned 1.8.0 = fumadocs' version), empty-state 1435 and text-shimmer 12336 written from their
   registry items (CLI refusals), empty-states-4 19376 served by its primitive `empty` (the block needs a shadcn style
@@ -100,8 +100,9 @@ in AI hosts), each in words and shape. L6 finishes it (captures, ecosystem, proo
 - `index.ts` exports all 165 names (checked by a throwaway page importing the barrel into a server component and
   building/rendering it; the page is not committed), plus `Mark`/`TokenMark` re-exported from `@hako/identity` (one
   implementation; Mark lives with the marks). `cn` = the `cn` package (catalog 0.4.0) via `@hako/ui/lib/utils`.
-- Dependencies: catalog entries for everything in §3; `radix-ui ^1.6.7` (as apps/web) and `@base-ui/react 1.8.0` are
-  the installs' own runtime deps (no catalog entry). No tabler, remixicon, hugeicons, framer-motion, clsx or
+- Dependencies: catalog entries for everything in §3; `radix-ui 1.6.7` (pinned to the lockfile's version; apps/web still
+  says `^1.6.7`) and `@base-ui/react 1.8.0` are the installs' own runtime deps (no catalog entry); `shadcn 4.21.4` is a
+  devDependency for its `shadcn/tailwind.css`. No tabler, remixicon, hugeicons, framer-motion, clsx or
   tailwind-merge in `@hako/ui`.
 - `apps/web/src/components/ui/*` (identical to the new installs apart from imports) and `lib/utils.ts` are deleted;
   19 web files import `@hako/ui/components/ui/*` and `@hako/ui/lib/utils`. `apps/web/components.json`: `ui` and `utils`
@@ -111,8 +112,8 @@ in AI hosts), each in words and shape. L6 finishes it (captures, ecosystem, proo
 - `app/layout.tsx` (shared wiring): wrap with `<TooltipProvider>` (shadcn tooltip asks for it) and, where the gateway is
   not production, `<LogoProxyProvider gatewayUrl={GATEWAY_URL}>`; the default is `HAKO_GATEWAY_URL`
   (`api.usehako.xyz`, not resolving yet on 2026-10-17, so remote logos fall back to the disc until DNS is up).
-- `LOGO_PROXY_PATH = "/v1/logo"` lives in `packages/identity/src/identity.config.ts`; fold it into `@hako/config`
-  hosts (and the cards endpoint table) at merge if L1's route lands there.
+- The logo route at merge: see review finding 6 below.
+- `apps/web/src/proxy.ts` matcher: see review finding 5 below.
 - Provider ids for the C16 catalog providers are assumed `exa`, `artificial-analysis`, `elevenlabs`, `polymarket`,
   `jupiter`, `lifi`, `helius`; L2 uses these or the registry gets an alias.
 - `apps/web/package.json` still lists `clsx`, `tailwind-merge`, `class-variance-authority`, `radix-ui` that only the
@@ -122,3 +123,54 @@ in AI hosts), each in words and shape. L6 finishes it (captures, ecosystem, proo
   them to identity hosts later.
 - The 21st registry returns `registryDependencies` URLs that embed the API key; my fetch printed one in a local tool
   output during the install (nothing written to the repo; `rg 21st_sk_` is clean). Rotating `API_KEY_21ST` is cheap.
+
+## Review fixes (2026-10-17, second pass)
+
+Each finding of the W0.4 (a) review, in its order, with what was done.
+
+1. **The radix-nova style base was missing** (`packages/ui/src/styles.css:1`). `packages/ui/package.json` has
+   `"shadcn": "4.21.4"` in devDependencies (published 2026-10-07, over the 7-day rule; the CLI version that did the
+   installs) and `packages/ui/src/styles.css` starts with `@import "shadcn/tailwind.css";` (apps/web imports tailwindcss
+   and tw-animate-css before it). `pnpm install`, lockfile committed (149 new entries, the CLI's own tree; no existing entry removed).
+   Rebuilt web: its CSS now has `.shimmer{`, `.scroll-fade-b{`, `.data-horizontal\:h-px:where([data-orientation=horizontal])`
+   and `.data-open\:animate-in:where([data-state=open])`, so Separator/ItemSeparator draw, Dialog/Sheet/Tooltip/Accordion/
+   Questionnaire animate, and Trace/Attachment shimmer and the scroll fades work. Recorded as a decision in design.json.
+2. **Black-only marks vanished in dark** (`packages/identity/src/registry.ts:99`). PayBox, GitHub, Wikipedia, ElevenLabs
+   and Wayback register only their `-mono` file (`glyph(undefined, undefined, "<slug>-mono")`), so `markFile` resolves
+   to currentColor in every variant: their own single colour, drawn in the text colour, not a tint. Their fixed-colour
+   copies (`svg/{paybox,github,wikipedia,elevenlabs,wayback}.svg`) are deleted, the mono rows in PROVENANCE.md carry
+   the sources and why the mono file serves both variants. Hako's two-colour mark: `packages/brand/scripts/build.mjs`
+   writes `assets/hako-mark-adaptive.svg` (body `currentColor`, lid the accent, as `HakoMark` draws it; also in
+   `MARK_SVG`), and identity's `hako` stem is built from it (`hako-mono` stays the ink file). The landing's "Built on"
+   renders PayBox and MoonPay with `variant="mono"` (both in the line's text colour). Checked with the built app
+   (`next start`, catalog served from a local copy of the live catalog, headless Chrome at light and dark): the landing
+   shows both partner marks in dark, /tools shows GitHub's glyph and Hako's body (paper) + asagi lid on the dark card,
+   and both read in light; Wikipedia's and Wayback's markup is the same currentColor path.
+3. **shadcn's `accent` used as a surface** (`sidebar-001-utils/context.tsx:145`, `stepper.tsx:283`). The rail's hover
+   highlight is `bg-row-pressed` (Senryo's pressed/hover row) and the stepper's pending indicator is
+   `bg-muted text-muted-foreground`. `rg 'bg-accent|text-accent-foreground'` over packages/ui and apps finds no other use
+   (the `accent-pro` active bar stays the accent: the active row is the moment that matters). Both recorded as
+   deviations in `apps/web/.21st/design.json` plus a decision entry.
+4. **Two files over 400 lines.** `Sidebar001Separator`, `Sidebar001Header` and `Sidebar001Footer` moved unchanged to
+   `sidebar-001-utils/parts.tsx` and are re-exported from `sidebar-001.tsx` (now 360 lines). The stepper's types, its two
+   contexts and `useStepper`/`useStepItem` moved unchanged to `stepper-utils/context.tsx` and `stepper.tsx` (now 371)
+   re-exports the hooks: moving the indicator or separator alone would have imported the hooks back from stepper.tsx
+   (a cycle). Public names are unchanged (`index.ts` still `export *`s both files). design.json's deviation notes updated.
+5. **Proxy matcher still excludes `icon.svg`** (`apps/web/src/proxy.ts:27`). Coordinator-owned shared wiring, so not
+   edited in this lane. At merge, change the matcher to
+   `["/((?!_next/static|_next/image|favicon.ico|icon).*)"]` so `/icon?<hash>` (served by `app/icon.ts` since this lane)
+   is not rewritten to `/sandbox/icon` on the sandbox host.
+6. **The logo route defined twice** (`packages/identity/src/identity.config.ts:18`). The package index no longer exports
+   `LOGO_PROXY_PATH`/`LOGO_PROXY_PARAM` (index lists identity.config's geometry constants by name), so after the merge
+   the only exported route contract is b-cards' `endpoints.logo`; only `logoProxyUrl` reads the two constants. At merge
+   (after b-cards lands): put the path in `@hako/config` hosts (e.g. `HAKO_GATEWAY_PATHS.logo = "/v1/logo"`), make
+   b-cards' `endpoints.logo.path` and `logoProxyUrl` read it, keep `src` as the one query key, and delete the two
+   constants. Not reading `endpoints.logo.path` from @hako/cards directly: identity → cards would cycle as soon as the
+   React cards draw `Mark` (cards → identity).
+7. **`radix-ui` was a caret range** (`packages/ui/package.json:32`). Pinned to `1.6.7`, the version pnpm-lock.yaml
+   resolves (and apps/web uses); lockfile committed. apps/web/package.json (not this lane's file) still says `^1.6.7`; the
+   coordinator can pin it to `1.6.7` too (or add a catalog entry for both).
+8. **tokens.json `_note` path** (`packages/brand/tokens.json:2`). Now says `generated/tokens.ts`.
+
+Gates after the fixes, from the worktree root: `pnpm install --frozen-lockfile && pnpm lint && pnpm typecheck &&
+pnpm build` (lint: warnings only, all in installed author code). No plugin-safe source was touched.
