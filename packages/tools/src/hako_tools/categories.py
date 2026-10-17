@@ -77,3 +77,4 @@ class Render(StrEnum):
     yield_ = "yield"  # data.vaults[] (LI.FI Earn)
     positions = "positions"  # data.positions[] (LI.FI Earn)
     audio = "audio"  # data.url of generated audio kept 24 h (ElevenLabs)
+    model_bench = "model_bench"  # data.models[] of benchmarked AI models (Artificial Analysis)
