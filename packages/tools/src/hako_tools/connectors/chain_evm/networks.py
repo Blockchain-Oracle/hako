@@ -12,6 +12,7 @@ from pydantic import AfterValidator, Field
 
 from hako_tools.categories import Category
 from hako_tools.framework import NoAuth, Provider, Terms
+from hako_tools.framework.jsonrpc import Rpc
 
 EVM_NATIVE_ADDRESS = "0x0000000000000000000000000000000000000000"  # how LI.FI names every EVM native coin
 # One public RPC that hangs must leave time for the next one inside the 8 s run.
@@ -26,14 +27,6 @@ class Coin:
     name: str
     decimals: int
     address: str
-
-
-@dataclass(frozen=True, slots=True)
-class Rpc:
-    """One RPC URL as an upstream: its own client, concurrency and cooldown."""
-
-    provider: Provider
-    path: str
 
 
 @dataclass(frozen=True, slots=True)
