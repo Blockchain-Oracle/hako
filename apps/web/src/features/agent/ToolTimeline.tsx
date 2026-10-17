@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { ProviderLogo } from "@/components/common/ProviderLogo";
 import { formatPrice } from "@/lib/catalog/format";
 import { TOOL_VERBS } from "@/lib/constants/agent";
-import { cn } from "@/lib/utils";
+import { cn } from "@hako/ui/lib/utils";
 
 import { useEndpoint } from "./endpoints-context";
 import { isRunning, runOutput, type ToolPart, toolName } from "./parts";

@@ -1,7 +1,7 @@
 "use client";
 
 import { HAKO_GATEWAY_URL } from "@hako/config";
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 
 import { FallbackDisc } from "./fallback-disc.tsx";
 import { logoProxyUrl } from "./logo-proxy.ts";
@@ -21,14 +21,20 @@ export function LogoProxyProvider({ gatewayUrl, children }: { gatewayUrl: string
 export function LogoImage({ src, label, size }: { src: string; label: string; size: number }) {
   const gatewayUrl = useContext(GatewayContext);
   const [failed, setFailed] = useState(false);
+  const ref = useRef<HTMLImageElement>(null);
+  // A server-rendered image can fail before React hydrates and attaches onError: check once after mount.
+  useEffect(() => {
+    const img = ref.current;
+    if (img?.complete && img.naturalWidth === 0) setFailed(true);
+  }, []);
   if (failed) return <FallbackDisc label={label} size={size} />;
   return (
     <img
+      ref={ref}
       src={logoProxyUrl(src, gatewayUrl)}
       alt=""
       width={size}
       height={size}
-      loading="lazy"
       decoding="async"
       onError={() => setFailed(true)}
       className="block rounded-full bg-muted object-cover"

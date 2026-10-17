@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "@hako/brand/paint.css";
+@import "@hako/ui/styles.css";
 
 /* Tailwind scans the shared React packages too: the card library, the installed UI components, the brand's mark and
  * lockup, and the identity marks (plan §3). */

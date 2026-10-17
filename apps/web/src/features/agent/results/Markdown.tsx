@@ -3,7 +3,7 @@
 import { type ComponentProps, useState } from "react";
 import { type Components, defaultRehypePlugins, Streamdown } from "streamdown";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@hako/ui/lib/utils";
 
 import { CLAMP_BREAK_MIN_SHARE } from "./constants";
 import { cutText } from "./format";

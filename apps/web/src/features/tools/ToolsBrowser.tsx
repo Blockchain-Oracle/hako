@@ -6,7 +6,7 @@ import { useMemo, useState } from "react";
 
 import { ProviderLogo } from "@/components/common/ProviderLogo";
 import type { Catalog } from "@/lib/catalog/types";
-import { cn } from "@/lib/utils";
+import { cn } from "@hako/ui/lib/utils";
 
 const ALL = "all";
 

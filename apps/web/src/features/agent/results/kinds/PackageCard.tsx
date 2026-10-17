@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@hako/ui/lib/utils";
 
 import { CHIPS_PREVIEW, RELEASE_NOTES_CLAMP_CHARS, RELEASES_PREVIEW } from "../constants";
 import { formatCount, humanize } from "../format";

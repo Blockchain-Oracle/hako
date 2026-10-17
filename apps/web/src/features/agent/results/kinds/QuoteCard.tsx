@@ -2,7 +2,7 @@
 
 import { ArrowDownRight, ArrowUpRight } from "lucide-react";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@hako/ui/lib/utils";
 
 import { LIST_PREVIEW, MONEY_DECIMALS } from "../constants";
 import { formatCount, formatMoney, formatNumber, formatPercent, formatSigned } from "../format";

@@ -4,7 +4,7 @@ import { AlertTriangle, ChevronDown, ExternalLink } from "lucide-react";
 import Image from "next/image";
 import { Children, Fragment, type ReactNode, useState } from "react";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@hako/ui/lib/utils";
 
 import { CLAMP_BREAK_MIN_SHARE } from "./constants";
 import { cutText, formatAbsolute, formatRelative } from "./format";

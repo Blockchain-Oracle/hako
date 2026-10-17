@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@hako/ui/lib/utils";
 
 import { KV_PREVIEW, TABLE_MAX_COLUMNS, TABLE_PREVIEW_ROWS } from "../constants";
 import { humanize } from "../format";

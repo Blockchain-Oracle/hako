@@ -6,7 +6,7 @@ import Link from "next/link";
 
 import { CopyCommand } from "@/components/common/CopyCommand";
 import { ProviderLogo } from "@/components/common/ProviderLogo";
-import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@hako/ui/components/ui/dialog";
 import { endpointPrompt, formatPrice } from "@/lib/catalog/format";
 import type { CatalogEndpoint } from "@/lib/catalog/types";
 import { AGENT_MARKS } from "@/lib/constants/landing";

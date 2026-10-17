@@ -2,7 +2,7 @@
 
 import { MessageSquarePlus, Pin, Trash2 } from "lucide-react";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@hako/ui/lib/utils";
 
 export interface ChatSummary {
   id: string;

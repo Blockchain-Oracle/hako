@@ -3,7 +3,7 @@
 import { ChevronDown } from "lucide-react";
 import { Fragment, useState } from "react";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@hako/ui/lib/utils";
 
 import { LIST_PREVIEW } from "../constants";
 import { formatAbsolute, formatAmount, formatRate, humanize } from "../format";
