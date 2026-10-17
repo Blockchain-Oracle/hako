@@ -28,6 +28,7 @@ import { jsonError } from "../errors.js";
 import { forwardRead, forwardRun } from "../forward.js";
 import type { Forwarded } from "../forward.js";
 import { startCatalogRefresh, state } from "./catalog-state.js";
+import { registerMoneyRoutes } from "./money.js";
 
 const catalogLoading = (c: Context) =>
   jsonError(c, HTTP_UNAVAILABLE, "catalog_unavailable", "The tool catalog has not loaded yet; nothing was charged.");
@@ -43,6 +44,7 @@ const paidPath = (path: string) => path.replace(RUN_PREFIX, RUN_V2_PREFIX);
 export function registerRoutes(app: Hono): void {
   const config = gatewayConfig();
   startCatalogRefresh(config);
+  registerMoneyRoutes(app, config);
 
   const identity = () => ({
     service: SERVICE_ID,
