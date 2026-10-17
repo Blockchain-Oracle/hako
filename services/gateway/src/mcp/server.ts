@@ -8,7 +8,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 import { z } from "zod";
 
-import type { GatewayConfig } from "./config.js";
+import type { GatewayConfig } from "../config.js";
 import {
   DEFAULT_DISCOVER_LIMIT,
   HTTP_OK,
@@ -16,8 +16,8 @@ import {
   MCP_MAX_TEXT_CHARS,
   PAID_METHOD,
   RUN_V2_PREFIX,
-} from "./constants.js";
-import { forwardRead } from "./forward.js";
+} from "../constants.js";
+import { forwardRead } from "../forward.js";
 
 const text = (value: unknown) => {
   const json = typeof value === "string" ? value : JSON.stringify(value, null, 1);

@@ -29,6 +29,7 @@ export const CATALOG_FETCH_TIMEOUT_MS = 5_000;
 export const CATALOG_RETRY_DELAY_MS = 2_000;
 export const CATALOG_RETRY_ATTEMPTS = 30; // ~1 minute: the api container may still be starting
 export const ANY_ORIGIN = "*";
+export const CORS_MAX_AGE_S = 600; // browsers cache a preflight answer for ten minutes
 export const MAX_BODY_BYTES = 65_536; // tool inputs are small JSON bodies; the api enforces the same 64 KiB cap
 // The api may deploy without the gateway: re-read its catalog this often and rebuild the paid route table on change.
 export const CATALOG_REFRESH_MS = 60_000;

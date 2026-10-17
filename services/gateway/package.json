@@ -8,10 +8,12 @@
     "build": "tsc -p tsconfig.json --noEmit && esbuild src/server.ts --bundle --platform=node --target=node24 --format=esm --outfile=dist/server.mjs --external:@x402/extensions --banner:js=\"import{createRequire}from'module';const require=createRequire(import.meta.url);\"",
     "start": "node dist/server.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "lint": "tsc -p tsconfig.json --noEmit"
+    "lint": "eslint src"
   },
   "dependencies": {
     "@coinbase/cdp-sdk": "catalog:",
+    "@hako/config": "workspace:*",
+    "@hako/env": "workspace:*",
     "@hono/node-server": "catalog:",
     "@modelcontextprotocol/sdk": "^1.31.0",
     "@x402/core": "catalog:",
