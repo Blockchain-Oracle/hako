@@ -53,6 +53,5 @@ export const priceSchema = z.object({
   network: caip2Schema,
 });
 
-/** Any JSON object (a tool input, a catalog row): `z.record(z.string(), z.unknown())` on the wire, JSON here. */
-export const jsonObjectSchema = z.record(z.string(), z.json());
-export type JsonObject = z.output<typeof jsonObjectSchema>;
+/** Any JSON object (a tool input, a catalog row). */
+export const jsonObjectSchema = z.record(z.string(), z.unknown());

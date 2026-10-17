@@ -16,7 +16,8 @@ import { discoverRequestSchema, toolIdSchema } from "../wire/reads.js";
 import { READ_ONLY, PAYS } from "./annotations.js";
 
 const toolId = toolIdSchema.describe('Tool id from hako_discover, e.g. "openweather/current".');
-const toolInput = jsonObjectSchema.describe("Arguments matching the tool's input schema (see hako_inspect).");
+/** A tool input is JSON (it becomes the paid request's body): the wire's JSON object, held to JSON values. */
+const toolInput = z.record(z.string(), z.json()).describe("Arguments matching the tool's input schema (see hako_inspect).");
 
 const candidateSchema = z
   .object({

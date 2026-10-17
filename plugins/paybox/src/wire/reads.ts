@@ -95,7 +95,7 @@ export const chainCallRequestSchema = z.object({
   chain: caip2Schema,
   address: z.string().min(1),
   function: z.string().min(1),
-  args: z.array(z.json()).max(CONTRACT_ARGS_MAX).default([]),
+  args: z.array(z.unknown()).max(CONTRACT_ARGS_MAX).default([]),
   block: blockTagSchema.optional(),
 });
 export const chainLogsRequestSchema = z.object({
