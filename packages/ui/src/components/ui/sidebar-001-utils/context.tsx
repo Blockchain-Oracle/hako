@@ -142,7 +142,7 @@ export function HoverHighlight() {
       {enabled && hovered && hoverRect && (
         <motion.div
           key="sb001-hover-bg"
-          className="pointer-events-none absolute z-0 rounded-md bg-accent/50"
+          className="pointer-events-none absolute z-0 rounded-md bg-row-pressed"
           style={{ right: 0 }}
           initial={false}
           animate={{

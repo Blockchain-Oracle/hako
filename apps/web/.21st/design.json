@@ -606,7 +606,7 @@
       },
       {
         "name": "Rail (Sidebar 001)",
-        "web": "packages/ui/src/components/ui/sidebar-001.tsx + sidebar-001-utils/context.tsx",
+        "web": "packages/ui/src/components/ui/sidebar-001.tsx + sidebar-001-utils/{context,parts}.tsx",
         "source": [
           {
             "21st": 21517,
@@ -616,7 +616,7 @@
           }
         ],
         "install": "shadcn CLI 4.21.4 with the 21st registry item (`21st add` resolves to the same command)",
-        "deviations": "The published file is 552 lines; its contexts, scroll hook and hover highlight moved unchanged to sidebar-001-utils/context.tsx (the repo's 400-line limit). Its --accent-pro indicator colour points at the Hako accent in packages/ui/src/styles.css."
+        "deviations": "The published file is 552 lines; its contexts, scroll hook and hover highlight moved unchanged to sidebar-001-utils/context.tsx, and its separator, header and footer to sidebar-001-utils/parts.tsx (re-exported from sidebar-001.tsx under the same names), so every file stays under the repo's 400-line limit. Its --accent-pro indicator colour points at the Hako accent in packages/ui/src/styles.css (the active row: the moment that matters). Its hover highlight `bg-accent/50` (shadcn's `accent` is a hover surface) is Senryo's pressed row `bg-row-pressed`: Hako's `accent` is the hue, so the author's class would paint every hovered row asagi."
       },
       {
         "name": "Tx steps (Task Steps)",
@@ -633,7 +633,7 @@
       },
       {
         "name": "Tx steps (Stepper primitive)",
-        "web": "packages/ui/src/components/ui/stepper.tsx",
+        "web": "packages/ui/src/components/ui/stepper.tsx + stepper-utils/context.tsx",
         "source": [
           {
             "21st": 29815,
@@ -643,7 +643,7 @@
           }
         ],
         "install": "shadcn CLI 4.21.4 with the 21st registry item (`21st add` resolves to the same command)",
-        "deviations": "The item's own file is a demo (three sample steps: Account, Profile, Review); only the stepper primitive it installs (sean0205/stepper) is kept."
+        "deviations": "The item's own file is a demo (three sample steps: Account, Profile, Review); only the stepper primitive it installs (sean0205/stepper) is kept. Its types, two contexts and their hooks moved unchanged to stepper-utils/context.tsx (the repo's 400-line limit; stepper.tsx re-exports useStepper and useStepItem). The pending indicator's `bg-accent text-accent-foreground` (shadcn's quiet surface) is `bg-muted text-muted-foreground`: Hako's `accent` is the hue, kept for the moment that matters."
       },
       {
         "name": "Skeleton Swap",
@@ -839,6 +839,16 @@
       "date": "2026-10-17",
       "decision": "Demo bodies of 21st items (c-stepper-15's sample steps, empty-states-4's sample toasts) are not kept; their primitives are",
       "ref": "no demo data"
+    },
+    {
+      "date": "2026-10-17",
+      "decision": "shadcn's `accent` is a hover surface; Hako's `accent` is the hue (one accent only for the moment that matters). Installed files that use `bg-accent` as a surface point at Senryo's quiet surfaces instead: `bg-row-pressed` for hover (Sidebar 001's highlight), `bg-muted` for pending (the stepper's indicator). `rg 'bg-accent|text-accent-foreground' packages/ui apps` finds no other use",
+      "ref": "plan §6"
+    },
+    {
+      "date": "2026-10-17",
+      "decision": "@hako/ui imports the radix-nova style base `shadcn/tailwind.css` (shadcn 4.21.4 as its devDependency, the CLI version that did the installs): the data-open/closed/checked/active/horizontal/vertical variants on Radix's data-state and data-orientation, the accordion keyframes, and the shimmer, scroll-fade and no-scrollbar utilities the installed components use",
+      "ref": "ui.shadcn.com/r/styles/radix-nova/index.json"
     }
   ],
   "rules": [
