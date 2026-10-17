@@ -48,7 +48,7 @@ export function Hero({ tools }: { tools: number }) {
           <span key={partner.id} className="inline-flex items-center gap-1.5">
             {i > 0 && <span className="text-muted-foreground" aria-hidden>·</span>}
             <span aria-hidden className="inline-flex">
-              <Mark entity={providerKey(partner.id)} size={BUILT_ON_MARK_SIZE} disc={false} />
+              <Mark entity={providerKey(partner.id)} size={BUILT_ON_MARK_SIZE} variant="mono" />
             </span>
             {partner.name}
           </span>

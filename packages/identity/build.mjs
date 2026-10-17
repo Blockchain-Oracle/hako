@@ -11,9 +11,10 @@ const here = (file) => new URL(file, import.meta.url);
 const SVG_DIR = here("svg/");
 const OUT = here("src/generated/");
 const HEADER = "// GENERATED from svg/ by build.mjs. Do not edit; replace the SVG and rebuild.\n";
-/** Marks that live in another package: Hako's own (packages/brand, generated from mark.json). */
+/** Marks that live in another package: Hako's own (packages/brand, generated from mark.json). `hako` is the adaptive
+ * file (body in the current colour, lid in the accent), so it reads on the dark card as on the light one. */
 const EXTERNAL = {
-  hako: here("../brand/assets/hako-mark.svg"),
+  hako: here("../brand/assets/hako-mark-adaptive.svg"),
   "hako-mono": here("../brand/assets/hako-mark-ink.svg"),
 };
 const MONO_COLORS = new Set(["#000", "#000000", "#fff", "#ffffff", "black", "white"]);

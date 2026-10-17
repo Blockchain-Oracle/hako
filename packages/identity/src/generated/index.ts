@@ -17,7 +17,6 @@ import MarkCircleMono from "./circle-mono.tsx";
 import MarkCoinbase from "./coinbase.tsx";
 import MarkCoinbaseMono from "./coinbase-mono.tsx";
 import MarkDefillama from "./defillama.tsx";
-import MarkElevenlabs from "./elevenlabs.tsx";
 import MarkElevenlabsMono from "./elevenlabs-mono.tsx";
 import MarkEth from "./eth.tsx";
 import MarkEthMono from "./eth-mono.tsx";
@@ -57,7 +56,6 @@ import MarkFlagVn from "./flag-vn.tsx";
 import MarkFlagZa from "./flag-za.tsx";
 import MarkFrankfurterMono from "./frankfurter-mono.tsx";
 import MarkGaszip from "./gaszip.tsx";
-import MarkGithub from "./github.tsx";
 import MarkGithubMono from "./github-mono.tsx";
 import MarkGoogleNews from "./google-news.tsx";
 import MarkGoogleNewsMono from "./google-news-mono.tsx";
@@ -91,7 +89,6 @@ import MarkOpenstreetmapMono from "./openstreetmap-mono.tsx";
 import MarkOpenweather from "./openweather.tsx";
 import MarkOptimism from "./optimism.tsx";
 import MarkOptimismMono from "./optimism-mono.tsx";
-import MarkPaybox from "./paybox.tsx";
 import MarkPayboxMono from "./paybox-mono.tsx";
 import MarkPol from "./pol.tsx";
 import MarkPolMono from "./pol-mono.tsx";
@@ -109,11 +106,9 @@ import MarkSolana from "./solana.tsx";
 import MarkSolanaMono from "./solana-mono.tsx";
 import MarkUsdc from "./usdc.tsx";
 import MarkUsdcMono from "./usdc-mono.tsx";
-import MarkWayback from "./wayback.tsx";
 import MarkWaybackMono from "./wayback-mono.tsx";
 import MarkWikidata from "./wikidata.tsx";
 import MarkWikidataMono from "./wikidata-mono.tsx";
-import MarkWikipedia from "./wikipedia.tsx";
 import MarkWikipediaMono from "./wikipedia-mono.tsx";
 import MarkYoutube from "./youtube.tsx";
 import MarkYoutubeMono from "./youtube-mono.tsx";
@@ -138,7 +133,6 @@ export const MARKS = {
   "coinbase": MarkCoinbase,
   "coinbase-mono": MarkCoinbaseMono,
   "defillama": MarkDefillama,
-  "elevenlabs": MarkElevenlabs,
   "elevenlabs-mono": MarkElevenlabsMono,
   "eth": MarkEth,
   "eth-mono": MarkEthMono,
@@ -178,7 +172,6 @@ export const MARKS = {
   "flag-za": MarkFlagZa,
   "frankfurter-mono": MarkFrankfurterMono,
   "gaszip": MarkGaszip,
-  "github": MarkGithub,
   "github-mono": MarkGithubMono,
   "google-news": MarkGoogleNews,
   "google-news-mono": MarkGoogleNewsMono,
@@ -212,7 +205,6 @@ export const MARKS = {
   "openweather": MarkOpenweather,
   "optimism": MarkOptimism,
   "optimism-mono": MarkOptimismMono,
-  "paybox": MarkPaybox,
   "paybox-mono": MarkPayboxMono,
   "pol": MarkPol,
   "pol-mono": MarkPolMono,
@@ -230,11 +222,9 @@ export const MARKS = {
   "solana-mono": MarkSolanaMono,
   "usdc": MarkUsdc,
   "usdc-mono": MarkUsdcMono,
-  "wayback": MarkWayback,
   "wayback-mono": MarkWaybackMono,
   "wikidata": MarkWikidata,
   "wikidata-mono": MarkWikidataMono,
-  "wikipedia": MarkWikipedia,
   "wikipedia-mono": MarkWikipediaMono,
   "youtube": MarkYoutube,
   "youtube-mono": MarkYoutubeMono,

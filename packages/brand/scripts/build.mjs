@@ -1,7 +1,7 @@
 // Generates the brand from its two sources (Kawase's Senryo pipeline, tamion/packages/ui-tokens/build.mjs):
 //   tokens.json → generated/web.css (shadcn variable names + Tailwind 4 `@theme inline` + type utilities)
 //               → generated/tokens.ts (the same values for code that cannot use class names)
-//   mark.json   → generated/mark.ts and assets/{hako-mark,hako-mark-ink,hako-mark-inverse,app-icon,favicon}.svg
+//   mark.json   → generated/mark.ts and assets/{hako-mark,hako-mark-adaptive,hako-mark-ink,hako-mark-inverse,app-icon,favicon}.svg
 // Run: pnpm --filter @hako/brand build (this script, then check-contrast.mjs, which fails the build below 4.5:1).
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 
@@ -119,6 +119,9 @@ const favicon = svg(
 );
 const assets = {
   "hako-mark.svg": svg(glyph(INK, tokens.accent.value)),
+  // For pages that inline it (@hako/identity's `hako` mark): the body in the current text colour, the lid in the
+  // accent, as HakoMark draws it, so it reads on the light and the dark card alike.
+  "hako-mark-adaptive.svg": svg(glyph("currentColor", tokens.accent.value)),
   "hako-mark-ink.svg": svg(glyph(INK, INK)),
   "hako-mark-inverse.svg": svg(glyph(PAPER, PAPER)),
   "app-icon.svg": appIcon,

@@ -96,8 +96,8 @@ const NONE: Look = { shape: "uncontained", marks: {} };
 
 /** Hako, the wallet and ramp it is built on, and the money rails it routes through. */
 const PLATFORM: Entity[] = [
-  provider("hako", "Hako", glyph("#000000", "hako", "hako-mono")),
-  provider("paybox", "PayBox", glyph("#000000", "paybox", "paybox-mono")),
+  provider("hako", "Hako", glyph(undefined, "hako", "hako-mono")),
+  provider("paybox", "PayBox", glyph(undefined, undefined, "paybox-mono")),
   provider("moonpay", "MoonPay", glyph("#7D00FF", "moonpay", "moonpay-mono")),
   provider("lifi", "LI.FI", tile("#F7C2FF", "lifi", "lifi-mono")),
   provider("circle", "Circle", glyph("#00E599", "circle", "circle-mono")),
@@ -115,7 +115,7 @@ const CATALOG: Entity[] = [
   provider("dictionary", "Free Dictionary API", NONE),
   provider("firecrawl", "Firecrawl", glyph("#FA5D19", "firecrawl", "firecrawl-mono")),
   provider("frankfurter", "Frankfurter", glyph(undefined, undefined, "frankfurter-mono")),
-  provider("github", "GitHub", glyph("#181717", "github", "github-mono")),
+  provider("github", "GitHub", glyph(undefined, undefined, "github-mono")),
   provider("google-news", "Google News", glyph("#174EA6", "google-news", "google-news-mono")),
   provider("groq", "Groq", tile("#F43E01", "groq")),
   provider("hackernews", "Hacker News", tile("#F0652F", "hackernews", "hackernews-mono")),
@@ -133,15 +133,15 @@ const CATALOG: Entity[] = [
   provider("pypi", "PyPI", glyph("#3775A9", "pypi", "pypi-mono")),
   provider("serper", "Serper", glyph(undefined, undefined, "serper-mono")),
   provider("usgs", "USGS Earthquakes", NONE),
-  provider("wayback", "Wayback Machine", glyph("#666666", "wayback", "wayback-mono")),
+  provider("wayback", "Wayback Machine", glyph(undefined, undefined, "wayback-mono")),
   provider("wikidata", "Wikidata", glyph("#006699", "wikidata", "wikidata-mono")),
-  provider("wikipedia", "Wikipedia", glyph("#000000", "wikipedia", "wikipedia-mono")),
+  provider("wikipedia", "Wikipedia", glyph(undefined, undefined, "wikipedia-mono")),
   provider("worldbank", "World Bank Open Data", NONE),
   provider("youtube", "YouTube", glyph("#FF0000", "youtube", "youtube-mono")),
   // C16: the new catalog providers (plan §1 C16).
   provider("exa", "Exa", glyph("#0143D9", "exa", "exa-mono")),
   provider("artificial-analysis", "Artificial Analysis", glyph(undefined, undefined, "artificial-analysis-mono")),
-  provider("elevenlabs", "ElevenLabs", glyph("#000000", "elevenlabs", "elevenlabs-mono")),
+  provider("elevenlabs", "ElevenLabs", glyph(undefined, undefined, "elevenlabs-mono")),
   provider("polymarket", "Polymarket", glyph(undefined, undefined, "polymarket-mono")),
   provider("jupiter", "Jupiter", disc("#00BEF0", "jupiter", "jupiter-mono")),
   provider("helius", "Helius", glyph("#E84125", "helius")),
