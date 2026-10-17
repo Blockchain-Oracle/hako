@@ -1,8 +1,10 @@
-import { SOLANA_TX_MAX_BYTES, SOLANA_TX_REQUIRED_SIGNERS } from "@hako/config";
-import { parseAtomic, sameAddress } from "@hako/money";
-import { LIFI_CONTRACT_ALLOWLIST, networkByCaip2 } from "@hako/networks";
+// Plugin-safe: imports only the plugin-safe sources, by relative path, so the PayBox plugin bundles this file as is
+// (plugins/paybox/src/shared.ts) and the gateway takes it through @hako/defi/server. One composition of R15/R16 rules.
+import { SOLANA_TX_MAX_BYTES, SOLANA_TX_REQUIRED_SIGNERS } from "../../config/src/index.ts";
+import { parseAtomic, sameAddress } from "../../money/src/index.ts";
+import { LIFI_CONTRACT_ALLOWLIST, networkByCaip2 } from "../../networks/src/index.ts";
 
-import type { R15Rules, R16Rules } from "../core/index.ts";
+import type { R15Rules, R16Rules } from "./core/index.ts";
 
 /**
  * R15's rules for a source chain, filled from the one source of each value: LI.FI's allowlist and the native coin
