@@ -21,7 +21,19 @@ names; `check_samples.py` fails if they drift.
 | `earn/positions` | `lifi-earn/positions` (any) | | `positions` |
 
 Also new and free (not aliased, reachable by discover/inspect): `polymarket/markets` (`market`), `jupiter/events`
-(`market`). Catalog: 80 → 97 endpoints.
+(`market`).
+
+Paid (sold on `/v2`, plan C16):
+
+| Tool | Price (tier) | Render | Available |
+| --- | --- | --- | --- |
+| `elevenlabs/tts-500` | $0.05 (`media-medium`) | `audio` | yes (key set) |
+| `elevenlabs/tts-2000` | $0.20 (`media-large`) | `audio` | yes |
+| `elevenlabs/sound-effect` | $0.02 (`media-small`) | `audio` | yes |
+| `exa/search`, `exa/answer` | $0.01 (`premium`) | `search_results`, `answer` | no: `EXA_API_KEY` empty |
+| `artificial-analysis/models` | $0.005 (`standard`) | `model_bench` | no: `ARTIFICIAL_ANALYSIS_API_KEY` empty |
+
+Catalog: 80 → 103 endpoints.
 
 ## Done (branch `lane/l2-catalog`)
 
@@ -55,6 +67,19 @@ Also new and free (not aliased, reachable by discover/inspect): `polymarket/mark
   `data` against `packages/cards/schemas/<render>.schema.json`; checks every `READ_ALIAS_CONNECTORS` id exists and is
   free, that each alias's zod body (per chain family, defaults applied) is accepted by the tool's pydantic input, and
   that the EVM/Solana mirrors equal `@hako/networks`.
+- **ElevenLabs** (`connectors/elevenlabs/`): Flash v2.5 speech in two fixed tiers (≤ 500 / ≤ 2,000 characters) and
+  sound effects (0.5–5 s), MP3 `mp3_44100_128`. R18: input caps per tier, a daily ceiling of 15,000 credits checked
+  before each call (503 `tool_unavailable` past it, nothing charged), an 80 % spend alarm in the logs, real cost from
+  the `character-cost` header (`budget.py`). Voices: George (default), Rachel, Alice, Liam, Matilda, Adam — each
+  answered 200 for our key (Sarah 404s; the key lacks `voices_read`, so no listing). Music not built (generation
+  exceeds the 8 s run).
+- **Generated files** (`hako_tools/files.py` + hako-api `GET /v1/files/<id>`): bytes + JSON sidecar under
+  `HAKO_DATA_DIR/files`, 24 h, swept on write; ids are 32 hex; unknown/expired → 404; `cache-control: immutable`.
+  `data.url` = `HAKO_PUBLIC_BASE_URL` + `/v1/files/<id>`.
+- **Exa** (`exa/search` with highlights, `exa/answer` with citations) and **Artificial Analysis**
+  (`artificial-analysis/models`: LLM leaderboard by intelligence/speed/price, media by ELO; cached 1 h). Written
+  from their API docs; not run live (no keys) — run `check_samples.py exa/search exa/answer
+  artificial-analysis/models` once the keys are set.
 - New Python deps (hako-tools): `eth-abi`, `pycryptodome` (keccak backend for eth-utils), `solders`.
 
 ## Evidence (2026-10-17, ~22:15 WAT)
@@ -67,6 +92,9 @@ Also new and free (not aliased, reachable by discover/inspect): `polymarket/mark
   program fees, Polymarket "election", Jupiter "nba", hako/markets "fed rate cut") → all 200, `billable: false`,
   price 0; `lifi-earn/*` → 503 `tool_unavailable`. `/v1/version`: 97 endpoints. `/v1/discover` "wallet balance on
   base" → chain-evm/balance first.
+- ElevenLabs on the local api: `tts-500` (Alice) and `sound-effect` (1 s) → 200, `data` valid against
+  `audio.schema.json`, `GET` of the returned URL → 200 `audio/mpeg` (51 KB / 17 KB); unknown or malformed file id →
+  404; 501 characters → 422 `invalid_input`. `check_samples.py elevenlabs/tts-2000` → OK.
 - Gates: `uv sync --all-packages && uv run ruff check . && uv run pyright` green; JS gates green (no JS touched).
 
 ## Open (for the coordinator / L1)
@@ -81,5 +109,10 @@ Also new and free (not aliased, reachable by discover/inspect): `polymarket/mark
 - **Brand:** catalog provider ids are `chain-evm`, `chain-solana`, `polymarket`, `jupiter`, `lifi-earn`, `hako`
   (`logo_domain`: ethereum.org, solana.com, polymarket.com, jup.ag, li.fi). W0.4 (a) assumed `lifi`/`helius` ids —
   alias `lifi-earn` → li.fi and the chain providers in the logo registry.
-- Not done (time): Exa, Artificial Analysis, ElevenLabs (C16 second half). Exa/AA keys are empty, so they would
-  report unavailable anyway.
+- **Files (L1 + ops):** the gateway must forward `GET /v1/files/:id` (endpoint table `file`) to hako-api, and
+  hako-api on Coolify needs `HAKO_PUBLIC_BASE_URL` = the gateway's public URL (today
+  `https://hako-api.84.46.247.92.sslip.io`, later `https://api.usehako.xyz`), else audio URLs point at localhost.
+- **Web (L3):** `apps/web/src/lib/catalog/types.ts` types `price.tier` as `local | standard | premium`; the catalog
+  now also has `free`, `media-small`, `media-medium`, `media-large` (type-only, nothing parses it at runtime).
+- **Keys:** `EXA_API_KEY`, `ARTIFICIAL_ANALYSIS_API_KEY`, `LIFI_API_KEY` (Abu's free signups) turn those tools on
+  with no code change; `ELEVENLABS_API_KEY` must be on hako-api in Coolify for the audio tools.
