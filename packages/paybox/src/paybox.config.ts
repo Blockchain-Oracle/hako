@@ -40,7 +40,6 @@ export const UUID_HEX_GROUPS = [8, 4, 4, 4, 12] as const;
 export const UUID_NAME_BASED_VERSION = "5";
 export const UUID_VARIANT_MASK = 0x3;
 export const UUID_VARIANT_BITS = 0x8;
-export const HEX_RADIX = 16;
 
 /** The header an MCP host uses to declare its signing surface (SDK 2.2.0 README). */
 export const PAYBOX_SIGNING_SURFACE_HEADER = "x-paybox-signing-surface";

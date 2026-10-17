@@ -6,10 +6,11 @@
 import { createHash } from "node:crypto";
 
 import type { CallToolResult } from "@ai-sdk/mcp";
+import { HEX_RADIX } from "@hako/defi/core";
 
 import type { ListRequestsFilter, TransferArgs, UseServiceArgs, WalletSignArgs } from "./intents/types.ts";
 import { toolPayload, type PayboxMcpSession, type ToolCallOptions } from "./mcp.ts";
-import { HEX_RADIX, UUID_HEX_GROUPS, UUID_NAME_BASED_VERSION, UUID_VARIANT_BITS, UUID_VARIANT_MASK } from "./paybox.config.ts";
+import { UUID_HEX_GROUPS, UUID_NAME_BASED_VERSION, UUID_VARIANT_BITS, UUID_VARIANT_MASK } from "./paybox.config.ts";
 import { PayboxEnvelopeError, parseRequestEnvelope, type PayboxRequestEnvelope } from "./status.ts";
 
 type Json = Record<string, unknown>;
