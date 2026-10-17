@@ -523,6 +523,12 @@ importers:
       '@hako/defi':
         specifier: workspace:*
         version: link:../defi
+      '@hako/env':
+        specifier: workspace:*
+        version: link:../env
+      '@hako/money':
+        specifier: workspace:*
+        version: link:../money
       '@hako/networks':
         specifier: workspace:*
         version: link:../networks
@@ -532,6 +538,9 @@ importers:
       server-only:
         specifier: 'catalog:'
         version: 0.0.1
+      zod:
+        specifier: 'catalog:'
+        version: 4.6.5
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
