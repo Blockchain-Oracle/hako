@@ -8,7 +8,8 @@
     "build": "tsc -p tsconfig.json --noEmit && esbuild src/server.ts --bundle --platform=node --target=node24 --format=esm --outfile=dist/server.mjs --external:@x402/extensions --banner:js=\"import{createRequire}from'module';const require=createRequire(import.meta.url);\"",
     "start": "node dist/server.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "test": "tsx --test src/routes/money/*.test.ts"
   },
   "dependencies": {
     "@coinbase/cdp-sdk": "catalog:",
