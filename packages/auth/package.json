@@ -1,0 +1,28 @@
+{
+  "name": "@hako/auth",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Better Auth (Phase 1): Hako sessions on Postgres, jwt() with its JWKS, nextCookies(). Mounted by the web at app/api/auth/[...all]. Server-only; `./node` is the entry for plain Node processes.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./node": "./src/node.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint": "eslint src scripts",
+    "migration:generate": "node scripts/migration-sql.ts"
+  },
+  "dependencies": {
+    "@hako/config": "workspace:*",
+    "@hako/db": "workspace:*",
+    "@hako/env": "workspace:*",
+    "better-auth": "catalog:",
+    "server-only": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "typescript": "catalog:"
+  }
+}
