@@ -57,3 +57,4 @@ so the §12 broadcast tests run in `pnpm -r --if-present test`.
 - **Helius:** the key's plan is exhausted (429 "max usage reached"); the public-RPC fallback covers it, Helius returns once topped up.
 - **Redis:** set `REDIS_URL` on hako-gateway (the money cache, rehearsal cache and the send-once claims use it; memory otherwise, per replica). Batch/invoice routes may want to share `money/runtime.ts`'s store (move it up to `services/gateway/src/` at merge).
 - `LIFI_API_KEY` is empty: quotes and the race run keyless (rate-limited); Earn vault/position reads are L2's connectors behind the aliases.
+- `encodeBase58` (`money/solana.ts`) belongs beside `decodeBase58` in `@hako/defi/core` (defi's own tests keep a copy in `test/fixtures.ts`); fold it there at merge, since packages/defi is not this lane's.
