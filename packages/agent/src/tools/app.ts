@@ -12,7 +12,7 @@ import { z } from "zod";
 
 import { APP_ONLY, card, defineTool, DRAFT, READ } from "../define.ts";
 import type { AgentDeps } from "../deps.ts";
-import { draftCard, type DraftLive, loadDraft, loadDraftVersion } from "../draft-cards.ts";
+import { draftCard, type DraftLive, loadDraft, loadDraftAt, loadDraftVersion, staleVersion } from "../draft-cards.ts";
 import { nextInput } from "../draft-edits.ts";
 import { AgentToolError, invalidInput } from "../errors.ts";
 import { outcomeCard, receiptCard, runOfStatus } from "../outcomes.ts";
@@ -29,7 +29,8 @@ export const hakoDraftUpdate = defineTool({
   title: "Edit a draft",
   description:
     "App-only: an edit from a draft card makes the next draft version, re-quoted and re-rehearsed in the same card. " +
-    "`version` is the version the card shows; a card behind the store is refused with the latest card.",
+    "`version` is the version the card shows; a card behind the store (or an edit that lost a race with another) is " +
+    "refused with the latest card.",
   input: draftRefSchema.extend({ edit: draftEditSchema }),
   output: structuredContentUnion(DRAFT_CARD_KINDS),
   annotations: DRAFT,
@@ -40,8 +41,11 @@ export const hakoDraftUpdate = defineTool({
     const tool = "hako_draft_update";
     const current = await loadDraftVersion(deps, { draftId, version }, tool);
     const next = await nextInput(deps, current, edit);
-    await deps.intents.reviseDraft(draftId, next.input);
-    return draftCard(await loadDraft(deps, draftId, tool), deps, { known: next.known });
+    // The write names its base version: when another edit from the same version landed after the check above, it
+    // stands, nothing is written here, and this card is refused like any stale one.
+    const revision = await deps.intents.reviseDraft(draftId, version, next.input);
+    if (!revision) throw await staleVersion(deps, await loadDraft(deps, draftId, tool));
+    return draftCard(await loadDraftAt(deps, { draftId, version: revision.version }, tool), deps, { known: next.known });
   },
 });
 

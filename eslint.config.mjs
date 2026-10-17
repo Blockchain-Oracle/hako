@@ -35,9 +35,9 @@ const NEXT_BAN = {
   group: ["next", "next/*"],
   message: "@hako/cards renders inside MCP hosts too: no next/* imports (pass links and images through CardHost).",
 };
-/** The gateway's and CLI's entry of @hako/env and @hako/paybox skip the `server-only` guard: Next code takes the guarded root. */
+/** The gateway's and CLI's entry of @hako/env, @hako/paybox and @hako/agent skip the `server-only` guard: Next code takes the guarded root. */
 const NODE_ENTRY_BAN = {
-  group: ["@hako/env/node", "@hako/paybox/node"],
+  group: ["@hako/env/node", "@hako/paybox/node", "@hako/agent/node"],
   message: "The /node entries are for the gateway and the CLI; Next code imports the package root (it carries import 'server-only').",
 };
 const PLUGIN_BAN = {

@@ -136,6 +136,19 @@ Each finding as the reviewer gave it, then what changed.
    `AgentDeps.drafts` is a `DraftReader` returning `{view, ownerUserId}` for the caller's drafts only; `loadDraft`
    refuses an anonymous caller on a user's draft (`auth_required`) and hides it from other users; `AgentDeps` documents
    that drafts and intents are scoped to the caller. Every tool that reads a draft goes through `loadDraft`.
+   **Round 2 (still open: two edits racing).** — The check and the write were separate, and `reviseDraft(id, patch)`
+   took no base version, so two edits from version N both passed and the second overwrote the first. Now
+   `MoneyIntents.reviseDraft(id, baseVersion, patch)` (`packages/paybox/src/intents/types.ts`, the W0.6 contract; outside
+   this lane's paths, changed because the finding names it, types only, no implementation existed) writes
+   `baseVersion + 1` through `DraftStore.appendVersion` (the compare-and-set `@hako/db`'s `appendDraftVersion` already
+   does on the unique `(draft_id, version)` row) and returns `null` with nothing written when `baseVersion` is no longer
+   the latest. It returns null rather than throwing because the contract is type-only (`export type *`) and `@hako/agent`
+   has `@hako/paybox` as a dev dependency only, so a thrown class could not be recognised without a runtime import from a
+   package whose entries are split server-only / node; null also matches `appendVersion`'s `false`.
+   `hako_draft_update` passes the card's `version`; on `null` it throws `staleVersion(deps, latest)` (the same
+   `stale_version` error with the latest card that `loadDraftVersion` throws, now one helper). The answer is drawn from
+   the revision's own version: `DraftReader.getVersion(id, version)` (scoped like `getDraft`) through `loadDraftAt`, which
+   shares the ownership checks with `loadDraft` (`ownedView`), never from whatever version is latest by then.
 9. **No tool produces `yield` / `positions`.** — `hako_chain_read` ops `earn_vaults` (`/v1/earn/vaults`: chain, token,
    sort, limit) and `earn_positions` (`/v1/earn/positions`: address, chain) → `yield` / `positions` cards with
    `envelope.source`.
@@ -157,14 +170,14 @@ Each finding as the reviewer gave it, then what changed.
     (the text the scan read: a bare address or an `ethereum:`/`solana:` URI), verified only when the scanned address
     equals the saved one; `contactDataSchema.action` gained `verified`.
 16. **(Coordinator) `@hako/agent/node` not in `NODE_ENTRY_BAN`.** — Outside this lane's paths: still open below.
+    **Round 2.** — `NODE_ENTRY_BAN.group` in `eslint.config.mjs` is now `["@hako/env/node", "@hako/paybox/node",
+    "@hako/agent/node"]` (its comment names all three), so `apps/web` and `apps/docs` get a lint error on the unguarded
+    agent entry. Nothing else in the file changed.
 
 ## Open (for the coordinator / later lanes)
-- **ESLint:** add `@hako/agent/node` to `NODE_ENTRY_BAN.group` in `eslint.config.mjs` (finding 16).
 - **W0.6 / `@hako/db`:** drafts need an owner (Hako user id, or the anonymous session) so the surfaces can implement
-  `DraftReader` (`getDraft → {view, ownerUserId}`, scoped to the caller) and `intents.createDraft` records it.
-  `MoneyIntents.reviseDraft(id, patch)` takes no expected version: the agent refuses stale cards, but two edits racing
-  between that check and the write can still both land; `reviseDraft` should pass the version to
-  `DraftStore.appendVersion(id, expectedVersion, …)` (which already takes one).
+  `DraftReader` (`getDraft` and `getVersion → {view, ownerUserId}`, scoped to the caller) and `intents.createDraft`
+  records it. W0.6 implements `reviseDraft(id, baseVersion, patch)` over `DraftStore.appendVersion` (null on a lost race).
 - **A run's settlement tx on its receipt line:** PayBox's `use_service` output carries the paid body, not the x402
   settlement tx, and the gateway records the settlement without knowing the draft. `envelope.payment.tx` is filled when a
   receipt for the draft exists (`?draftId=`); L1 could link the two (e.g. record the PayBox request or draft on the

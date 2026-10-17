@@ -164,7 +164,12 @@ export interface DraftStatus {
 
 export interface MoneyIntents {
   createDraft<K extends DraftKind>(kind: K, input: DraftInput<K>): Promise<DraftView<K>>;
-  reviseDraft<K extends DraftKind>(id: string, patch: DraftPatch<K>): Promise<DraftRevision>;
+  /**
+   * Writes `patch` over version `baseVersion` as version `baseVersion + 1` through `DraftStore.appendVersion` (the
+   * compare-and-set on the unique `(draft_id, version)` row). Null, with nothing written, when `baseVersion` is no
+   * longer the latest: another edit landed first, so an edit made from an older version never overwrites a newer one.
+   */
+  reviseDraft<K extends DraftKind>(id: string, baseVersion: number, patch: DraftPatch<K>): Promise<DraftRevision | null>;
   /**
    * Inserts the unique `(draft_id, version)` row first, then creates the PayBox request once (`request_transfer`,
    * `request_wallet_sign` + the broadcast job, or `use_service`) and stores its `request_id`. An unknown outcome
