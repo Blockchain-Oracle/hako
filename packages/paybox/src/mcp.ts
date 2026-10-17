@@ -1,7 +1,9 @@
 /**
  * PayBox core tools over MCP with the user's bearer (plan §3 PayBox row; SP13 in detail/12-wave0-results.md: the
  * `@ai-sdk/mcp` HTTP transport loads all 30 PayBox tools). The bearer is read for every HTTP request through a custom
- * `fetch`, so a long session never sends an expired token; an idle session is closed (it holds an inbound SSE stream).
+ * `fetch`, so a long session never sends an expired token; a session nobody holds is closed after
+ * PAYBOX_SESSION_IDLE_MS (it holds an inbound SSE stream). Work that keeps the client (AI SDK `client.tools()` for a
+ * whole agent run, MCP Apps resource reads) holds a lease, so the session can't close under it.
  */
 import { PAYBOX_MCP_URL } from "@hako/config";
 import { createMCPClient, type CallToolResult, type MCPClient } from "@ai-sdk/mcp";
@@ -36,13 +38,25 @@ export interface ToolCallOptions {
   timeoutMs?: number;
 }
 
+/** The connected client, held open until `release()` (idempotent); the idle close waits for every lease. */
+export interface PayboxMcpLease {
+  client: MCPClient;
+  release(): void;
+}
+
 export interface PayboxMcpSession {
   /** Calls one PayBox tool and returns its payload (`structuredContent`, else the first text block's JSON). */
   call(tool: string, args: Record<string, unknown>, options?: ToolCallOptions): Promise<unknown>;
   /** The raw MCP result (for `use_plugin`, whose result is the plugin's own tool result). */
   callRaw(tool: string, args: Record<string, unknown>, options?: ToolCallOptions): Promise<CallToolResult>;
-  /** The connected client, for AI SDK tool sets (`client.tools()`) and MCP Apps resources. */
-  client(): Promise<MCPClient>;
+  /**
+   * The connected client for work that keeps it (AI SDK tool sets from `client.tools()`, MCP Apps resource reads):
+   * the session stays open until the lease is released. Prefer `withClient` when the work fits in one callback.
+   */
+  acquire(): Promise<PayboxMcpLease>;
+  /** Runs `work` with the connected client and releases it when `work` settles (an agent run, a resource read). */
+  withClient<T>(work: (client: MCPClient) => Promise<T>): Promise<T>;
+  /** Closes the session now, leases or not (the next call reconnects). */
   close(): Promise<void>;
 }
 
@@ -110,17 +124,39 @@ export function createPayboxMcpSession(settings: McpSessionSettings): PayboxMcpS
     if (pending) await (await pending.catch(() => null))?.close();
   }
 
-  async function withClient<T>(work: (client: MCPClient) => Promise<T>): Promise<T> {
+  /** Starts the idle countdown; it closes the session only if nobody took a lease meanwhile. */
+  function armIdleClose(): void {
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(() => {
+      if (active === 0) void close();
+    }, settings.idleMs ?? PAYBOX_SESSION_IDLE_MS);
+    idleTimer.unref?.();
+  }
+
+  async function acquire(): Promise<PayboxMcpLease> {
     clearTimeout(idleTimer);
     active += 1;
-    try {
-      return await work(await open());
-    } finally {
+    let held = true;
+    const release = (): void => {
+      if (!held) return;
+      held = false;
       active -= 1;
-      if (active === 0) {
-        idleTimer = setTimeout(() => void close(), settings.idleMs ?? PAYBOX_SESSION_IDLE_MS);
-        idleTimer.unref?.();
-      }
+      if (active === 0) armIdleClose();
+    };
+    try {
+      return { client: await open(), release };
+    } catch (error) {
+      release();
+      throw error;
+    }
+  }
+
+  async function withClient<T>(work: (client: MCPClient) => Promise<T>): Promise<T> {
+    const lease = await acquire();
+    try {
+      return await work(lease.client);
+    } finally {
+      lease.release();
     }
   }
 
@@ -138,7 +174,8 @@ export function createPayboxMcpSession(settings: McpSessionSettings): PayboxMcpS
       if (result.isError) throw new PayboxToolError(tool, errorText(result), payload);
       return payload;
     },
-    client: () => withClient(async (client) => client),
+    acquire,
+    withClient,
     close,
   };
 }
