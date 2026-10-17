@@ -4,7 +4,7 @@
  * under a per-user Redis lock (the refresh token rotates on every use; a replayed one revokes the client).
  */
 import { MS_PER_SECOND, TOKEN_REFRESH_SKEW_S } from "@hako/config";
-import { getActivePayboxLink, revokePayboxLink, savePayboxTokens, type PayboxLinkRow, type Pool } from "@hako/db/node";
+import { clearPayboxTokens, getActivePayboxLink, revokePayboxLink, savePayboxTokens, type PayboxLinkRow, type Pool } from "@hako/db/node";
 import type { Redis } from "ioredis";
 
 import type { TokenCipher } from "./crypto.ts";
@@ -20,7 +20,7 @@ export class PayboxNotConnectedError extends Error {
   }
 }
 
-/** PayBox refused the stored grant (revoked client, spent refresh token): the link is revoked, the user reconnects. */
+/** The stored grant can't be used (no refresh token, or PayBox refused the refresh): the user reconnects. */
 export class PayboxReconnectRequiredError extends Error {
   constructor(reason: string) {
     super(`PayBox needs to be reconnected: ${reason}`);
@@ -50,8 +50,11 @@ export interface PayboxTokenStore {
   save(link: PayboxLinkRow, tokens: PayboxTokenSet): Promise<PayboxLinkRow>;
   /** A usable access token, refreshed first when it has less than TOKEN_REFRESH_SKEW_S left. */
   access(userId: string): Promise<PayboxAccess>;
-  /** Disconnect: drops the stored tokens (the grant itself is revoked in PayBox's Clients screen). */
-  disconnect(userId: string, reason: string): Promise<boolean>;
+  /**
+   * Disconnect: drops the stored tokens and keeps the per-user client (plan §1), so a reconnect authorizes the same
+   * `client_id` and every request it minted stays readable. The grant itself is revoked in PayBox's Clients screen.
+   */
+  disconnect(userId: string): Promise<boolean>;
 }
 
 export interface TokenStoreDeps {
@@ -101,7 +104,8 @@ export function createPayboxTokenStore(deps: TokenStoreDeps): PayboxTokenStore {
       if (!link?.accessTokenEnc) throw new PayboxNotConnectedError(userId);
       if (fresh(link)) return access(link);
       if (!link.refreshTokenEnc) {
-        await revokePayboxLink(deps.pool, link.id, "access token expired and no refresh token was granted");
+        // The client is still good: only a new authorization is needed, so the link keeps it.
+        await clearPayboxTokens(deps.pool, link.id);
         throw new PayboxReconnectRequiredError("the access token expired and PayBox granted no refresh token");
       }
       let tokens: PayboxTokenSet;
@@ -109,6 +113,7 @@ export function createPayboxTokenStore(deps: TokenStoreDeps): PayboxTokenStore {
         tokens = await refreshPayboxTokens({ clientId: link.clientId, refreshToken: deps.cipher.decrypt(link.refreshTokenEnc, sealContext(link, "refresh")) }, deps.fetch);
       } catch (error) {
         if (error instanceof PayboxOAuthError && error.revoked) {
+          // invalid_client, or invalid_grant on a replayed refresh token (which revokes the client): a new one is needed.
           await revokePayboxLink(deps.pool, link.id, `refresh refused: ${error.code}`);
           throw new PayboxReconnectRequiredError(`PayBox refused the refresh (${error.code})`);
         }
@@ -126,9 +131,9 @@ export function createPayboxTokenStore(deps: TokenStoreDeps): PayboxTokenStore {
       if (!link?.accessTokenEnc) throw new PayboxNotConnectedError(userId);
       return fresh(link) ? access(link) : refresh(userId);
     },
-    async disconnect(userId, reason) {
+    async disconnect(userId) {
       const link = await getActivePayboxLink(deps.pool, userId);
-      return link ? revokePayboxLink(deps.pool, link.id, reason) : false;
+      return link ? clearPayboxTokens(deps.pool, link.id) : false;
     },
   };
 }

@@ -77,7 +77,24 @@ export async function savePayboxTokens(q: Queryable, linkId: string, tokens: Pay
   return rows[0] ?? null;
 }
 
-/** Revokes a link (Disconnect, a refused refresh, a revoked client): its tokens are dropped, the row stays. */
+/**
+ * Disconnect (plan §1: every reconnect reuses the client): drops the link's tokens and keeps it active with its
+ * `client_id` and `sub`, so the next Connect PayBox authorizes the same client and the requests it minted stay
+ * readable. True when there were tokens to drop.
+ */
+export async function clearPayboxTokens(q: Queryable, linkId: string): Promise<boolean> {
+  const { rowCount } = await q.query(
+    `update paybox_links set access_token_enc = null, refresh_token_enc = null, access_expires_at = null, updated_at = now()
+     where id = $1 and revoked_at is null and (access_token_enc is not null or refresh_token_enc is not null)`,
+    [linkId],
+  );
+  return rowCount === 1;
+}
+
+/**
+ * Revokes a link, after which Connect PayBox registers a new client: PayBox refused the client or a replayed refresh
+ * token (`invalid_client`, `invalid_grant`), or the redirect URL changed. Its tokens are dropped, the row stays.
+ */
 export async function revokePayboxLink(q: Queryable, linkId: string, reason: string): Promise<boolean> {
   const { rowCount } = await q.query(
     `update paybox_links set revoked_at = now(), revoked_reason = $2, access_token_enc = null, refresh_token_enc = null,

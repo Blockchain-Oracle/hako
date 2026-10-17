@@ -39,7 +39,7 @@ export interface PayboxServer {
   sessionFor(userId: string): Promise<PayboxUserSession>;
   /** The money intents' `payboxFor(userId)` (MoneyIntentDeps). */
   payboxFor(userId: string): Promise<ServerPayboxCaller>;
-  /** Disconnect: drops the stored tokens; the user revokes the grant in PayBox's Clients screen. */
+  /** Disconnect: drops the stored tokens and keeps the per-user client; the grant is revoked in PayBox's Clients screen. */
   disconnect(userId: string): Promise<boolean>;
 }
 
@@ -63,6 +63,6 @@ export function createPayboxServer(settings: PayboxServerSettings): PayboxServer
     connect,
     sessionFor,
     payboxFor: async (userId) => (await sessionFor(userId)).caller,
-    disconnect: (userId) => tokens.disconnect(userId, "disconnected by the user"),
+    disconnect: (userId) => tokens.disconnect(userId),
   };
 }
