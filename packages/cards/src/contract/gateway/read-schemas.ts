@@ -1,3 +1,4 @@
+import { HAKO_LOGO_PROXY_PARAM } from "@hako/config";
 import { z } from "zod";
 
 import {
@@ -46,7 +47,7 @@ export const toolPathParamsSchema = z.object({
 });
 
 /** `GET /v1/logo?src=`: an allowlisted logo URL, cached 24 h. */
-export const logoQuerySchema = z.object({ src: urlSchema });
+export const logoQuerySchema = z.object({ [HAKO_LOGO_PROXY_PARAM]: urlSchema });
 
 /** A block: its number, or the chain head. */
 const blockTagSchema = z.union([z.number().int().min(0), z.literal("latest")]);

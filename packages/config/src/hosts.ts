@@ -23,6 +23,12 @@ export const HAKO_DOCS_URL = `https://${HAKO_DOCS_HOST}`;
 export const HAKO_SANDBOX_URL = `https://${HAKO_SANDBOX_HOST}`;
 /** One MCP URL everywhere (Claude, ChatGPT, Cursor, VS Code custom connectors). */
 export const HAKO_MCP_URL = `${HAKO_GATEWAY_URL}/mcp`;
+/**
+ * The gateway's allowlisted logo proxy: `GET /v1/logo?src=<url>` (plan B12; cached LOGO_CACHE_TTL_S). The cards endpoint
+ * table and `logoProxyUrl` (@hako/identity) both read these.
+ */
+export const HAKO_LOGO_PROXY_PATH = "/v1/logo";
+export const HAKO_LOGO_PROXY_PARAM = "src";
 /** Better Auth, mounted by the web at `app/api/auth/[...all]` (plan E33): issuer and the JWKS the gateway verifies with. */
 export const HAKO_AUTH_ISSUER = `${HAKO_APP_URL}/api/auth`;
 export const HAKO_AUTH_JWKS_URL = `${HAKO_AUTH_ISSUER}/jwks`;
