@@ -68,7 +68,11 @@ async function nextRoute(deps: AgentDeps, kind: "swap" | "bridge", input: RouteI
     nextToken(deps, { chain: input.toChain, token: toBefore }, toChain, edit.toToken),
   ]);
   const fromAddress = await nextSender(deps, input.fromAddress, input.fromChain, fromChain);
-  const toAddress = edit.to ?? (kind === "swap" ? fromAddress : await nextSender(deps, input.toAddress, input.toChain, toChain));
+  // A recipient edit names an address, a contact or a PayBox username, resolved for the destination chain's family;
+  // otherwise the recipient stays, or follows a change of family to the user's own wallet there.
+  const toAddress = edit.to
+    ? (await resolveRecipient(deps, edit.to, toChain)).address
+    : await nextSender(deps, input.toAddress, input.toChain, toChain);
   // A new route or a new pair drops the pinned tool unless the edit picks one: the race runs again.
   const routeChanged =
     fromChain !== input.fromChain || toChain !== input.toChain || !sameAddress(fromToken.address, input.fromToken) || !sameAddress(toToken.address, input.toToken);

@@ -1,23 +1,20 @@
 import {
   ACTIVITY_PAGE_DEFAULT,
   ACTIVITY_PAGE_MAX,
-  type ActivityRow,
-  type PayboxRequestStatus,
-  type ReceiptData,
-  requestStatusToPhase,
-  requestWaitsOn,
-  type RequestWait,
+  activitySurfaceSchema,
+  receiptKindSchema,
+  receiptStatusSchema,
   structuredContentSchema,
   structuredContentUnion,
 } from "@hako/cards/contract";
 import { BASE } from "@hako/networks";
 import { z } from "zod";
 
-import { ACCOUNT_CHANGE_NOTE_MAX_CHARS, ACTIVITY_LIVE_REFRESH_MAX } from "../agent.config.ts";
+import { activityPage } from "../activity.ts";
+import { ACCOUNT_CHANGE_NOTE_MAX_CHARS } from "../agent.config.ts";
 import { card, defineTool, MODEL_AND_APP, READ } from "../define.ts";
 import { chainInputSchema } from "../inputs.ts";
 import { familyOf, requireAccount, requireUser, sumUsd, walletFor, walletRef } from "../resolve.ts";
-import { PHASE_BY_RECEIPT } from "./execute.ts";
 
 /** The person's PayBox account in cards: balances, the activity ledger, funding and the limit. */
 
@@ -55,82 +52,30 @@ export const hakoPortfolio = defineTool({
   },
 });
 
-const WAIT_WORDS: Record<RequestWait, string> = {
-  approval: "Waiting for your approval in PayBox",
-  funding: "Waiting for funds",
-  signature: "Waiting for PayBox to sign",
-  settlement: "Arriving",
-  confirmation: "Confirming on chain",
-};
-const END_WORDS: Record<"denied" | "error", string> = { denied: "Declined in PayBox", error: "Failed in PayBox" };
-
-function receiptWords(receipt: ReceiptData): string {
-  if (receipt.status === "pending") return "Pending";
-  if (receipt.status === "reverted") return "Failed on chain";
-  if (receipt.kind === "bridge") return "Arrived";
-  return receipt.kind === "invoice" || receipt.kind === "run" || receipt.kind === "batch" ? "Paid" : "Confirmed";
-}
-
-function toRow(receipt: ReceiptData): ActivityRow {
-  const amount = receipt.sent ?? receipt.received;
-  const tx = receipt.txs[0] ?? null;
-  return {
-    id: receipt.id,
-    kind: receipt.kind,
-    verb: receipt.title,
-    direction: receipt.sent ? "out" : receipt.received ? "in" : "none",
-    amount,
-    phase: PHASE_BY_RECEIPT[receipt.status],
-    statusText: receiptWords(receipt),
-    chain: tx?.chain ?? amount?.token.chain ?? null,
-    tx,
-    requestId: receipt.requestId,
-    receiptId: receipt.id,
-    surface: null,
-    at: receipt.at,
-  };
-}
-
-/** A pending row re-read from PayBox: its status in words and its phase, as the request stands now. */
-function liveRow(row: ActivityRow, status: PayboxRequestStatus): ActivityRow {
-  const wait = requestWaitsOn(status);
-  if (wait) return { ...row, phase: "live", statusText: WAIT_WORDS[wait] };
-  if (status === "denied" || status === "error") return { ...row, phase: requestStatusToPhase(status), statusText: END_WORDS[status] };
-  return row;
-}
-
 export const hakoActivity = defineTool({
   name: "hako_activity",
   title: "Activity",
   description:
     "Everything Hako did with the person's PayBox, newest first: paid tools, sends, swaps, bridges, Earn moves and " +
-    "invoices, each with its amount, status, time and explorer link. Pending rows are re-read from PayBox. Pass the " +
-    "previous page's cursor for older rows.",
+    "invoices with their amount, status, time and explorer link, plus PayBox requests that stopped (declined, failed, " +
+    "stopped at the limit) or still wait. Live rows are re-read from PayBox. Filter by kind, status, chain or surface; " +
+    "pass the previous page's cursor for older rows.",
   input: z.object({
     cursor: z.string().min(1).optional(),
     limit: z.number().int().min(1).max(ACTIVITY_PAGE_MAX).default(ACTIVITY_PAGE_DEFAULT),
+    kind: receiptKindSchema.optional().describe("Only this kind: run, batch, send, swap, bridge, earn_deposit, earn_withdraw, invoice, approve"),
+    status: receiptStatusSchema.optional().describe("Only confirmed, reverted or pending rows"),
+    chain: chainInputSchema.optional().describe("Only moves on this chain"),
+    surface: activitySurfaceSchema.optional().describe("Only what was done from web, mcp, cli, plugin or voice"),
   }),
   output: structuredContentSchema("activity"),
   annotations: READ,
   visibility: MODEL_AND_APP,
   auth: "required",
   cardKinds: ["activity"],
-  async execute({ cursor, limit }, deps) {
+  async execute(input, deps) {
     requireUser(deps, "hako_activity");
-    const page = await deps.gateway.call("receipts", { query: { limit, ...(cursor ? { cursor } : {}) } });
-    let rows = page.receipts.map(toRow);
-    const account = deps.account;
-    if (account) {
-      const pending = rows.filter((row) => row.phase === "live" && row.requestId).slice(0, ACTIVITY_LIVE_REFRESH_MAX);
-      const live = new Map(
-        await Promise.all(pending.map(async (row) => [row.id, (await account.getRequest(row.requestId as string)).status] as const)),
-      );
-      rows = rows.map((row) => {
-        const status = live.get(row.id);
-        return status ? liveRow(row, status) : row;
-      });
-    }
-    return card("activity", { rows, nextCursor: page.nextCursor }, { phase: "result" }, deps);
+    return card("activity", await activityPage(deps, input), { phase: "result" }, deps);
   },
 });
 

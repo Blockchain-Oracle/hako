@@ -4,6 +4,19 @@
 export const HTTP_BAD_REQUEST = 400;
 export const HTTP_UNPROCESSABLE = 422;
 
+/** A paid re-fetch PayBox stored (`use_service` output): 2xx is an answer; the gateway settles x402 only then. */
+export const HTTP_OK_MIN = 200;
+export const HTTP_OK_END = 300;
+
+/** The technical line behind a failure card's disclosure: the start of what the paid route answered. */
+export const FAILURE_TECHNICAL_MAX_CHARS = 300;
+
+/**
+ * A PayBox denial that came from the person's grant limit ("Your agent stopped at your limit · Raise it", plan add-ons
+ * "Agent passport"). PayBox gives a denial as words only, so the reason text is matched.
+ */
+export const LIMIT_DENIAL_PATTERN = /\b(limit|budget|exceed(s|ed)?|cap)\b/i;
+
 /** Pending activity rows re-read from PayBox per page (`get_request`), so the ledger's live rows stay current. */
 export const ACTIVITY_LIVE_REFRESH_MAX = 10;
 

@@ -24,13 +24,19 @@ import { txLink } from "./resolve.ts";
 /** Drafts signed as a wallet transaction and sent by Hako's broadcast job: PayBox `success` means signed, not sent. */
 const WALLET_SIGNED: ReadonlySet<DraftKindName> = new Set(["swap", "bridge", "earn_deposit", "earn_withdraw"]);
 
-/** Where the move is, from PayBox's status and the intent state. */
+/**
+ * Where the move is, from PayBox's status and the intent state. A request PayBox finishes itself (`request_transfer`
+ * for a send, `use_service` for a run or an invoice payment) is confirmed at `success`: PayBox documents `success` on
+ * an on-chain request as "confirmed on-chain, never merely broadcast" (context/01-paybox-platform/request-lifecycle.md),
+ * the same rule `requestStatusToPhase` follows. SP5 records `request_transfer`'s live terminal output; if it shows a
+ * broadcast-only `success`, a send moves to `sent` here and to `confirmed` with its receipt.
+ */
 export function stageOf(kind: DraftKindName | null, status: PayboxRequestStatus | null, state: IntentState | null, sourceSent: boolean): MoveStage | null {
   const pending = status ? pendingRequestStage(status) : null;
   if (pending) return pending;
   if (state === "completed") return "confirmed";
   if (status !== "success" || !kind) return null;
-  if (!WALLET_SIGNED.has(kind)) return kind === "send" ? "sent" : "confirmed";
+  if (!WALLET_SIGNED.has(kind)) return "confirmed";
   if (!sourceSent) return "sending";
   return kind === "bridge" ? "arriving" : "sent";
 }
@@ -69,16 +75,18 @@ export function txLinks(view: DraftView, hashes: { source: string | null; destin
 
 export interface StatusParts extends Omit<StatusData, "updatedAt" | "waitsOn" | "signUrl" | "stage"> {
   phase: CardPhase;
+  /** Set when the caller knows the stage without a PayBox request (a tx Hako's broadcast route just sent). */
+  stage?: MoveStage;
 }
 
 export function statusCard(deps: AgentDeps, parts: StatusParts): StructuredContent<"status"> {
-  const { phase, ...rest } = parts;
+  const { phase, stage, ...rest } = parts;
   const sourceSent = rest.txs.some((tx) => tx.role !== "approve" && tx.role !== "destination");
   const request = rest.requestId && rest.requestStatus ? requestRef(deps, rest.requestId, rest.requestStatus, rest.approvalUrl) : null;
   const data: StatusData = {
     ...rest,
     waitsOn: rest.requestStatus ? requestWaitsOn(rest.requestStatus) : null,
-    stage: stageOf(rest.kind, rest.requestStatus, rest.state, sourceSent),
+    stage: stage ?? stageOf(rest.kind, rest.requestStatus, rest.state, sourceSent),
     signUrl: request?.signUrl ?? null,
     updatedAt: deps.now().toISOString(),
   };

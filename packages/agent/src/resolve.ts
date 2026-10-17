@@ -28,7 +28,10 @@ export function requireAccount(deps: AgentDeps, tool: string): PayboxAccount {
   return deps.account;
 }
 
-/** A chain as the person or the model names it: a network key ("base") or any CAIP-2 id, in Hako's canonical form. */
+/**
+ * A chain as the person or the model names it: a network key ("base") or a CAIP-2 id, in Hako's canonical form. Only
+ * EVM (`eip155:*`) and Solana (`solana:*`) chains: Hako reads and drafts on nothing else.
+ */
 export function resolveChain(value: string): Caip2 {
   const text = value.trim().toLowerCase();
   if (isNetworkKey(text)) return NETWORKS[text].caip2;
@@ -36,12 +39,27 @@ export function resolveChain(value: string): Caip2 {
   if (known) return known.caip2;
   const parsed = caip2Schema.safeParse(value.trim());
   if (!parsed.success) throw invalidInput(`"${value}" is not a chain: use base, ethereum, arbitrum, optimism, polygon, solana or a CAIP-2 id.`);
+  familyOf(parsed.data);
   return parsed.data;
 }
 
+/** CAIP-2 namespaces Hako works with, and their chain family. */
+const FAMILY_BY_NAMESPACE: Readonly<Record<string, NetworkFamily>> = { eip155: "evm", solana: "solana" };
+
+/** The chain family of a CAIP-2 id, from its namespace; any namespace but `eip155` and `solana` is refused. */
 export function familyOf(chain: Caip2): NetworkFamily {
-  return chain.startsWith("solana:") ? "solana" : "evm";
+  const [namespace = ""] = chain.split(":");
+  const family = Object.hasOwn(FAMILY_BY_NAMESPACE, namespace) ? FAMILY_BY_NAMESPACE[namespace] : undefined;
+  if (!family) throw new AgentToolError("unsupported", `Hako works on EVM (eip155) and Solana chains, not ${chain}.`);
+  return family;
 }
+
+const ADDRESS_SCHEMAS = { evm: evmAddressSchema, solana: solanaAddressSchema } as const satisfies Record<NetworkFamily, unknown>;
+
+/** Whether a string is an address of the family (EVM 0x, Solana base58). */
+export const isAddressOf = (family: NetworkFamily, value: string): boolean => ADDRESS_SCHEMAS[family].safeParse(value).success;
+
+const familyWords = (family: NetworkFamily): string => (family === "evm" ? "an EVM (0x…)" : "a Solana");
 
 const fromInfo = (chain: Caip2, info: TokenInfo): TokenRef => ({ chain, address: info.address, symbol: info.symbol, decimals: info.decimals, name: info.name });
 
@@ -112,21 +130,33 @@ export const walletRef = (wallet: Pick<PayboxWallet, "address" | "family" | "nam
   label: wallet.name,
 });
 
-/** The sending address: the one given, else the user's PayBox wallet for the chain's family. */
+/**
+ * The sending address: the one given, else the user's PayBox wallet for the chain's family. A given address must be of
+ * the chain's family; a signed-in user's must also be one of the wallets they shared with Hako (PayBox signs only
+ * with those). An anonymous caller may draft from any address of the right family (nothing runs until sign-in).
+ */
 export async function senderFor(deps: AgentDeps, chain: Caip2, given: string | undefined, tool: string): Promise<WalletRef> {
   const family = familyOf(chain);
-  if (given) return { address: given, family };
+  if (given !== undefined) {
+    if (!isAddressOf(family, given)) throw invalidInput(`${given} is not ${familyWords(family)} address, so it can't send on ${chain}.`);
+    if (!deps.user) return { address: given, family };
+    const { wallets } = await requireAccount(deps, tool).credentials();
+    const own = wallets.find((wallet) => wallet.family === family && sameAddress(wallet.address, given));
+    if (!own) throw invalidInput(`${given} isn't a wallet you shared with Hako in PayBox: drafts send from your own PayBox wallets.`);
+    return walletRef(own);
+  }
   if (!deps.user) {
     throw new AgentToolError("auth_required", `Connect PayBox so ${tool} can draft from your wallet, or say which address sends.`, "connect_paybox");
   }
   return walletRef(await walletFor(requireAccount(deps, tool), family));
 }
 
-/** A send's recipient: an address of the chain's family, a saved contact, or a PayBox username. */
+/** A recipient: an address of the chain's family, a saved contact, or a PayBox username. */
 export async function resolveRecipient(deps: AgentDeps, to: string, chain: Caip2): Promise<WalletRef> {
   const family = familyOf(chain);
-  const addressSchema = family === "evm" ? evmAddressSchema : solanaAddressSchema;
-  if (addressSchema.safeParse(to).success) return { address: to, family };
+  if (isAddressOf(family, to)) return { address: to, family };
+  const otherFamily: NetworkFamily = family === "evm" ? "solana" : "evm";
+  if (isAddressOf(otherFamily, to)) throw invalidInput(`${to} is not ${familyWords(family)} address, so it can't receive on ${chain}.`);
   const contact = await deps.contacts?.find(to);
   if (contact) {
     if (contact.family !== family) throw invalidInput(`${contact.name} is saved with a ${contact.family} address, not one for ${chain}.`);

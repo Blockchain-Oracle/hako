@@ -1,34 +1,39 @@
 import { evmAddressSchema, structuredContentSchema } from "@hako/cards/contract";
 import { INVOICE_NOTE_MAX_CHARS } from "@hako/config";
-import { BASE, type Caip2 } from "@hako/networks";
+import { BASE, type Caip2, SOLANA } from "@hako/networks";
 import { z } from "zod";
 
 import { card, defineTool, DRAFT, MODEL_AND_APP } from "../define.ts";
 import type { AgentDeps } from "../deps.ts";
 import { draftCard } from "../draft-cards.ts";
 import { AgentToolError } from "../errors.ts";
-import { addressInputSchema, amountInputSchema, chainInputSchema, senderInputSchema, tokenInputSchema } from "../inputs.ts";
+import { amountInputSchema, chainInputSchema, recipientInputSchema, senderInputSchema, tokenInputSchema } from "../inputs.ts";
 import { atomicAmount, familyOf, requireAccount, resolveRecipient, resolveToken, senderFor, walletFor, walletRef } from "../resolve.ts";
 
 /**
  * The money drafts (plan E30, §1 card flow step 2): the agent only drafts. Each tool resolves what the person said,
  * creates a draft through the money core (quoted and rehearsed there) and returns its card. Nothing is signed or paid:
- * the card's one button calls `hako_execute` with the version it shows, and every edit makes a new version.
+ * the card's one button calls `hako_execute` with the version it shows, and every edit makes a new version. A draft
+ * whose source chain is off R17's executable list comes back read-only with its reason (`draftCard`'s `blocked`).
  */
 
 const toolInput = z.string().min(1).optional().describe("A LI.FI tool picked from the route race (bridge or exchange key); best route when absent");
+
+/** R17 in the model's words, on every move draft. */
+const EXECUTABLE_NOTE = ` Money moves from ${BASE.name} or ${SOLANA.name}; a draft from another chain is shown read-only with a switch to ${BASE.name}.`;
 
 export const hakoDraftSend = defineTool({
   name: "hako_draft_send",
   title: "Draft a send",
   description:
     "Drafts sending a token to someone: a saved contact's name, a PayBox username or an address. Shows a send card " +
-    "with the amount, recipient, fee and a rehearsal line; the person sends it with PayBox from the card. Never sends.",
+    "with the amount, recipient, fee and a rehearsal line; the person sends it with PayBox from the card. Never sends." +
+    EXECUTABLE_NOTE,
   input: z.object({
     chain: chainInputSchema,
     token: tokenInputSchema,
     amount: amountInputSchema,
-    to: z.string().min(1).describe("Recipient: a contact's name, a PayBox username, or an address"),
+    to: recipientInputSchema,
     from: senderInputSchema,
   }),
   output: structuredContentSchema("send_draft"),
@@ -66,7 +71,12 @@ async function routeDraft(
     resolveToken(deps, input.toChain, input.toToken),
     senderFor(deps, input.fromChain, input.from, tool),
   ]);
-  const recipient = input.to || familyOf(input.toChain) !== sender.family ? await senderFor(deps, input.toChain, input.to, tool) : sender;
+  // The recipient: whoever the person named (address, contact or PayBox username), else their own wallet there.
+  const recipient = input.to
+    ? await resolveRecipient(deps, input.to, input.toChain)
+    : familyOf(input.toChain) === sender.family
+      ? sender
+      : await senderFor(deps, input.toChain, undefined, tool);
   const view = await deps.intents.createDraft(kind, {
     fromChain: input.fromChain,
     toChain: input.toChain,
@@ -85,7 +95,8 @@ export const hakoDraftSwap = defineTool({
   title: "Draft a swap",
   description:
     "Drafts a same-chain swap through LI.FI (e.g. USDC → ETH on Base): shows the amount in, the amount out, the minimum " +
-    "received, the route, fee, time and a rehearsal line. The person swaps with PayBox from the card. Never swaps.",
+    "received, the route, fee, time and a rehearsal line. The person swaps with PayBox from the card. Never swaps." +
+    EXECUTABLE_NOTE,
   input: z.object({
     chain: chainInputSchema,
     fromToken: tokenInputSchema,
@@ -111,7 +122,8 @@ export const hakoDraftBridge = defineTool({
   description:
     "Drafts moving a token between chains through LI.FI (e.g. 1 USDC Base → Solana): shows both amounts, the minimum " +
     "received, the bridge, fee, time and a rehearsal line, and races LI.FI's routes so the person can pick one. The " +
-    "person bridges with PayBox from the card. Never bridges.",
+    "person bridges with PayBox from the card. Never bridges." +
+    EXECUTABLE_NOTE,
   input: z.object({
     fromChain: chainInputSchema,
     toChain: chainInputSchema,
@@ -119,7 +131,7 @@ export const hakoDraftBridge = defineTool({
     toToken: tokenInputSchema,
     amount: amountInputSchema.describe("Amount of fromToken, in token units"),
     from: senderInputSchema,
-    to: addressInputSchema.optional().describe("Recipient on the destination chain; the connected PayBox wallet when absent"),
+    to: recipientInputSchema.optional().describe("Recipient on the destination chain (contact, PayBox username or address); your PayBox wallet when absent"),
     tool: toolInput,
   }),
   output: structuredContentSchema("bridge_draft"),
@@ -159,7 +171,8 @@ export const hakoDraftEarnDeposit = defineTool({
   title: "Draft an Earn deposit",
   description:
     "Drafts depositing into a LI.FI Earn vault (from the yield card): amount, vault, expected shares, fee and a " +
-    "rehearsal line; an exact approve comes first when needed ('Step 1 of 2'). The person deposits from the card.",
+    "rehearsal line; an exact approve comes first when needed ('Step 1 of 2'). The person deposits from the card." +
+    EXECUTABLE_NOTE,
   input: earnInput,
   output: structuredContentSchema("earn_deposit_draft"),
   annotations: DRAFT,
@@ -177,7 +190,8 @@ export const hakoDraftEarnWithdraw = defineTool({
   title: "Draft an Earn withdraw",
   description:
     "Drafts withdrawing from a LI.FI Earn position: amount, vault, what comes back, fee and a rehearsal line. The " +
-    "person withdraws from the card. Never withdraws.",
+    "person withdraws from the card. Never withdraws." +
+    EXECUTABLE_NOTE,
   input: earnInput,
   output: structuredContentSchema("earn_withdraw_draft"),
   annotations: DRAFT,

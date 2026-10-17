@@ -1,4 +1,4 @@
-import { type EndpointResponse, GatewayError } from "@hako/cards/client";
+import { type EndpointResponse, endpointUrl, GatewayError } from "@hako/cards/client";
 import {
   DISCOVER_LIMIT_DEFAULT,
   DISCOVER_LIMIT_MAX,
@@ -9,6 +9,7 @@ import {
   structuredContentSchema,
   toolIdSchema,
 } from "@hako/cards/contract";
+import { HAKO_GATEWAY_URL } from "@hako/config";
 import { networkByCaip2 } from "@hako/networks";
 import type { DraftView } from "@hako/paybox";
 import { z } from "zod";
@@ -60,7 +61,7 @@ export const hakoInspect = defineTool({
   cardKinds: ["tool"],
   async execute({ id }, deps) {
     const doc = await deps.gateway.call("inspect", { body: { id } });
-    const paidUrl = doc.available ? deps.gateway.url("run", { params: { provider: doc.provider, slug: doc.slug } }) : null;
+    const paidUrl = doc.available ? paidRunUrl(deps, doc) : null;
     const howToPay = paidUrl
       ? `Paid per call: $${doc.price.usd} in USDC on Base (${doc.price.network}) from your PayBox wallet. hako_run makes a pay card; ` +
         `any PayBox agent can also call PayBox's use_service with url ${paidUrl}, method POST and the input as body.`
@@ -106,6 +107,13 @@ export const hakoRun = defineTool({
 type ToolDoc = EndpointResponse<"inspect">;
 
 /**
+ * The `/v2/run/<provider>/<slug>` URL PayBox's servers fetch and pay: always on the gateway's public origin, never on
+ * the address this process reaches the gateway by (a Coolify internal host is unreachable from PayBox).
+ */
+export const paidRunUrl = (deps: Pick<AgentDeps, "publicGatewayUrl">, doc: Pick<ToolDoc, "provider" | "slug">): string =>
+  endpointUrl(deps.publicGatewayUrl ?? HAKO_GATEWAY_URL, "run", { params: { provider: doc.provider, slug: doc.slug } });
+
+/**
  * A run draft's pay card: the tool from the catalog, the price frozen on the draft version (what PayBox will pay),
  * and the `/v2` URL PayBox pays. Used by hako_run and by hako_refresh when a stored pay card re-mounts.
  */
@@ -127,7 +135,7 @@ export function payCard(deps: AgentDeps, doc: ToolDoc, view: DraftView<"run">, l
         // The catalog's USD price, only while it still matches the price frozen on this version.
         usd: doc.price.atomic === priceAtomic ? doc.price.usd : null,
       },
-      paidUrl: deps.gateway.url("run", { params: { provider: doc.provider, slug: doc.slug } }),
+      paidUrl: paidRunUrl(deps, doc),
       method: "POST",
       input: view.input.input as Record<string, unknown>,
     },

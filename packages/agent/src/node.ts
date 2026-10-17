@@ -4,6 +4,7 @@ export * from "./registry.ts";
 export * from "./define.ts";
 export * from "./deps.ts";
 export * from "./errors.ts";
+export * from "./outcomes.ts";
 export * from "./tools/catalog.ts";
 export * from "./tools/reads.ts";
 export * from "./tools/drafts.ts";

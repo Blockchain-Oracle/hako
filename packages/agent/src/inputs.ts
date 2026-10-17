@@ -26,9 +26,13 @@ export const tokenInputSchema = z.string().min(1).describe("Token symbol (USDC, 
 
 export const amountInputSchema = decimalAmountSchema;
 
+/** Format and family are checked against the chain when the draft is made (`senderFor`, `resolveRecipient`). */
 export const addressInputSchema = z.string().min(1).describe("A wallet address (0x… or Solana base58)");
 
 /** Optional: the wallet that sends. Absent → the user's PayBox wallet for that chain (needs Connect PayBox). */
 export const senderInputSchema = addressInputSchema
   .optional()
-  .describe("Sending wallet address; leave out to use the connected PayBox wallet");
+  .describe("Sending wallet address, one of your PayBox wallets; leave out to use the connected PayBox wallet");
+
+/** Who receives: an address of the destination chain's family, a saved contact's name or a PayBox username. */
+export const recipientInputSchema = z.string().min(1).describe("Recipient: a contact's name, a PayBox username, or an address");

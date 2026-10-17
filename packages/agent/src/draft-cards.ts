@@ -1,19 +1,22 @@
 import {
+  type Blocked,
   type CardPhase,
   type DraftCardKind,
+  type DraftRef,
   intentStateToPhase,
   type RequestRef,
   type StructuredContent,
   type TokenRef,
 } from "@hako/cards/contract";
 import { sameAddress } from "@hako/money";
-import type { Caip2 } from "@hako/networks";
+import { BASE, type Caip2, isExecutableCaip2, networkByCaip2 } from "@hako/networks";
 import type { DraftKind, DraftView } from "@hako/paybox";
 
 import { card } from "./define.ts";
 import type { AgentDeps } from "./deps.ts";
-import { AgentToolError } from "./errors.ts";
+import { AgentToolError, authRequired } from "./errors.ts";
 import { familyOf, resolveToken } from "./resolve.ts";
+import { draftChains } from "./status-cards.ts";
 
 /**
  * A draft as its card shows it: the version from the store (never from the client), its tokens resolved for display,
@@ -57,10 +60,12 @@ export async function draftCard(view: DraftView, deps: AgentDeps, live: DraftLiv
     createdAt: view.createdAt,
     updatedAt: view.updatedAt,
   };
+  const blocked = executableBlock(view);
   const envelope = {
     phase: live.phase ?? intentStateToPhase(view.state),
     intent: { id: view.id, version: view.version, state: view.state },
     ...(live.request ? { request: live.request } : {}),
+    ...(blocked ? { blocked } : {}),
   };
   if (isKind(view, "send")) {
     const { chain, token, amountAtomic, from, to, toLabel } = view.input;
@@ -103,9 +108,45 @@ export async function draftCard(view: DraftView, deps: AgentDeps, live: DraftLiv
   throw new AgentToolError("unsupported", `A ${view.kind} draft is shown on its own card (pay card or invoice), not a move card.`);
 }
 
-/** The latest version of a draft from the store, or a not-found error. */
-export async function loadDraft(deps: AgentDeps, draftId: string): Promise<DraftView> {
-  const view = await deps.drafts.getDraft(draftId);
-  if (!view) throw new AgentToolError("not_found", `No draft ${draftId}: it may have expired. Ask for a fresh quote.`);
-  return view;
+/**
+ * R17 (`@hako/networks` executable list): only a source chain Hako executes on gets the action button. A draft from
+ * any other chain is read-only, with the reason in words and one fix: the same draft from Base.
+ */
+export function executableBlock(view: DraftView): Blocked | undefined {
+  const { source } = draftChains(view);
+  if (isExecutableCaip2(source)) return undefined;
+  const edit = view.kind === "bridge" ? { fromChain: BASE.key } : { chain: BASE.key };
+  return {
+    reason: `Hako can't move money from ${networkByCaip2(source)?.name ?? source} yet`,
+    fix: "change_network",
+    action: { type: "tool", label: `Switch to ${BASE.name}`, tool: "hako_draft_update", input: { draftId: view.id, version: view.version, edit } },
+  };
+}
+
+/**
+ * The latest version of one of the caller's drafts, or a not-found error. A draft a signed-in user owns is refused to
+ * an anonymous caller (sign in first) and hidden from every other user.
+ */
+export async function loadDraft(deps: AgentDeps, draftId: string, tool: string): Promise<DraftView> {
+  const owned = await deps.drafts.getDraft(draftId);
+  const notFound = new AgentToolError("not_found", `No draft ${draftId}: it may have expired. Ask for a fresh quote.`);
+  if (!owned) throw notFound;
+  if (owned.ownerUserId !== null) {
+    if (!deps.user) throw authRequired(tool);
+    if (deps.user.id !== owned.ownerUserId) throw notFound;
+  }
+  return owned.view;
+}
+
+/**
+ * The draft at the version its card shows. A card behind the store (another edit landed first, or the card was
+ * re-mounted from an old message) is refused with `stale_version`, carrying the latest card to draw instead.
+ */
+export async function loadDraftVersion(deps: AgentDeps, ref: DraftRef, tool: string): Promise<DraftView> {
+  const view = await loadDraft(deps, ref.draftId, tool);
+  if (view.version === ref.version) return view;
+  const latest = isMoveDraft(view.kind) ? await draftCard(view, deps) : null;
+  throw new AgentToolError("stale_version", `This card is out of date: the draft is at version ${view.version} now. Make the change on the latest card.`, {
+    card: latest,
+  });
 }

@@ -1,56 +1,57 @@
-import {
-  type CardPhase,
-  draftRefSchema,
-  type ReceiptData,
-  SIGNED_TX_MAX_CHARS,
-  structuredContentSchema,
-  type Suggestion,
-  txHashSchema,
-} from "@hako/cards/contract";
+import { draftRefSchema, OUTCOME_CARD_KINDS, SIGNED_TX_MAX_CHARS, structuredContentSchema, structuredContentUnion, txHashSchema } from "@hako/cards/contract";
+import { BASE } from "@hako/networks";
 import { z } from "zod";
 
-import { APP_ONLY, card, chip, defineTool, MODEL_AND_APP, MONEY, READ } from "../define.ts";
-import { loadDraft } from "../draft-cards.ts";
+import { APP_ONLY, defineTool, MODEL_AND_APP, MONEY, READ } from "../define.ts";
+import { executableBlock, loadDraft, loadDraftVersion } from "../draft-cards.ts";
+import { AgentToolError } from "../errors.ts";
 import { chainInputSchema } from "../inputs.ts";
-import { requireUser, txLink } from "../resolve.ts";
-import { statusCard, txLinks } from "../status-cards.ts";
+import { failureCard, outcomeCard, receiptCard, runOfStatus } from "../outcomes.ts";
+import { requireAccount, requireUser, txLink } from "../resolve.ts";
+import { statusCard } from "../status-cards.ts";
 
 /**
  * Execution and its outcome (plan §1 execution rules): `hako_execute` creates the one PayBox request for a draft
  * version (a repeat returns the stored one), `hako_request_status` re-reads it, `hako_broadcast` hands a signed tx from
  * the user's own PayBox connector to Hako's broadcast checks, and `hako_receipt` records a transaction checked on chain.
+ * The first three answer with the outcome cards: the live status, the paid result with its receipt line, the receipt,
+ * or the failure that says whether money moved.
  */
+
+const outcomeOutput = structuredContentUnion(OUTCOME_CARD_KINDS);
 
 export const hakoExecute = defineTool({
   name: "hako_execute",
   title: "Pay or move with PayBox",
   description:
     "Runs one draft version with PayBox: pays a pay card or sends, swaps, bridges, deposits or withdraws exactly what " +
-    "that version of the card shows. PayBox asks the person to approve; the card follows the request to its receipt. " +
-    "Call it only for the draft id and version the person confirmed; calling it again returns the same request.",
+    "that version of the card shows. PayBox asks the person to approve; the card follows the request to its result or " +
+    "receipt. Call it only for the draft id and version the person confirmed; calling it again returns the same request.",
   input: draftRefSchema,
-  output: structuredContentSchema("status"),
+  output: outcomeOutput,
   annotations: MONEY,
   visibility: MODEL_AND_APP,
   auth: "required",
-  cardKinds: ["status"],
-  async execute({ draftId, version }, deps) {
-    const user = requireUser(deps, "hako_execute");
-    const result = await deps.intents.executeDraft(draftId, version, user.id);
-    const view = await loadDraft(deps, draftId);
-    return statusCard(deps, {
-      phase: result.phase,
-      draftId: result.draftId,
+  cardKinds: OUTCOME_CARD_KINDS,
+  async execute(ref, deps) {
+    const tool = "hako_execute";
+    const user = requireUser(deps, tool);
+    requireAccount(deps, tool);
+    const view = await loadDraftVersion(deps, ref, tool);
+    const blocked = executableBlock(view);
+    if (blocked) throw new AgentToolError("unsupported", `${blocked.reason}: switch the draft to ${BASE.name} first.`, "change_network");
+    const result = await deps.intents.executeDraft(ref.draftId, ref.version, user.id);
+    const after = await loadDraft(deps, ref.draftId, tool);
+    return outcomeCard(deps, after, {
       version: result.version,
-      kind: view.kind,
-      state: view.version === result.version ? view.state : null,
+      phase: result.phase,
+      state: after.version === result.version ? after.state : null,
       requestId: result.requestId,
       requestStatus: result.status,
       approvalUrl: result.approvalUrl,
       txs: [],
       reason: null,
       reused: result.reused,
-      receiptId: null,
     });
   },
 });
@@ -60,28 +61,16 @@ export const hakoRequestStatus = defineTool({
   title: "Follow a payment or move",
   description: "App-only: re-reads a draft's PayBox request and transactions (never re-sends anything).",
   input: z.object({ draftId: z.string().min(1) }),
-  output: structuredContentSchema("status"),
+  output: outcomeOutput,
   annotations: READ,
   visibility: APP_ONLY,
   auth: "required",
-  cardKinds: ["status"],
+  cardKinds: OUTCOME_CARD_KINDS,
   async execute({ draftId }, deps) {
-    requireUser(deps, "hako_request_status");
-    const [status, view] = await Promise.all([deps.intents.readStatus(draftId), loadDraft(deps, draftId)]);
-    return statusCard(deps, {
-      phase: status.phase,
-      draftId: status.draftId,
-      version: status.version,
-      kind: view.kind,
-      state: status.state,
-      requestId: status.requestId,
-      requestStatus: status.requestStatus,
-      approvalUrl: status.approvalUrl,
-      txs: txLinks(view, status.txHashes),
-      reason: status.reason,
-      reused: false,
-      receiptId: null,
-    });
+    const tool = "hako_request_status";
+    requireAccount(deps, tool);
+    const view = await loadDraft(deps, draftId, tool);
+    return outcomeCard(deps, view, runOfStatus(view, await deps.intents.readStatus(draftId)));
   },
 });
 
@@ -97,20 +86,19 @@ export const hakoBroadcast = defineTool({
     chain: chainInputSchema,
     signedTx: z.string().min(1).max(SIGNED_TX_MAX_CHARS).describe("The signed transaction exactly as PayBox returned it"),
   }),
-  output: structuredContentSchema("status"),
+  output: outcomeOutput,
   annotations: MONEY,
   visibility: MODEL_AND_APP,
   auth: "required",
-  cardKinds: ["status"],
+  cardKinds: OUTCOME_CARD_KINDS,
   async execute(input, deps) {
-    requireUser(deps, "hako_broadcast");
-    const [sent, view] = await Promise.all([deps.gateway.call("broadcast", { body: input }), loadDraft(deps, input.draftId)]);
-    const phase: CardPhase = sent.status === "refused" ? "error" : "live";
-    return statusCard(deps, {
-      phase,
-      draftId: input.draftId,
+    const tool = "hako_broadcast";
+    requireAccount(deps, tool);
+    const view = await loadDraft(deps, input.draftId, tool);
+    const sent = await deps.gateway.call("broadcast", { body: input });
+    const run = {
       version: input.version,
-      kind: view.kind,
+      phase: sent.status === "refused" ? ("error" as const) : ("live" as const),
       state: view.version === input.version ? view.state : null,
       requestId: null,
       requestStatus: null,
@@ -118,23 +106,14 @@ export const hakoBroadcast = defineTool({
       txs: sent.txHash ? [txLink(input.chain, sent.txHash, "source")] : [],
       reason: sent.reason,
       reused: sent.status === "already_known",
-      receiptId: null,
-    });
+    };
+    if (sent.status === "refused") {
+      // A refused tx was never sent: the route says whether money moved (it never does for a refusal).
+      return failureCard(deps, view, run, { title: "Signed but not sent", moneyMoved: sent.moneyMoved });
+    }
+    return statusCard(deps, { ...run, draftId: view.id, kind: view.kind, receiptId: null, stage: "sent" });
   },
 });
-
-const PHASE_BY_RECEIPT: Record<ReceiptData["status"], CardPhase> = { confirmed: "result", reverted: "error", pending: "live" };
-
-/** The card flow's next steps after a move (plan §1 step 5): bridge the rest, earn on it, check balance. */
-function nextSteps(receipt: ReceiptData): Suggestion[] {
-  if (receipt.status !== "confirmed" || receipt.kind === "run" || receipt.kind === "batch") return [];
-  const symbol = receipt.received?.token.symbol ?? receipt.sent?.token.symbol ?? "it";
-  return [
-    chip("Check balance", "What's in my PayBox wallet now?"),
-    chip("Earn on it", `Where can my ${symbol} earn the most?`),
-    chip("Show activity", "Show my recent Hako activity"),
-  ];
-}
 
 export const hakoReceipt = defineTool({
   name: "hako_receipt",
@@ -157,9 +136,9 @@ export const hakoReceipt = defineTool({
   async execute({ chain, txHash, draftId, version }, deps) {
     requireUser(deps, "hako_receipt");
     const draft = draftId && version ? { draftId, version } : undefined;
+    // A receipt is linked only to a draft the caller may see.
+    if (draft) await loadDraft(deps, draft.draftId, "hako_receipt");
     const receipt = await deps.gateway.call("receiptCreate", { body: { chain, txHash, ...(draft ? { draft } : {}) } });
-    return card("receipt", receipt, { phase: PHASE_BY_RECEIPT[receipt.status], suggestions: nextSteps(receipt) }, deps);
+    return receiptCard(deps, receipt);
   },
 });
-
-export { nextSteps as receiptNextSteps, PHASE_BY_RECEIPT };
