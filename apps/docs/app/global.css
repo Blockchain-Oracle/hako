@@ -3,64 +3,40 @@
 @import "fumadocs-ui/css/preset.css";
 @import "@hako/brand/paint.css";
 @source "../node_modules/fumadocs-ui/dist";
+/* The brand's mark and lockup carry their own classes. */
+@source "../../../packages/brand/src";
 
 /*
- * Stock Fumadocs layout on Hako's paint (Monid's palette). Dark first: near-black page, #1e1e1e panels, white and
- * grey text, the accent's readable tint for links and the active page. Light keeps Monid's own accent (#0016d7).
- * Every colour is a paint token; the two dark-only values below (hover surface, rule) have no light counterpart.
+ * Stock Fumadocs layout on Hako's tokens (@hako/brand, Kawase's Senryo): light by default with dark as an adaptation.
+ * The fd-* roles point at the brand's variables, which `.dark` redefines, so one mapping serves both themes. Fumadocs
+ * reads `accent` as its hover surface (shadcn's sense), so that role takes Senryo's quiet secondary plate; Hako's
+ * accent stays the focus ring, and links use `link`.
  */
-:root {
-  --docs-dark-hover: #262626;
-  --docs-dark-line: #2b2b2b;
-
-  --color-fd-background: var(--ak-bg);
-  --color-fd-foreground: var(--ak-ink);
-  --color-fd-muted: var(--ak-bg-muted);
-  --color-fd-muted-foreground: var(--ak-muted);
-  --color-fd-card: var(--ak-bg-subtle);
-  --color-fd-card-foreground: var(--ak-ink);
-  --color-fd-popover: var(--ak-bg);
-  --color-fd-popover-foreground: var(--ak-ink);
-  --color-fd-border: var(--ak-line);
-  --color-fd-primary: var(--ak-accent);
-  --color-fd-primary-foreground: #ffffff;
-  --color-fd-secondary: var(--ak-bg-muted);
-  --color-fd-secondary-foreground: var(--ak-ink);
-  --color-fd-accent: var(--ak-bg-muted);
-  --color-fd-accent-foreground: var(--ak-ink);
-  --color-fd-ring: var(--ak-accent);
-}
-
+:root,
 .dark {
-  color-scheme: dark;
-  /* the seal's check stroke reads var(--primary) */
-  --primary: var(--ak-accent-on-dark);
-  --background: var(--ak-dark);
-  --foreground: var(--ak-bg-subtle);
-
-  --color-fd-background: var(--ak-dark);
-  --color-fd-foreground: var(--ak-bg-subtle);
-  --color-fd-muted: var(--ak-dark-2);
-  --color-fd-muted-foreground: var(--ak-on-dark-muted);
-  --color-fd-card: var(--ak-dark-2);
-  --color-fd-card-foreground: var(--ak-bg-subtle);
-  --color-fd-popover: var(--ak-dark-2);
-  --color-fd-popover-foreground: var(--ak-bg-subtle);
-  --color-fd-border: var(--docs-dark-line);
-  --color-fd-primary: var(--ak-accent-on-dark);
-  --color-fd-primary-foreground: var(--ak-dark);
-  --color-fd-secondary: var(--ak-dark-2);
-  --color-fd-secondary-foreground: var(--ak-bg-subtle);
-  --color-fd-accent: var(--docs-dark-hover);
-  --color-fd-accent-foreground: var(--ak-bg-subtle);
-  --color-fd-ring: var(--ak-accent-on-dark);
+  --color-fd-background: var(--background);
+  --color-fd-foreground: var(--foreground);
+  --color-fd-muted: var(--muted);
+  --color-fd-muted-foreground: var(--muted-foreground);
+  --color-fd-card: var(--card);
+  --color-fd-card-foreground: var(--card-foreground);
+  --color-fd-popover: var(--popover);
+  --color-fd-popover-foreground: var(--popover-foreground);
+  --color-fd-border: var(--border);
+  --color-fd-primary: var(--link);
+  --color-fd-primary-foreground: var(--background);
+  --color-fd-secondary: var(--secondary);
+  --color-fd-secondary-foreground: var(--secondary-foreground);
+  --color-fd-accent: var(--row-pressed);
+  --color-fd-accent-foreground: var(--foreground);
+  --color-fd-ring: var(--ring);
 }
 
-/* neutral.css tints the dark sidebar with its own greys; keep it on the paint */
-.dark #nd-sidebar {
-  --color-fd-muted: var(--ak-dark-2);
-  --color-fd-secondary: var(--ak-dark-2);
-  --color-fd-muted-foreground: var(--ak-on-dark-muted);
+/* neutral.css tints the sidebar with its own greys; keep it on the tokens. */
+#nd-sidebar {
+  --color-fd-muted: var(--muted);
+  --color-fd-secondary: var(--secondary);
+  --color-fd-muted-foreground: var(--muted-foreground);
 }
 
 body {
@@ -68,20 +44,17 @@ body {
   color: var(--color-fd-foreground);
 }
 
-/* Prose: Outfit 600 headings, accent links, mono data. */
+/* Prose: Roboto Condensed Black headings, link-coloured links, system mono for code. */
 .prose {
   --tw-prose-links: var(--color-fd-primary);
 }
 .prose :is(h1, h2, h3, h4) {
-  font-family: var(--font-display);
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  @apply font-display font-black tracking-[-0.02em];
   text-wrap: balance;
 }
 .prose :not(pre) > code {
-  font-family: var(--font-mono);
+  @apply font-mono rounded-step-xs;
   font-size: 0.85em;
-  border-radius: var(--radius-sm);
 }
 .prose table {
   font-size: 0.875rem;

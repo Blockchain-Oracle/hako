@@ -19,7 +19,7 @@ function dom<T extends object>(props: WithNode<T>): T {
 }
 
 /**
- * Element overrides in Monid paint. They also keep the look independent of Streamdown's own utility classes,
+ * Element overrides on the Senryo tokens. They also keep the look independent of Streamdown's own utility classes,
  * and keep provider markdown inert: links open in a new tab through the http(s)-only ExtLink, images are dropped
  * (a scraped page's images are tracking pixels as often as content), raw HTML is skipped.
  */
@@ -36,20 +36,20 @@ const COMPONENTS: Components = {
   ul: (props) => <ul {...dom(props)} className="my-2 list-disc space-y-1 pl-5" />,
   ol: (props) => <ol {...dom(props)} className="my-2 list-decimal space-y-1 pl-5" />,
   li: (props) => <li {...dom(props)} className="leading-relaxed" />,
-  blockquote: (props) => <blockquote {...dom(props)} className="my-3 border-l-2 border-line-default pl-3 text-muted-foreground" />,
-  hr: () => <hr className="my-4 border-line" />,
+  blockquote: (props) => <blockquote {...dom(props)} className="my-3 border-l-2 border-border pl-3 text-muted-foreground" />,
+  hr: () => <hr className="my-4 border-border" />,
   strong: (props) => <strong {...dom(props)} className="font-semibold text-foreground" />,
   table: (props) => (
-    <div className="my-3 overflow-x-auto rounded-sm border border-line">
+    <div className="my-3 overflow-x-auto rounded-sm border border-border">
       <table {...dom(props)} className="w-full border-collapse text-left text-xs" />
     </div>
   ),
-  th: (props) => <th {...dom(props)} className="border-b border-line bg-subtle px-2.5 py-1.5 font-medium text-foreground" />,
-  td: (props) => <td {...dom(props)} className="border-b border-line px-2.5 py-1.5 align-top" />,
+  th: (props) => <th {...dom(props)} className="border-b border-border bg-card px-2.5 py-1.5 font-medium text-foreground" />,
+  td: (props) => <td {...dom(props)} className="border-b border-border px-2.5 py-1.5 align-top" />,
   code: (props: WithNode<ComponentProps<"code">>) => {
     if ("data-block" in props) {
       return (
-        <pre className="my-3 overflow-x-auto rounded-sm border border-line bg-subtle p-3 font-mono text-xs leading-relaxed text-ink-2">
+        <pre className="my-3 overflow-x-auto rounded-sm border border-border bg-card p-3 font-mono text-xs leading-relaxed text-muted-foreground">
           <code>{props.children}</code>
         </pre>
       );
@@ -82,7 +82,7 @@ export function Markdown({ children, clampChars, className }: { children: string
   const long = clampChars !== undefined && children.length > clampChars;
   const text = long && !open ? cutText(children, clampChars, CLAMP_BREAK_MIN_SHARE) : children;
   return (
-    <div className={cn("text-[0.875rem] break-words text-ink-2", className)}>
+    <div className={cn("text-[0.875rem] break-words text-muted-foreground", className)}>
       <div className="relative">
         <Render text={text} />
         {long && !open && <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-linear-to-t from-background" />}
@@ -92,7 +92,7 @@ export function Markdown({ children, clampChars, className }: { children: string
           type="button"
           onClick={() => setOpen((o) => !o)}
           aria-expanded={open}
-          className="mt-1 text-[0.8125rem] font-medium text-brand underline-offset-4 hover:underline"
+          className="mt-1 text-[0.8125rem] font-medium text-link underline-offset-4 hover:underline"
         >
           {open ? "Show less" : "Show more"}
         </button>

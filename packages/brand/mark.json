@@ -1,0 +1,13 @@
+{
+  "_note": "The Hako mark: 箱 (hako, box) drawn as an open box. The body carries 目's two bars (the right half of 箱), the two lid flaps open outward like the ⺮ strokes on top. Drawn on a 32-unit grid with every edge of the body and bars on an even unit, so it stays crisp at 16 px. The body takes the ink (currentColor in React), the lid takes the accent. scripts/build.mjs turns this file into the SVG assets and generated/mark.ts.",
+  "viewBox": "0 0 32 32",
+  "size": 32,
+  "body": "M4 12h24v13a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3Z",
+  "bars": ["M8 16h16v2H8Z", "M8 22h16v2H8Z"],
+  "lid": ["M4 12h11l-3-8H1Z", "M17 12h11l3-8H20Z"],
+  "appIcon": {
+    "_note": "The app icon and touch icon: the mark in paper and accent on an ink tile, at 60% of the tile.",
+    "radius": 7,
+    "scale": 0.6
+  }
+}

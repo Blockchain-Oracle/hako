@@ -56,12 +56,12 @@ function PageText({ content }: { content: string }) {
         type="button"
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
-        className="text-[0.8125rem] font-medium text-brand underline-offset-4 hover:underline"
+        className="text-[0.8125rem] font-medium text-link underline-offset-4 hover:underline"
       >
         {open ? "Hide page text" : "Read page text"}
       </button>
       {open && (
-        <div className="mt-2 rounded-sm border border-line bg-subtle px-3 py-1">
+        <div className="mt-2 rounded-sm border border-border bg-card px-3 py-1">
           <Markdown clampChars={CONTENT_CLAMP_CHARS}>{content}</Markdown>
         </div>
       )}
@@ -88,16 +88,16 @@ function Result({ item }: { item: Rec }) {
         {(str(item.published) || str(item.pushed_at)) && <TimeAgo value={item.published ?? item.pushed_at} />}
       </Meta>
       <h4 className="mt-0.5 text-[0.9375rem] leading-snug font-medium">
-        <ExtLink href={url} className="text-foreground hover:text-brand">
+        <ExtLink href={url} className="text-foreground hover:text-link">
           {title}
         </ExtLink>
       </h4>
-      {snippet && <ClampText text={snippet} chars={SNIPPET_CLAMP_CHARS} className="mt-1 text-[0.8125rem] leading-relaxed text-ink-2" />}
+      {snippet && <ClampText text={snippet} chars={SNIPPET_CLAMP_CHARS} className="mt-1 text-[0.8125rem] leading-relaxed text-muted-foreground" />}
       <div className="mt-1">
         <Stats item={item} />
       </div>
       {passages.length > 0 && (
-        <ul className="mt-2 space-y-1.5 border-l-2 border-line pl-3">
+        <ul className="mt-2 space-y-1.5 border-l-2 border-border pl-3">
           {passages.slice(0, PASSAGES_PREVIEW).map((passage, i) => (
             <li key={i}>
               <ClampText text={passage} chars={SNIPPET_CLAMP_CHARS} className="text-[0.8125rem] text-muted-foreground" />
@@ -128,7 +128,7 @@ function ImageGrid({ items }: { items: Rec[] }) {
                   className="aspect-square h-auto w-full"
                 />
               </ExtLink>
-              <p className="mt-1 truncate text-xs text-ink-2">{pickStr(item, "title")}</p>
+              <p className="mt-1 truncate text-xs text-muted-foreground">{pickStr(item, "title")}</p>
               <p className="truncate text-[0.6875rem] text-muted-foreground">{pickStr(item, "source") ?? hostOf(page)}</p>
             </li>
           );
@@ -143,10 +143,10 @@ function AnswerBox({ box }: { box: Rec }) {
   const answer = pickStr(box, "answer", "snippet");
   if (!answer) return null;
   return (
-    <div className="mb-4 rounded-sm bg-subtle px-3 py-2.5">
+    <div className="mb-4 rounded-sm bg-card px-3 py-2.5">
       <Label>Answer box</Label>
       <p className="mt-1 text-[0.9375rem] font-medium text-foreground">{answer}</p>
-      {str(box.answer) && str(box.snippet) && <p className="mt-1 text-[0.8125rem] text-ink-2">{str(box.snippet)}</p>}
+      {str(box.answer) && str(box.snippet) && <p className="mt-1 text-[0.8125rem] text-muted-foreground">{str(box.snippet)}</p>}
       {(str(box.title) || str(box.url)) && (
         <ExtLink href={box.url ?? box.link} className="mt-1 inline-block text-xs">
           {pickStr(box, "title") ?? hostOf(box.url)}
@@ -161,10 +161,10 @@ function KnowledgePanel({ panel }: { panel: Rec }) {
   if (!title) return null;
   const attributes = inlineEntries(rec(panel.attributes));
   return (
-    <div className="mb-4 rounded-sm border border-line px-3 py-2.5">
+    <div className="mb-4 rounded-sm border border-border px-3 py-2.5">
       <p className="font-display text-base font-semibold tracking-[-0.02em]">{title}</p>
       {str(panel.type) && <p className="text-xs text-muted-foreground">{str(panel.type)}</p>}
-      {str(panel.description) && <p className="mt-1.5 text-[0.8125rem] leading-relaxed text-ink-2">{str(panel.description)}</p>}
+      {str(panel.description) && <p className="mt-1.5 text-[0.8125rem] leading-relaxed text-muted-foreground">{str(panel.description)}</p>}
       {attributes.length > 0 && (
         <KeyValues className="mt-2" rows={attributes.map(([key, value]) => [key, <ScalarValue key={key} name={key} value={value} />])} />
       )}
@@ -183,7 +183,7 @@ function PeopleAlsoAsk({ items }: { items: Rec[] }) {
         {items.slice(0, LIST_PREVIEW).map((item, index) => (
           <li key={rowKey(item, index, "question")}>
             <p className="text-[0.8125rem] font-medium text-foreground">{str(item.question)}</p>
-            {str(item.snippet) && <ClampText text={str(item.snippet) ?? ""} chars={SNIPPET_CLAMP_CHARS} className="text-xs text-ink-2" />}
+            {str(item.snippet) && <ClampText text={str(item.snippet) ?? ""} chars={SNIPPET_CLAMP_CHARS} className="text-xs text-muted-foreground" />}
             {safeHref(item.url) && <ExtLink href={item.url} className="text-xs">{hostOf(item.url)}</ExtLink>}
           </li>
         ))}
@@ -223,7 +223,7 @@ export function SearchResultsCard({ data }: { data: Rec }) {
         <ImageGrid items={items} />
       ) : (
         <>
-          <ol className="divide-y divide-line">
+          <ol className="divide-y divide-border">
             {shown.map((item, index) => (
               <Result key={rowKey(item, index)} item={item} />
             ))}
@@ -236,7 +236,7 @@ export function SearchResultsCard({ data }: { data: Rec }) {
         <Section label="Related searches">
           <ul className="flex flex-wrap gap-1.5">
             {related.map((term) => (
-              <li key={term} className="rounded-full border border-line px-2.5 py-0.5 text-xs text-ink-2">
+              <li key={term} className="rounded-full border border-border px-2.5 py-0.5 text-xs text-muted-foreground">
                 {term}
               </li>
             ))}

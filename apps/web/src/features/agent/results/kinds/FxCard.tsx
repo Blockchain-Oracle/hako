@@ -54,7 +54,7 @@ function Fixings({ providers }: { providers: Rec[] }) {
       {providers.map((p, i) => (
         <li key={rowKey(p, i, "provider")} className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-xs">
           <span className="font-medium text-foreground">{pickStr(p, "name", "provider") ?? "Publisher"}</span>
-          {num(p.rate) !== null && <span className="font-mono text-ink-2">{formatRate(num(p.rate) ?? 0)}</span>}
+          {num(p.rate) !== null && <span className="font-mono text-muted-foreground">{formatRate(num(p.rate) ?? 0)}</span>}
           <Meta className="text-[0.6875rem]">
             {str(p.date) && formatAbsolute(p.date)}
             {str(p.rate_type)}
@@ -74,17 +74,17 @@ function RateRow({ rate, showConverted, showSources }: { rate: Rate; showConvert
   const inverse = rate.rate !== 0 ? `1 ${rate.quote} = ${formatRate(1 / rate.rate)} ${rate.base ?? ""}` : undefined;
   return (
     <Fragment>
-      <tr className="border-b border-line last:border-0">
+      <tr className="border-b border-border last:border-0">
         <td className="px-2.5 py-1.5 font-mono font-semibold text-foreground">{rate.quote}</td>
         <td className="px-2.5 py-1.5 text-right font-mono tabular-nums text-foreground" title={inverse}>
           {formatRate(rate.rate)}
         </td>
         {showConverted && (
-          <td className="px-2.5 py-1.5 text-right font-mono whitespace-nowrap tabular-nums text-ink-2">
+          <td className="px-2.5 py-1.5 text-right font-mono whitespace-nowrap tabular-nums text-muted-foreground">
             {rate.converted !== null ? formatAmount(rate.converted, rate.quote) : "—"}
           </td>
         )}
-        <td className="px-2.5 py-1.5 whitespace-nowrap text-ink-2">{rate.date ? formatAbsolute(rate.date) : "—"}</td>
+        <td className="px-2.5 py-1.5 whitespace-nowrap text-muted-foreground">{rate.date ? formatAbsolute(rate.date) : "—"}</td>
         {showSources && (
           <td className="px-2.5 py-1.5 text-right">
             <span className="inline-flex items-center gap-1.5">
@@ -96,7 +96,7 @@ function RateRow({ rate, showConverted, showSources }: { rate: Rate; showConvert
                   onClick={() => setOpen((o) => !o)}
                   aria-expanded={open}
                   aria-label={`${open ? "Hide" : "Show"} each publisher's ${rate.quote} fixing`}
-                  className="inline-flex items-center gap-0.5 text-xs text-brand hover:underline"
+                  className="inline-flex items-center gap-0.5 text-xs text-link hover:underline"
                 >
                   {rate.providers.length}
                   <ChevronDown className={cn("size-3 transition-transform", open && "rotate-180")} aria-hidden />
@@ -107,7 +107,7 @@ function RateRow({ rate, showConverted, showSources }: { rate: Rate; showConvert
         )}
       </tr>
       {open && (
-        <tr className="border-b border-line bg-subtle">
+        <tr className="border-b border-border bg-card">
           <td colSpan={TABLE_COLUMNS + (showConverted ? 1 : 0)} className="px-2.5 py-1.5">
             <Fixings providers={rate.providers} />
           </td>
@@ -155,10 +155,10 @@ export function FxCard({ data }: { data: Rec }) {
         </p>
       )}
       {(!single || single.providers.length > 0 || str(single.provenance.agreement)) && (
-        <div className="overflow-x-auto rounded-sm border border-line">
+        <div className="overflow-x-auto rounded-sm border border-border">
           <table className="w-full border-collapse text-left text-[0.8125rem]">
             <thead>
-              <tr className="border-b border-line bg-subtle font-mono text-[0.625rem] tracking-[0.1em] whitespace-nowrap text-muted-foreground uppercase">
+              <tr className="border-b border-border bg-card font-mono text-[0.625rem] tracking-[0.1em] whitespace-nowrap text-muted-foreground uppercase">
                 <th scope="col" className="px-2.5 py-1.5 font-normal">{base ? `${base} →` : "Quote"}</th>
                 <th scope="col" className="px-2.5 py-1.5 text-right font-normal">Rate</th>
                 {showConverted && <th scope="col" className="px-2.5 py-1.5 text-right font-normal">Converted</th>}

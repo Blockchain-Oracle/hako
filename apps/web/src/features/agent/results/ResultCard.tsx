@@ -49,7 +49,7 @@ const KINDS: Record<string, ComponentType<{ data: Rec }>> = {
 const SOURCE_OK = "ok";
 
 function Shell({ children }: { children: ReactNode }) {
-  return <article className="w-full min-w-0 rounded-md border border-line bg-background p-4 shadow-card sm:p-5">{children}</article>;
+  return <article className="w-full min-w-0 rounded-md border border-border bg-background p-4 sm:p-5">{children}</article>;
 }
 
 function Header({ env }: { env: Envelope }) {
@@ -79,11 +79,11 @@ function Source({ source }: { source: SourceRef }) {
   return (
     <li className="inline-flex items-baseline gap-1" title={title}>
       {host ? (
-        <ExtLink href={source.url} className={ok ? "text-ink-2 hover:text-brand" : "text-muted-foreground"}>
+        <ExtLink href={source.url} className={ok ? "text-foreground hover:text-link" : "text-muted-foreground"}>
           {source.name}
         </ExtLink>
       ) : (
-        <span className={ok ? "text-ink-2" : "text-muted-foreground"}>{source.name}</span>
+        <span className={ok ? "text-foreground" : "text-muted-foreground"}>{source.name}</span>
       )}
       {host && <span className="text-muted-foreground">{host}</span>}
       {!ok && source.status && <span className="text-muted-foreground italic">({humanize(source.status).toLowerCase()})</span>}
@@ -95,7 +95,7 @@ function Footer({ env }: { env: Envelope }) {
   const { shown, expanded, toggle, total } = usePreview(env.sources, SOURCES_PREVIEW);
   if (env.sources.length === 0 && env.notes.length === 0) return null;
   return (
-    <footer className="mt-4 space-y-2 border-t border-line pt-3">
+    <footer className="mt-4 space-y-2 border-t border-border pt-3">
       {env.sources.length > 0 && (
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
           <Label className="text-[0.625rem]">Sources</Label>
@@ -127,7 +127,7 @@ function NotFound({ env }: { env: Envelope }) {
       </span>
       <div className="min-w-0">
         <p className="text-[0.9375rem] font-medium text-foreground">Nothing found</p>
-        <p className="mt-0.5 text-[0.875rem] break-words text-ink-2">{message ?? "The provider had no match for this request."}</p>
+        <p className="mt-0.5 text-[0.875rem] break-words text-muted-foreground">{message ?? "The provider had no match for this request."}</p>
         {env.billable === false && <p className="mt-1.5 text-xs text-muted-foreground">Not charged — a lookup that finds nothing settles at zero.</p>}
       </div>
     </div>

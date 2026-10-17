@@ -27,13 +27,13 @@ export function PayCard({ input, proposal }: { input: Record<string, unknown>; p
   ];
 
   return (
-    <div className="w-full max-w-[520px] overflow-hidden rounded-md border border-line bg-background shadow-card">
-      <div className="flex items-center justify-between border-b border-line bg-subtle px-4 py-2.5">
+    <div className="w-full max-w-[520px] overflow-hidden rounded-md border border-border bg-background">
+      <div className="flex items-center justify-between border-b border-border bg-card px-4 py-2.5">
         <span className="font-mono text-[0.6875rem] tracking-[0.12em] text-muted-foreground uppercase">
           Payment required · x402
         </span>
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-line bg-background px-2 py-0.5 font-mono text-[0.6875rem] text-ink-2">
-          <span className="size-1.5 rounded-full bg-brand" aria-hidden /> {PAYMENT_NETWORK.label}
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-2 py-0.5 font-mono text-[0.6875rem] text-muted-foreground">
+          <span className="size-1.5 rounded-full bg-primary" aria-hidden /> {PAYMENT_NETWORK.label}
         </span>
       </div>
       <div className="space-y-4 p-4">
@@ -50,26 +50,26 @@ export function PayCard({ input, proposal }: { input: Record<string, unknown>; p
             <span className="font-mono text-[0.6875rem] text-muted-foreground">USDC per call</span>
           </p>
         </div>
-        <pre className="max-h-40 overflow-auto rounded-sm bg-subtle p-3 font-mono text-[0.75rem] text-ink-2">
+        <pre className="max-h-40 overflow-auto rounded-sm bg-card p-3 font-mono text-[0.75rem] text-muted-foreground">
           {JSON.stringify(input.input ?? {}, null, 2)}
         </pre>
         <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 font-mono text-[0.75rem]">
           {rows.map(([label, value]) => (
             <div key={label} className="contents">
               <dt className="text-muted-foreground">{label}</dt>
-              <dd className="text-ink-2">{value}</dd>
+              <dd className="text-muted-foreground">{value}</dd>
             </div>
           ))}
         </dl>
-        <p className="text-sm text-ink-2">
+        <p className="text-sm text-muted-foreground">
           Paid runs are paid from your PayBox wallet. Connecting PayBox to this chat isn&apos;t available yet, so this
           run was not made and nothing was charged.
         </p>
         <p className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
-          <a href={PAYBOX_URL} target="_blank" rel="noreferrer" className="inline-flex items-center gap-0.5 text-brand underline-offset-4 hover:underline">
+          <a href={PAYBOX_URL} target="_blank" rel="noreferrer" className="inline-flex items-center gap-0.5 text-link underline-offset-4 hover:underline">
             Get PayBox <ArrowUpRight className="size-3.5" aria-hidden />
           </a>
-          <a href={SKILL_URL} className="text-brand underline-offset-4 hover:underline">
+          <a href={SKILL_URL} className="text-link underline-offset-4 hover:underline">
             Run it from your own agent with PayBox
           </a>
         </p>

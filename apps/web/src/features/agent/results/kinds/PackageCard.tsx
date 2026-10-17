@@ -67,7 +67,7 @@ function Releases({ versions }: { versions: Rec[] }) {
   const { shown, expanded, toggle, total } = usePreview(versions, RELEASES_PREVIEW);
   return (
     <Section label="Recent versions">
-      <ul className="divide-y divide-line text-[0.8125rem]">
+      <ul className="divide-y divide-border text-[0.8125rem]">
         {shown.map((v, index) => (
           <li key={rowKey(v, index, "version")} className="flex items-baseline justify-between gap-3 py-1">
             <span className="font-mono text-foreground">
@@ -99,7 +99,7 @@ function Vulnerabilities({ data }: { data: Rec }) {
               {str(v.id) ?? "advisory"}
             </ExtLink>
             {strings(v.aliases).length > 0 && <span className="text-xs text-muted-foreground">{strings(v.aliases).join(", ")}</span>}
-            {strings(v.fixed_in).length > 0 && <span className="text-xs text-ink-2">fixed in {strings(v.fixed_in).join(", ")}</span>}
+            {strings(v.fixed_in).length > 0 && <span className="text-xs text-muted-foreground">fixed in {strings(v.fixed_in).join(", ")}</span>}
           </li>
         ))}
         {vulns.length === 0 &&
@@ -155,8 +155,8 @@ export function PackageCard({ data }: { data: Rec }) {
         {data.is_default === true && <Pill tone="success">default version</Pill>}
         {data.fork === true && <Pill>fork</Pill>}
       </div>
-      {releaseName && <p className="mt-0.5 text-[0.8125rem] text-ink-2">{releaseName}</p>}
-      {description && <p className="mt-1.5 text-[0.875rem] leading-relaxed text-ink-2">{description}</p>}
+      {releaseName && <p className="mt-0.5 text-[0.8125rem] text-muted-foreground">{releaseName}</p>}
+      {description && <p className="mt-1.5 text-[0.875rem] leading-relaxed text-muted-foreground">{description}</p>}
       <Meta className="mt-1.5">
         {licenses.length > 0 && <span>{licenses.join(", ")}</span>}
         {str(data.language)}
@@ -189,7 +189,7 @@ export function PackageCard({ data }: { data: Rec }) {
       {topics.length > 0 && (
         <ul className="mt-3 flex flex-wrap gap-1.5">
           {topics.map((topic) => (
-            <li key={topic} className="rounded-full border border-line px-2.5 py-0.5 text-xs text-ink-2">
+            <li key={topic} className="rounded-full border border-border px-2.5 py-0.5 text-xs text-muted-foreground">
               {topic}
             </li>
           ))}

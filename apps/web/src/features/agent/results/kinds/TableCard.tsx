@@ -34,7 +34,7 @@ export function DataTable({ rows }: { rows: Rec[] }) {
   if (rows.length === 0) return <Empty>No rows.</Empty>;
   return (
     <div>
-      <div className="overflow-x-auto rounded-sm border border-line">
+      <div className="overflow-x-auto rounded-sm border border-border">
         <table className="w-full border-collapse text-left text-[0.8125rem]">
           <thead>
             <tr>
@@ -43,7 +43,7 @@ export function DataTable({ rows }: { rows: Rec[] }) {
                   key={key}
                   scope="col"
                   className={cn(
-                    "border-b border-line bg-subtle px-2.5 py-1.5 font-mono text-[0.625rem] font-normal tracking-[0.1em] whitespace-nowrap text-muted-foreground uppercase",
+                    "border-b border-border bg-card px-2.5 py-1.5 font-mono text-[0.625rem] font-normal tracking-[0.1em] whitespace-nowrap text-muted-foreground uppercase",
                     numeric.has(key) && "text-right",
                   )}
                 >
@@ -54,18 +54,18 @@ export function DataTable({ rows }: { rows: Rec[] }) {
           </thead>
           <tbody>
             {shown.map((row, index) => (
-              <tr key={rowKey(row, index)} className="border-b border-line last:border-0">
+              <tr key={rowKey(row, index)} className="border-b border-border last:border-0">
                 {columns.map((key) => (
                   <td
                     key={key}
                     className={cn(
-                      "max-w-[28rem] px-2.5 py-1.5 align-top text-ink-2",
+                      "max-w-[28rem] px-2.5 py-1.5 align-top text-muted-foreground",
                       numeric.has(key) && "text-right font-mono whitespace-nowrap tabular-nums",
                       key === titleKey && "min-w-[9rem] font-medium text-foreground",
                     )}
                   >
                     {key === titleKey && linkKey && safeHref(row[linkKey]) ? (
-                      <ExtLink href={row[linkKey]} className="text-foreground hover:text-brand">
+                      <ExtLink href={row[linkKey]} className="text-foreground hover:text-link">
                         {str(row[key]) ?? "open"}
                       </ExtLink>
                     ) : (
@@ -84,7 +84,7 @@ export function DataTable({ rows }: { rows: Rec[] }) {
           <button
             type="button"
             onClick={() => setWide((w) => !w)}
-            className="mt-2 text-[0.8125rem] font-medium text-brand underline-offset-4 hover:underline"
+            className="mt-2 text-[0.8125rem] font-medium text-link underline-offset-4 hover:underline"
           >
             {wide ? "Fewer columns" : `All ${all.length} columns`}
           </button>

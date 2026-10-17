@@ -20,7 +20,7 @@ export default async function ToolsPage() {
     <>
       <SiteHeader active="Tools" />
       <main id="main" className="mx-auto max-w-[1200px] px-4 py-14 sm:px-6">
-        <p className="inline-flex items-center gap-2 rounded-full border border-line px-3.5 py-1.5 font-mono text-[0.6875rem] tracking-[0.12em] text-muted-foreground uppercase">
+        <p className="inline-flex items-center gap-2 rounded-full border border-border px-3.5 py-1.5 font-mono text-[0.6875rem] tracking-[0.12em] text-muted-foreground uppercase">
           <span className="size-1.5 rounded-full bg-success" aria-hidden /> {tools} tools · {providers} providers
         </p>
         <h1 className="display mt-6 text-[clamp(2.6rem,6vw,4rem)]">

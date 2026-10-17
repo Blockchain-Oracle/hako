@@ -14,7 +14,7 @@ import { isRunning, runOutput, type ToolPart, toolName } from "./parts";
 /*
  * Ported from KeeperHub Copilot v2 (same author) components/chat/tool-timeline.tsx (21st heygaia/tool-calls-section +
  * serafimcloud/tool-group): tilted marks and "Used N tools" behind a chevron; open, every call is a row on a
- * connector line. Changes: Monid tokens; three tools (find / inspect / run) with the run's provider mark and price.
+ * connector line. Changes: Senryo tokens (@hako/brand); three tools (find / inspect / run) with the run's provider mark and price.
  */
 const MAX_ICONS = 6;
 const TILT_DEG = 8;
@@ -40,7 +40,7 @@ function CallIcon({ part }: { part: ToolPart }) {
   if (name === "run_tool" && endpoint) return <ProviderLogo id={endpoint.provider} name={endpoint.providerName} size="sm" />;
   const Icon = name === "find_tools" ? Search : BookOpen;
   return (
-    <span className="flex size-5 items-center justify-center rounded-[6px] border border-line bg-background text-brand">
+    <span className="flex size-5 items-center justify-center rounded-[6px] border border-border bg-background text-link">
       <Icon className="size-3" aria-hidden />
     </span>
   );
@@ -72,16 +72,16 @@ function CallRow({ part, last }: { part: ToolPart; last: boolean }) {
         <div className="flex min-h-7 items-center">
           <CallIcon part={part} />
         </div>
-        {!last && <div className="min-h-3 w-px flex-1 bg-line-default" />}
+        {!last && <div className="min-h-3 w-px flex-1 bg-border" />}
       </div>
       <div className="min-w-0 flex-1 pb-2">
         <button type="button" onClick={() => setOpen((o) => !o)} className="group flex items-center gap-1 text-left" aria-expanded={open}>
-          <span className={cn("text-xs font-medium", failed ? "text-destructive" : "text-ink-2 group-hover:text-foreground")}>{title}</span>
+          <span className={cn("text-xs font-medium", failed ? "text-destructive" : "text-muted-foreground group-hover:text-foreground")}>{title}</span>
           <ChevronDown className={cn("size-3.5 shrink-0 text-muted-foreground transition-transform", open && "rotate-180")} />
         </button>
         <p className="font-mono text-[0.6875rem] text-muted-foreground">{failed ? "failed · not charged" : meta}</p>
         {open && (
-          <pre className="mt-2 max-h-56 overflow-auto rounded-sm bg-subtle p-2.5 font-mono text-[0.6875rem] leading-relaxed text-ink-2">
+          <pre className="mt-2 max-h-56 overflow-auto rounded-sm bg-card p-2.5 font-mono text-[0.6875rem] leading-relaxed text-muted-foreground">
             {JSON.stringify(part.input ?? {}, null, 2)}
           </pre>
         )}

@@ -1,4 +1,4 @@
-import { Seal } from "@hako/brand/react";
+import { HakoMark } from "@hako/brand/react";
 import Image from "next/image";
 
 import { LOGO_IDS } from "@/lib/constants/logos";
@@ -20,9 +20,9 @@ export function ProviderLogo({ id, name, size = "md", className }: {
       <span
         aria-hidden
         style={{ width: px, height: px }}
-        className={cn("inline-flex shrink-0 items-center justify-center rounded-[6px] bg-brand text-primary-foreground", className)}
+        className={cn("inline-flex shrink-0 items-center justify-center rounded-[6px] bg-primary text-primary-foreground", className)}
       >
-        <Seal className="size-[72%]" label={null} />
+        <HakoMark className="size-[72%]" label={null} />
       </span>
     );
   }
@@ -33,7 +33,7 @@ export function ProviderLogo({ id, name, size = "md", className }: {
         alt=""
         width={px}
         height={px}
-        className={cn("shrink-0 rounded-[6px] border border-line bg-white object-contain p-[2px]", className)}
+        className={cn("shrink-0 rounded-[6px] border border-border bg-white object-contain p-[2px]", className)}
       />
     );
   }
@@ -42,7 +42,7 @@ export function ProviderLogo({ id, name, size = "md", className }: {
       aria-hidden
       style={{ width: px, height: px }}
       className={cn(
-        "inline-flex shrink-0 items-center justify-center rounded-[6px] bg-brand font-display text-[0.75em] font-semibold text-primary-foreground",
+        "inline-flex shrink-0 items-center justify-center rounded-[6px] bg-primary font-display text-[0.75em] font-semibold text-primary-foreground",
         className,
       )}
     >

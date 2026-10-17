@@ -11,7 +11,7 @@ import { cutText, formatAbsolute, formatRelative } from "./format";
 import { safeHref } from "./parse";
 import { useNow } from "./useNow";
 
-/** Monid's mono micro-label. */
+/** The mono micro-label. */
 export function Label({ children, className }: { children: ReactNode; className?: string }) {
   return (
     <p className={cn("font-mono text-[0.6875rem] tracking-[0.12em] text-muted-foreground uppercase", className)}>
@@ -22,7 +22,7 @@ export function Label({ children, className }: { children: ReactNode; className?
 
 export function Section({ label, children, className }: { label: ReactNode; children: ReactNode; className?: string }) {
   return (
-    <section className={cn("mt-4 border-t border-line pt-3", className)}>
+    <section className={cn("mt-4 border-t border-border pt-3", className)}>
       <Label>{label}</Label>
       <div className="mt-2">{children}</div>
     </section>
@@ -51,7 +51,7 @@ export function ExtLink({
       target="_blank"
       rel="noopener noreferrer nofollow"
       title={title ?? safe}
-      className={cn("text-brand underline-offset-4 hover:underline", icon && "inline-flex items-center gap-1", className)}
+      className={cn("text-link underline-offset-4 hover:underline", icon && "inline-flex items-center gap-1", className)}
     >
       {children}
       {icon && <ExternalLink className="size-3 shrink-0" aria-hidden />}
@@ -60,11 +60,11 @@ export function ExtLink({
 }
 
 const PILL_TONES = {
-  neutral: "bg-muted text-ink-2",
-  brand: "bg-brand/[0.07] text-brand",
-  success: "bg-success/[0.08] text-success",
-  outline: "border border-line-default text-ink-2",
-  strong: "bg-dark text-background",
+  neutral: "bg-muted text-muted-foreground",
+  brand: "bg-selected-row text-link",
+  success: "bg-up-surface text-success",
+  outline: "border border-border text-muted-foreground",
+  strong: "bg-primary text-background",
 } as const;
 
 export type PillTone = keyof typeof PILL_TONES;
@@ -141,7 +141,7 @@ export function ShowAll({ total, limit, expanded, onToggle, noun = "items", clas
       onClick={onToggle}
       aria-expanded={expanded}
       className={cn(
-        "mt-2 inline-flex items-center gap-1 text-[0.8125rem] font-medium text-brand underline-offset-4 hover:underline",
+        "mt-2 inline-flex items-center gap-1 text-[0.8125rem] font-medium text-link underline-offset-4 hover:underline",
         className,
       )}
     >
@@ -163,7 +163,7 @@ export function ClampText({ text, chars, className }: { text: string; chars: num
           type="button"
           onClick={() => setOpen((o) => !o)}
           aria-expanded={open}
-          className="mt-1 text-[0.8125rem] font-medium text-brand underline-offset-4 hover:underline"
+          className="mt-1 text-[0.8125rem] font-medium text-link underline-offset-4 hover:underline"
         >
           {open ? "Show less" : "Show more"}
         </button>
@@ -184,7 +184,7 @@ export function KeyValues({ rows, className }: { rows: KeyValueRow[]; className?
           <dt className="truncate text-muted-foreground" title={label}>
             {label}
           </dt>
-          <dd className="min-w-0 break-words text-ink-2">{value}</dd>
+          <dd className="min-w-0 break-words text-muted-foreground">{value}</dd>
         </div>
       ))}
     </dl>
@@ -202,7 +202,7 @@ export function Stat({ label, value, title }: { label: string; value: ReactNode;
 }
 
 export function Empty({ children }: { children: ReactNode }) {
-  return <p className="rounded-sm bg-subtle px-3 py-2.5 text-[0.8125rem] text-muted-foreground">{children}</p>;
+  return <p className="rounded-sm bg-card px-3 py-2.5 text-[0.8125rem] text-muted-foreground">{children}</p>;
 }
 
 /** A calm callout for deprecations, retractions and conflicts (the palette has no alarm colour, on purpose). */
@@ -210,7 +210,7 @@ export function Notice({ children, className }: { children: ReactNode; className
   return (
     <p
       className={cn(
-        "flex items-start gap-2 rounded-sm border border-line-default bg-muted px-3 py-2 text-[0.8125rem] text-foreground",
+        "flex items-start gap-2 rounded-sm border border-border bg-muted px-3 py-2 text-[0.8125rem] text-foreground",
         className,
       )}
     >
@@ -245,7 +245,7 @@ export function Thumb({ src, alt, width, height, className }: {
       loading="lazy"
       referrerPolicy="no-referrer"
       onError={() => setFailed(true)}
-      className={cn("shrink-0 rounded-sm border border-line bg-muted object-cover", className)}
+      className={cn("shrink-0 rounded-sm border border-border bg-muted object-cover", className)}
     />
   );
 }

@@ -17,8 +17,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en" className={fontVariables} suppressHydrationWarning>
       <body className="flex min-h-dvh flex-col">
-        {/* Dark first, like Monid's docs; the toggle still offers light. */}
-        <RootProvider theme={{ defaultTheme: "dark", enableSystem: false, storageKey: site.themeStorageKey }}>
+        {/* Light by default with dark as an adaptation (Senryo); the toggle offers both. */}
+        <RootProvider theme={{ defaultTheme: "light", enableSystem: false, storageKey: site.themeStorageKey }}>
           {children}
         </RootProvider>
       </body>
