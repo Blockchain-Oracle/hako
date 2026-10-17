@@ -2,7 +2,7 @@ import { HAKO_APP_PATHS, HAKO_SANDBOX_SUBDOMAIN } from "@hako/config";
 import { type NextRequest, NextResponse } from "next/server";
 
 /**
- * Host rewrite (plan §9): the signing sandbox origin (sandbox.usehako.xyz, SP4) serves only `app/sandbox/**`, so
+ * Host rewrite (plan §9): the signing sandbox origin (sandbox.usehako.site, SP4) serves only `app/sandbox/**`, so
  * PayBox's signing window runs in an origin that is not the app's. Every other host passes through untouched.
  */
 const SANDBOX_PATH = HAKO_APP_PATHS.sandbox;

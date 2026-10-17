@@ -1,5 +1,5 @@
 {
-  "$id": "https://usehako.xyz/schemas/cards/package.schema.json",
+  "$id": "https://usehako.site/schemas/cards/package.schema.json",
   "title": "package",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "anyOf": [

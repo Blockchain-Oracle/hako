@@ -1,5 +1,5 @@
 {
-  "$id": "https://usehako.xyz/schemas/cards/contract_read.schema.json",
+  "$id": "https://usehako.site/schemas/cards/contract_read.schema.json",
   "title": "contract_read",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",

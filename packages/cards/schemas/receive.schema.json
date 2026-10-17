@@ -1,5 +1,5 @@
 {
-  "$id": "https://usehako.xyz/schemas/cards/receive.schema.json",
+  "$id": "https://usehako.site/schemas/cards/receive.schema.json",
   "title": "receive",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",

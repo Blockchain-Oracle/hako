@@ -1,5 +1,5 @@
 {
-  "$id": "https://usehako.xyz/schemas/cards/limit.schema.json",
+  "$id": "https://usehako.site/schemas/cards/limit.schema.json",
   "title": "limit",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",

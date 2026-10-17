@@ -14,7 +14,7 @@ export const DB_CONNECT_TIMEOUT_MS = 5_000;
 export const DB_LIST_DEFAULT_LIMIT = 50;
 export const DB_LIST_MAX_LIMIT = 200;
 
-/** Invoice ids are short (they are the path of `usehako.xyz/pay/<id>` and its QR): this many base62 characters. */
+/** Invoice ids are short (they are the path of `usehako.site/pay/<id>` and its QR): this many base62 characters. */
 export const INVOICE_ID_LENGTH = 12;
 /** Values one random byte takes (ids are drawn from random bytes by rejection sampling). */
 export const BYTE_VALUES = 256;

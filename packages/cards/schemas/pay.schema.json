@@ -1,5 +1,5 @@
 {
-  "$id": "https://usehako.xyz/schemas/cards/pay.schema.json",
+  "$id": "https://usehako.site/schemas/cards/pay.schema.json",
   "title": "pay",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",

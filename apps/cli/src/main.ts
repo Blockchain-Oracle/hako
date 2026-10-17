@@ -12,7 +12,7 @@ const HELP = `hako ${VERSION} — Hako's agent tools from a terminal: find and r
 
 Without installing: npx -y usehako <command>.
 Paid runs: inspect prints the tool's paidUrl. Your PayBox wallet pays it in USDC on Base with PayBox's use_service.
-Environment: HAKO_API_URL (default https://api.usehako.xyz).`;
+Environment: HAKO_API_URL (default https://api.usehako.site).`;
 
 function flag(args: string[], name: string): string | undefined {
   const index = args.indexOf(name);

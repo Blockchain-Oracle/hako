@@ -28,7 +28,7 @@
     "url": "git+https://github.com/Blockchain-Oracle/hako.git",
     "directory": "apps/cli"
   },
-  "homepage": "https://docs.usehako.xyz/docs/cli",
+  "homepage": "https://docs.usehako.site/docs/cli",
   "bugs": "https://github.com/Blockchain-Oracle/hako/issues",
   "keywords": [
     "hako",

@@ -5,7 +5,7 @@ import { heliusEnvShape, lifiEnvShape } from "./providers.ts";
 import { envLoader, nodeEnv, optionalHexKey32, optionalPem, optionalText, optionalUrl, portOr, requiredUrl } from "./shared.ts";
 
 /**
- * services/gateway (api.usehako.xyz). Only HAKO_API_URL is required; every other feature degrades without its
+ * services/gateway (api.usehako.site). Only HAKO_API_URL is required; every other feature degrades without its
  * variables: no CDP key pair → no paid `/v2` route at all (never a half-configured one).
  */
 export const gatewayEnvSchema = z.object({

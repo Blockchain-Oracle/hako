@@ -1,5 +1,5 @@
 {
-  "$id": "https://usehako.xyz/schemas/cards/search_results.schema.json",
+  "$id": "https://usehako.site/schemas/cards/search_results.schema.json",
   "title": "search_results",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "anyOf": [

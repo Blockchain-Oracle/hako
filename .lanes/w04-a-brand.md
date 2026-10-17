@@ -111,7 +111,7 @@ in AI hosts), each in words and shape. L6 finishes it (captures, ecosystem, proo
 ## Open (for the coordinator)
 - `app/layout.tsx` (shared wiring): wrap with `<TooltipProvider>` (shadcn tooltip asks for it) and, where the gateway is
   not production, `<LogoProxyProvider gatewayUrl={GATEWAY_URL}>`; the default is `HAKO_GATEWAY_URL`
-  (`api.usehako.xyz`, not resolving yet on 2026-10-17, so remote logos fall back to the disc until DNS is up).
+  (`api.usehako.site`, not resolving yet on 2026-10-17, so remote logos fall back to the disc until DNS is up).
 - The logo route and the `proxy.ts` matcher: done in the third pass (review findings 5 and 6 below).
 - Provider ids for the C16 catalog providers are assumed `exa`, `artificial-analysis`, `elevenlabs`, `polymarket`,
   `jupiter`, `lifi`, `helius`; L2 uses these or the registry gets an alias.
@@ -161,7 +161,7 @@ Each finding of the W0.4 (a) review, in its order, with what was done.
    is not rewritten to `/sandbox/icon` on the sandbox host.
    **Fixed (third pass, `w04/fix-a-brand`):** the matcher is now
    `["/((?!_next/static|_next/image|favicon.ico|icon).*)"]` and its comment names the favicon route. Checked with the
-   built web (`next start`): `curl -H 'Host: sandbox.usehako.xyz' localhost:<port>/icon` returns 200 `image/svg+xml`
+   built web (`next start`): `curl -H 'Host: sandbox.usehako.site' localhost:<port>/icon` returns 200 `image/svg+xml`
    (the review saw 404), the app host's `/icon` too, and `/` on the sandbox host still reaches `app/sandbox/page.tsx`
    (its placeholder 404 until L4 builds it, same as `/sandbox` on the app host).
 6. **The logo route defined twice** (`packages/identity/src/identity.config.ts:18`). The package index no longer exports

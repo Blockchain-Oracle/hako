@@ -6,8 +6,8 @@ export const PROTOCOL_VERSION = "2026-07-28"; // starter 1.0.2's MCP protocol ve
 
 // The gateway is a non-sensitive environment variable so the owner can point it elsewhere without a new upload.
 export const GATEWAY_URL_ENV = "HAKO_GATEWAY_URL";
-// Until usehako.xyz resolves the bundle ships the Hako gateway's sslip host; the portal variable HAKO_GATEWAY_URL switches it without an upload.
-export const DEFAULT_GATEWAY_URL = "https://hako-api.84.46.247.92.sslip.io";
+// The portal variable HAKO_GATEWAY_URL can point the plugin elsewhere without a new upload.
+export const DEFAULT_GATEWAY_URL = "https://api.usehako.site";
 export const RUN_V2_PREFIX = "/v2/run"; // mainnet USDC routes (CDP facilitator) that PayBox can pay
 
 // PayBox: each operation has a ten-second budget; the guide suggests ~4 s per request.

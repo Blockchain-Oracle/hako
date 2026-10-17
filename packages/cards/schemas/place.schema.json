@@ -1,5 +1,5 @@
 {
-  "$id": "https://usehako.xyz/schemas/cards/place.schema.json",
+  "$id": "https://usehako.site/schemas/cards/place.schema.json",
   "title": "place",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "anyOf": [

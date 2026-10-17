@@ -4,7 +4,7 @@
  */
 
 /** Hako's own hosts (plan §8: DNS A records for apex, www, api, docs and sandbox). */
-export const HAKO_DOMAIN = "usehako.xyz";
+export const HAKO_DOMAIN = "usehako.site";
 export const HAKO_WWW_HOST = `www.${HAKO_DOMAIN}`;
 /** The gateway (Hono): `/v1/*`, the x402 `/v2/*` routes and the hosted MCP server at `/mcp`. */
 export const HAKO_GATEWAY_HOST = `api.${HAKO_DOMAIN}`;

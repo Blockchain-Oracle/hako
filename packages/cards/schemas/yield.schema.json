@@ -1,5 +1,5 @@
 {
-  "$id": "https://usehako.xyz/schemas/cards/yield.schema.json",
+  "$id": "https://usehako.site/schemas/cards/yield.schema.json",
   "title": "yield",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",

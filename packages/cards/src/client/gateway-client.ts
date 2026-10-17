@@ -6,7 +6,7 @@ import { type EndpointDef, type EndpointKey, GATEWAY_ENDPOINTS, type GatewayEndp
 
 /**
  * The typed gateway client, built from the endpoint table: real `fetch` against the gateway URL (production
- * `api.usehako.xyz` from @hako/config unless the caller's environment names another). Requests are checked against
+ * `api.usehako.site` from @hako/config unless the caller's environment names another). Requests are checked against
  * the table's zod schemas before they leave and responses after they arrive, so contract drift fails loudly with the
  * route's name instead of drawing a broken card. It never pays: an x402 route answers 402 and the client reports it.
  */

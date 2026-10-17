@@ -1,5 +1,5 @@
 {
-  "$id": "https://usehako.xyz/schemas/cards/failure.schema.json",
+  "$id": "https://usehako.site/schemas/cards/failure.schema.json",
   "title": "failure",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",

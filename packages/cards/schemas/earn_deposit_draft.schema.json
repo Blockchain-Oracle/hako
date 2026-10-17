@@ -1,5 +1,5 @@
 {
-  "$id": "https://usehako.xyz/schemas/cards/earn_deposit_draft.schema.json",
+  "$id": "https://usehako.site/schemas/cards/earn_deposit_draft.schema.json",
   "title": "earn_deposit_draft",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",

@@ -1,5 +1,5 @@
 {
-  "$id": "https://usehako.xyz/schemas/cards/time.schema.json",
+  "$id": "https://usehako.site/schemas/cards/time.schema.json",
   "title": "time",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "anyOf": [
