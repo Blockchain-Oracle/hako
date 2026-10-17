@@ -6,6 +6,7 @@ from enum import StrEnum
 
 from hako_tools.constants import (
     PAYMENT_NETWORK,
+    PRICE_FREE_USD,
     PRICE_LOCAL_USD,
     PRICE_PREMIUM_USD,
     PRICE_STANDARD_USD,
@@ -16,12 +17,14 @@ _ATOMIC_PER_USD = Decimal(10) ** USDC_DECIMALS
 
 
 class PriceTier(StrEnum):
+    free = "free"  # a free read: the gateway serves it on /v1 and never sells it on /v2
     local = "local"
     standard = "standard"
     premium = "premium"
 
 
 _TIER_USD = {
+    PriceTier.free: PRICE_FREE_USD,
     PriceTier.local: PRICE_LOCAL_USD,
     PriceTier.standard: PRICE_STANDARD_USD,
     PriceTier.premium: PRICE_PREMIUM_USD,
@@ -40,10 +43,15 @@ class Price:
     def atomic(self) -> int:
         return int(Decimal(self.usd) * _ATOMIC_PER_USD)
 
+    @property
+    def free(self) -> bool:
+        return self.tier is PriceTier.free
+
     def doc(self) -> dict[str, str]:
         return {"usd": self.usd, "atomic": str(self.atomic), "tier": self.tier, "network": PAYMENT_NETWORK}
 
 
+FREE = Price(PriceTier.free)
 LOCAL = Price(PriceTier.local)
 STANDARD = Price(PriceTier.standard)
 PREMIUM = Price(PriceTier.premium)

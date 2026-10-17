@@ -64,3 +64,15 @@ class Render(StrEnum):
     time = "time"  # clocks, holidays, calendars
     table = "table"  # data.rows[] of flat objects
     json = "json"  # anything else
+    # Plan C18: each matches packages/cards/schemas/<kind>.schema.json (snake_case, CAIP-2 chains, atomic amounts).
+    balance = "balance"  # data.balances[] of one address on one chain
+    token = "token"  # one ERC-20 / SPL token's facts
+    tx_receipt = "tx_receipt"  # a transaction and its receipt / a Solana signature's status
+    block = "block"  # one EVM block
+    gas = "gas"  # fee levels right now
+    contract_read = "contract_read"  # an eth_call decoded by its function signature
+    logs = "logs"  # data.logs[] from eth_getLogs
+    chain_name = "chain_name"  # ENS / Basename, forward or reverse
+    market = "market"  # data.markets[] of prediction markets with outcome odds
+    yield_ = "yield"  # data.vaults[] (LI.FI Earn)
+    positions = "positions"  # data.positions[] (LI.FI Earn)

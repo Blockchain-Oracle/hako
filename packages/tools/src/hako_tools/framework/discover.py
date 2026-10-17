@@ -142,14 +142,17 @@ def _search(query: str) -> list[tuple[str, float]]:
 
 
 def _hints(top: Endpoint, ranked: list[Endpoint]) -> list[str]:
-    hints = [
-        f"POST /v1/inspect with {{\"id\": \"{top.id}\"}} for its input schema, "
-        f"then pay POST {PAID_RUN_PREFIX}/{top.id} with PayBox use_service."
-    ]
+    inspect = f"POST /v1/inspect with {{\"id\": \"{top.id}\"}} for its input schema"
+    if top.price.free:
+        hints = [f"{inspect}; it is free: the gateway serves it on its free read routes (hako_chain_read, "
+                 f"hako_markets, Earn), never on {PAID_RUN_PREFIX}."]
+    else:
+        hints = [f"{inspect}, then pay POST {PAID_RUN_PREFIX}/{top.id} with PayBox use_service."]
     cheaper = [e for e in ranked if e.price.atomic < top.price.atomic and set(e.categories) & set(top.categories)]
     if cheaper:
         c = cheaper[0]
-        hints.append(f"Cheaper for the same kind of job: {c.id} at ${c.price.usd} per call.")
+        price = "free" if c.price.free else f"${c.price.usd} per call"
+        hints.append(f"Cheaper for the same kind of job: {c.id} ({price}).")
     hints.extend(f"Related: {sid}" for sid in top.see_also if sid in REGISTRY)
     return hints
 

@@ -26,6 +26,9 @@ MAX_SHRINK_PASSES: Final = 8
 
 # USDC has 6 decimals: $0.005 = 5000 atomic units.
 USDC_DECIMALS: Final = 6
+# Free reads (chain lookups, market odds, Earn vaults): served by the gateway's free /v1 aliases and never sold on /v2
+# (plan C17, B13), so they cost nothing anywhere.
+PRICE_FREE_USD: Final = "0"
 PRICE_LOCAL_USD: Final = "0.001"  # keyless upstreams and local compute
 PRICE_STANDARD_USD: Final = "0.005"  # keyed upstream, cheap per call
 PRICE_PREMIUM_USD: Final = "0.01"  # upstream cost ≥ $0.005 (Firecrawl search ≈ 2 credits, composites)

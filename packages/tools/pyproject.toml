@@ -9,6 +9,8 @@ dependencies = [
     "defusedxml>=0.7.1",
     "python-dotenv>=1.1",
     "redis>=6.4",
+    "eth-abi>=5.2",
+    "pycryptodome>=3.23",
 ]
 
 [project.scripts]

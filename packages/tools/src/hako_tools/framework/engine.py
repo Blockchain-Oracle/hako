@@ -82,7 +82,7 @@ def _envelope(endpoint: Endpoint, deadline: Deadline, *, data: Any, sources: lis
         "provider": endpoint.provider.id,
         "status": "ok",
         "found": found,
-        "billable": found,
+        "billable": found and not endpoint.price.free,  # a free read is never charged
         "cached": cached,
         "as_of": datetime.now(UTC).isoformat(timespec="seconds"),
         "elapsed_ms": deadline.elapsed_ms(),

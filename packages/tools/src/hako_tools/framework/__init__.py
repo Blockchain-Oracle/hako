@@ -6,10 +6,11 @@ from hako_tools.framework.context import RunContext
 from hako_tools.framework.endpoint import Endpoint, tool
 from hako_tools.framework.errors import ProviderError, ToolNotFoundResult
 from hako_tools.framework.models import Citation, Link, ToolInput, ToolOutput
-from hako_tools.framework.pricing import LOCAL, PREMIUM, STANDARD, Price
+from hako_tools.framework.pricing import FREE, LOCAL, PREMIUM, STANDARD, Price
 from hako_tools.framework.provider import Provider, Terms
 
 __all__ = [
+    "FREE",
     "LOCAL",
     "PREMIUM",
     "STANDARD",
