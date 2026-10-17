@@ -6,9 +6,10 @@
 
 import { PAYMENT_TIMEOUT_S } from "../../constants.js";
 
-/** Status codes these routes answer that the gateway's shared constants don't name. */
-export const HTTP_UNAUTHORIZED = 401;
-export const HTTP_PAYMENT_REQUIRED = 402;
+/**
+ * Status codes these routes answer that neither the gateway's shared constants nor @hako/cards/contract
+ * (HTTP_UNAUTHORIZED, HTTP_PAYMENT_REQUIRED) name.
+ */
 export const HTTP_CONFLICT = 409;
 export const HTTP_TOO_MANY_REQUESTS = 429;
 /** 3xx: a redirect (the logo proxy follows one only to another allowlisted host). */
@@ -40,6 +41,14 @@ export const MEMORY_STORE_MAX_KEYS = 10_000;
 
 /** The allowlisted logo proxy (`GET /v1/logo?src=`): https only, these hosts only, images only, this big at most. */
 export const LOGO_MAX_BYTES = 512 * 1_024;
+/**
+ * Only logos this small are kept in Redis (which also holds the batch and invoice claims): a bigger one is served with
+ * its immutable Cache-Control and left to browsers.
+ */
+export const LOGO_CACHE_MAX_BYTES = 64 * 1_024;
+/** Upstream logo fetches (cache misses) per client IP per window; cached logos don't count. */
+export const LOGO_FETCHES_PER_WINDOW = 120;
+export const LOGO_RATE_WINDOW_S = 60;
 export const LOGO_FETCH_TIMEOUT_MS = 4_000;
 /** IPFS gateways redirect to subdomain gateways: a few hops, each one allowlisted. */
 export const LOGO_MAX_REDIRECTS = 3;

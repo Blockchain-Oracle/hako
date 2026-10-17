@@ -8,16 +8,23 @@
 import type { Context, Hono } from "hono";
 import { z } from "zod";
 
-import { GATEWAY_ENDPOINTS, receiptCreateRequestSchema, receiptsQuerySchema, sharedReceiptsQuerySchema } from "@hako/cards/contract";
+import {
+  GATEWAY_ENDPOINTS,
+  HTTP_UNAUTHORIZED,
+  receiptCreateRequestSchema,
+  receiptsQuerySchema,
+  sharedReceiptsQuerySchema,
+} from "@hako/cards/contract";
 import { getListedReceipt, listReceipts, type ListedReceipt, type PageCursor, type ReceiptScope } from "@hako/db/node";
 
 import { HTTP_BAD_GATEWAY, HTTP_BAD_REQUEST, HTTP_NOT_FOUND, HTTP_UNAVAILABLE, HTTP_UNPROCESSABLE, RUN_PREFIX } from "../constants.js";
 import { jsonError } from "../errors.js";
 import { receiptCard } from "./x402/cards.js";
 import type { X402Context } from "./x402/context.js";
-import { refuse } from "./x402/http.js";
+import { refuse, sessionUnavailable } from "./x402/http.js";
 import { recordOnchainReceipt } from "./x402/onchain-receipt.js";
-import { HTTP_CONFLICT, HTTP_UNAUTHORIZED } from "./x402/x402.config.js";
+import type { Session } from "./x402/session.js";
+import { HTTP_CONFLICT } from "./x402/x402.config.js";
 
 const { receipts, receiptsShared, receiptGet, receiptCreate } = GATEWAY_ENDPOINTS;
 
@@ -66,9 +73,12 @@ export function registerReceipts(app: Hono, ctx: X402Context): void {
     return page(c, "public", query.data);
   });
 
-  const signedOut = (c: Context, status: "none" | "invalid") =>
-    refuse(c, HTTP_UNAUTHORIZED, status === "none" ? "auth_required" : "invalid_session",
-      "Your receipts need a signed-in Hako session (a bearer); shared receipts are at /v1/receipts/shared.");
+  /** No session or a bad one → 401; a session that could not be checked (the issuer's keys unreachable) → 503, retryable. */
+  const signedOut = (c: Context, status: Exclude<Session["status"], "valid">) =>
+    status === "unavailable"
+      ? sessionUnavailable(c)
+      : refuse(c, HTTP_UNAUTHORIZED, status === "none" ? "auth_required" : "invalid_session",
+        "Your receipts need a signed-in Hako session (a bearer); shared receipts are at /v1/receipts/shared.");
 
   app.get(receipts.path, async (c) => {
     if (!pool) return unavailable(c);
@@ -90,17 +100,22 @@ export function registerReceipts(app: Hono, ctx: X402Context): void {
       return jsonError(c, HTTP_BAD_REQUEST, "invalid_json", "Request body is not valid JSON.");
     }
     const parsed = receiptCreateRequestSchema.safeParse(body);
-    if (!parsed.success) return refuse(c, HTTP_UNPROCESSABLE, "invalid_receipt", "A receipt is {chain, txHash, draft?}.", queryDetails(parsed.error));
+    if (!parsed.success) return refuse(c, HTTP_UNPROCESSABLE, "invalid_receipt", "A receipt is {chain, txHash, draft}.", queryDetails(parsed.error));
     const outcome = await recordOnchainReceipt(ctx, session.userId, parsed.data);
     if (outcome.ok) return c.json(receiptCard(outcome.receipt, toolName));
     switch (outcome.reason) {
       case "chain_unavailable":
         return jsonError(c, HTTP_BAD_GATEWAY, outcome.reason, outcome.message);
       case "recorded_by_another_account":
+      case "tx_pending":
         return refuse(c, HTTP_CONFLICT, outcome.reason, outcome.message);
       case "unsupported_chain":
+      case "draft_required":
+      case "not_a_send_draft":
+      case "tx_mismatch":
         return refuse(c, HTTP_UNPROCESSABLE, outcome.reason, outcome.message);
-      default:
+      case "unknown_draft":
+      case "tx_not_found":
         return jsonError(c, HTTP_NOT_FOUND, outcome.reason, outcome.message);
     }
   });

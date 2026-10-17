@@ -6,8 +6,11 @@
 
 import type { Context } from "hono";
 
-import { HTTP_UNPROCESSABLE } from "../../constants.js";
-import { HTTP_CONFLICT, HTTP_TOO_MANY_REQUESTS, HTTP_UNAUTHORIZED } from "./x402.config.js";
+import { HTTP_UNAUTHORIZED } from "@hako/cards/contract";
+
+import { HTTP_UNAVAILABLE, HTTP_UNPROCESSABLE } from "../../constants.js";
+import { jsonError } from "../../errors.js";
+import { HTTP_CONFLICT, HTTP_TOO_MANY_REQUESTS } from "./x402.config.js";
 
 type RefusalStatus = typeof HTTP_UNAUTHORIZED | typeof HTTP_CONFLICT | typeof HTTP_TOO_MANY_REQUESTS | typeof HTTP_UNPROCESSABLE;
 
@@ -15,6 +18,11 @@ type RefusalStatus = typeof HTTP_UNAUTHORIZED | typeof HTTP_CONFLICT | typeof HT
 export function refuse(c: Context, status: RefusalStatus, code: string, message: string, details: string[] = []) {
   const retryable = status === HTTP_CONFLICT || status === HTTP_TOO_MANY_REQUESTS;
   return c.json({ error: { code, message, retryable, details } }, status);
+}
+
+/** A bearer that could not be checked (the issuer's key set timed out or is unreachable): 503, retryable, not "sign in again". */
+export function sessionUnavailable(c: Context) {
+  return jsonError(c, HTTP_UNAVAILABLE, "session_unavailable", "Your Hako session could not be checked right now; nothing was changed. Try again shortly.");
 }
 
 /**

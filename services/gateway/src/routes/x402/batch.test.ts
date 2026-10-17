@@ -12,13 +12,14 @@ import type { FacilitatorClient } from "@x402/core/server";
 import type { PaymentRequired } from "@x402/core/types";
 import { Hono } from "hono";
 
+import { HTTP_PAYMENT_REQUIRED } from "@hako/cards/contract";
+
 import type { CatalogEndpoint } from "../../catalog.js";
 import { HTTP_BAD_GATEWAY, HTTP_NOT_FOUND, HTTP_OK, HTTP_UNPROCESSABLE } from "../../constants.js";
 import type { Forwarded } from "../../forward.js";
 import { registerBatch } from "../batch.js";
 import type { X402Context } from "./context.js";
 import { memoryStore } from "./kv.js";
-import { HTTP_PAYMENT_REQUIRED } from "./x402.config.js";
 
 const NETWORK = "eip155:8453" as const;
 const PAY_TO = "0x8164000000000000000000000000000000c0948d" as const;

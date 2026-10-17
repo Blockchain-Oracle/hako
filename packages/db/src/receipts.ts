@@ -116,6 +116,19 @@ export async function findReceiptByTx(q: Queryable, kind: ReceiptKind, chain: st
   return rows[0] ?? null;
 }
 
+/**
+ * The x402 settlement that paid an invoice, if one was recorded: the gateway reads it to finish an invoice left
+ * `settling` (paid on chain, but the row was never marked paid). Only used on that rare path, so no index.
+ */
+export async function getReceiptByInvoice(q: Queryable, invoiceId: string): Promise<ReceiptRow | null> {
+  const { rows } = await q.query<ReceiptRow>(
+    `select ${COLUMNS} from receipts where kind = 'x402_settlement' and invoice_id = $1 and tx_hash is not null
+     order by created_at asc, id asc limit 1`,
+    [invoiceId],
+  );
+  return rows[0] ?? null;
+}
+
 export interface ReceiptUpdate {
   status?: ReceiptStatus;
   txHash?: string;

@@ -4,28 +4,30 @@
  * any PayBox agent pays with core `use_service`: `DynamicPayTo` = the payee, `DynamicPrice` = the exact amount, so the
  * money never passes through Hako. `onBeforeSettle` claims the invoice (`SET NX` in Redis, then open → settling in
  * Postgres) and aborts every other settlement; `onAfterSettle` marks it paid with the tx hash. Unknown → 404; once
- * claimed or paid it answers 200 with the invoice to every request and never issues another 402.
+ * claimed or paid it answers 200 with the invoice to every request and never issues another 402. A row left `settling`
+ * after its claim expired (the paid mark failed, or the process died mid-settlement) is finished from the settlement's
+ * receipt when there is one, else released, whenever it is next read.
  */
 
 import { decodePaymentSignatureHeader } from "@x402/core/http";
+import type { SettleResponse } from "@x402/core/types";
 import type { Context, Hono } from "hono";
 
 import { endpointUrl } from "@hako/cards/client";
-import { GATEWAY_ENDPOINTS, invoiceCreateRequestSchema } from "@hako/cards/contract";
-import { claimInvoice, createInvoice, getInvoice, type InvoiceRow, markInvoicePaid, releaseInvoice } from "@hako/db/node";
-import { formatPrice, fromAtomic } from "@hako/money";
+import { GATEWAY_ENDPOINTS, HTTP_UNAUTHORIZED, invoiceCreateRequestSchema } from "@hako/cards/contract";
+import { claimInvoice, createInvoice, getInvoice, getReceiptByInvoice, type InvoiceRow, markInvoicePaid, releaseInvoice } from "@hako/db/node";
+import { formatPrice, fromAtomic, sameAddress } from "@hako/money";
 import { networkByCaip2 } from "@hako/networks";
 
 import { HTTP_BAD_REQUEST, HTTP_NOT_FOUND, HTTP_UNAVAILABLE, HTTP_UNPROCESSABLE } from "../constants.js";
 import { jsonError } from "../errors.js";
 import { invoiceCard } from "./x402/cards.js";
 import type { X402Context } from "./x402/context.js";
-import { clientIp, refuse } from "./x402/http.js";
+import { clientIp, refuse, sessionUnavailable } from "./x402/http.js";
 import { paidLayer, type PaidResource } from "./x402/paid.js";
 import {
   HTTP_CONFLICT,
   HTTP_TOO_MANY_REQUESTS,
-  HTTP_UNAUTHORIZED,
   INVOICE_CLAIM_TTL_S,
   INVOICE_CREATES_PER_WINDOW,
   INVOICE_MAX_ATOMIC,
@@ -73,6 +75,35 @@ export function registerInvoices(app: Hono, ctx: X402Context): void {
     return terms.get(id)!;
   }
 
+  /**
+   * A row still `settling` with no claim in Redis (the claim outlives one settlement): its settlement either landed —
+   * then the receipt the payment layer recorded holds the tx and payer, and the row is marked paid — or it never did,
+   * and the invoice is open again. A row with a live claim, or any other status, is returned as it is.
+   */
+  async function recovered(row: InvoiceRow): Promise<InvoiceRow> {
+    if (row.status !== "settling" || !pool || !kv || (await kv.get(claimKey(row.id)))) return row;
+    const receipt = await getReceiptByInvoice(pool, row.id);
+    if (receipt?.txHash) {
+      const paid = await markInvoicePaid(pool, row.id, { txHash: receipt.txHash, payer: receipt.payer });
+      console.log(JSON.stringify({ event: "invoice_recovered", id: row.id, outcome: "paid", tx: receipt.txHash, marked: Boolean(paid) }));
+    } else {
+      const released = await releaseInvoice(pool, row.id);
+      console.log(JSON.stringify({ event: "invoice_recovered", id: row.id, outcome: "released", released }));
+    }
+    return (await getInvoice(pool, row.id)) ?? row;
+  }
+
+  async function markPaid(id: string, result: SettleResponse) {
+    const paid = { txHash: result.transaction, payer: result.payer ?? null };
+    try {
+      return await markInvoicePaid(pool!, id, paid);
+    } catch (error) {
+      // Once more: the money moved, so the row should say so. If this fails too, the receipt lets `recovered` finish it.
+      console.warn(JSON.stringify({ event: "invoice_mark_paid_retry", id, tx: result.transaction, error: String(error) }));
+      return markInvoicePaid(pool!, id, paid);
+    }
+  }
+
   app.post(invoiceCreate.path, async (c) => {
     if (!rail) return jsonError(c, HTTP_NOT_FOUND, "mainnet_disabled", "Paid routes are not enabled on this gateway.");
     if (!pool || !kv || !usdc) return unavailable(c);
@@ -102,6 +133,7 @@ export function registerInvoices(app: Hono, ctx: X402Context): void {
     }
     const session = await ctx.sessions(c.req.header("authorization"));
     if (session.status === "invalid") return refuse(c, HTTP_UNAUTHORIZED, "invalid_session", "That Hako session is not valid; sign in again, or send no bearer.");
+    if (session.status === "unavailable") return sessionUnavailable(c);
     const row = await createInvoice(pool, {
       payTo,
       chain: rail.network,
@@ -118,13 +150,17 @@ export function registerInvoices(app: Hono, ctx: X402Context): void {
   app.get(invoiceGet.path, async (c) => {
     if (!pool) return unavailable(c);
     const row = await getInvoice(pool, c.req.param("id"));
-    return row ? c.json(card(row)) : unknown(c, c.req.param("id"));
+    return row ? c.json(card(await recovered(row))) : unknown(c, c.req.param("id"));
   });
 
   const resource: PaidResource = {
     path: invoicePay.path,
     description: "A Hako invoice, paid straight to its payee",
-    price: async ({ id = "" }) => `$${fromAtomic(BigInt((await termsOf(id)).amountAtomic), usdc?.decimals ?? 0)}`,
+    async price({ id = "" }) {
+      // The pre-check never lets a request this far without the rail's USDC; never price in guessed decimals.
+      if (!usdc) throw new Error("the paid rail's USDC is not in @hako/networks");
+      return `$${fromAtomic(BigInt((await termsOf(id)).amountAtomic), usdc.decimals)}`;
+    },
     payTo: async ({ id = "" }) => (await termsOf(id)).payTo,
     async unpaidBody({ id = "" }) {
       const row = pool ? await getInvoice(pool, id) : null;
@@ -137,7 +173,7 @@ export function registerInvoices(app: Hono, ctx: X402Context): void {
       return "invoice_not_open";
     },
     async settled({ id = "" }, result) {
-      const row = await markInvoicePaid(pool!, id, { txHash: result.transaction, payer: result.payer ?? null });
+      const row = await markPaid(id, result);
       console.log(JSON.stringify({ event: "invoice_paid", id, tx: result.transaction, payer: result.payer ?? null, marked: Boolean(row) }));
     },
     async release({ id = "" }) {
@@ -148,13 +184,17 @@ export function registerInvoices(app: Hono, ctx: X402Context): void {
 
   app.get(
     invoicePay.path,
-    // Before any 402: unknown → 404; claimed or paid → 200 with the invoice (never a second 402).
+    // Before any 402: unknown → 404; claimed or paid → 200 with the invoice (never a second 402); an open invoice in
+    // another chain or token than this gateway's rail → 503 (never a 402 in the wrong units).
     async (c, next) => {
-      if (!pool || !kv) return unavailable(c);
+      if (!rail) return jsonError(c, HTTP_NOT_FOUND, "mainnet_disabled", "Paid routes are not enabled on this gateway.");
+      if (!pool || !kv || !usdc) return unavailable(c);
       const id = c.req.param("id");
-      const row = await getInvoice(pool, id);
-      if (!row) return unknown(c, id);
+      const found = await getInvoice(pool, id);
+      if (!found) return unknown(c, id);
+      const row = await recovered(found);
       if (row.status !== "open" || (await kv.get(claimKey(id)))) return c.json(card(row));
+      if (row.chain !== rail.network || !sameAddress(row.asset, usdc.address)) return unavailable(c);
       await next();
     },
     paidLayer(ctx, resource),

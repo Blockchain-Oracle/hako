@@ -1,7 +1,8 @@
 /**
  * `GET /v1/logo?src=<url>` (plan B12, §3 logos row): one cached host for the 10+ hosts LI.FI's `logoURI`s point at,
  * and the only image host the MCP view's CSP allows. https only, allowlisted hosts only (every redirect hop too), images
- * only, LOGO_MAX_BYTES at most; cached LOGO_CACHE_TTL_S in the gateway's store and by browsers.
+ * only, LOGO_MAX_BYTES at most; cached LOGO_CACHE_TTL_S by browsers, and in the gateway's store when it is at most
+ * LOGO_CACHE_MAX_BYTES. Upstream fetches (cache misses) are limited per client IP.
  */
 
 import { createHash } from "node:crypto";
@@ -14,7 +15,21 @@ import { HAKO_LOGO_PROXY_PATH, LOGO_CACHE_TTL_S } from "@hako/config";
 import { HTTP_BAD_GATEWAY, HTTP_BAD_REQUEST, HTTP_NOT_FOUND, HTTP_OK } from "../constants.js";
 import { jsonError } from "../errors.js";
 import type { X402Context } from "./x402/context.js";
-import { HTTP_FIRST_REDIRECT, KV_PREFIX, LOGO_CONTENT_TYPES, LOGO_FETCH_TIMEOUT_MS, LOGO_HOSTS, LOGO_MAX_BYTES, LOGO_MAX_REDIRECTS, LOGO_SVG_CSP } from "./x402/x402.config.js";
+import { clientIp, refuse } from "./x402/http.js";
+import {
+  HTTP_FIRST_REDIRECT,
+  HTTP_TOO_MANY_REQUESTS,
+  KV_PREFIX,
+  LOGO_CACHE_MAX_BYTES,
+  LOGO_CONTENT_TYPES,
+  LOGO_FETCH_TIMEOUT_MS,
+  LOGO_FETCHES_PER_WINDOW,
+  LOGO_HOSTS,
+  LOGO_MAX_BYTES,
+  LOGO_MAX_REDIRECTS,
+  LOGO_RATE_WINDOW_S,
+  LOGO_SVG_CSP,
+} from "./x402/x402.config.js";
 
 interface Logo {
   contentType: string;
@@ -77,8 +92,14 @@ function logoResponse(logo: Logo): Response {
   });
 }
 
+/** One cache entry per fetched URL: the fragment never reaches the host, so `#a` and `#b` share it. */
+function cacheKey(src: URL): string {
+  const url = new URL(src);
+  url.hash = "";
+  return `${KV_PREFIX}:logo:${createHash("sha256").update(url.href).digest("hex")}`;
+}
+
 export function registerLogo(app: Hono, ctx: X402Context): void {
-  const cacheKey = (src: URL) => `${KV_PREFIX}:logo:${createHash("sha256").update(src.href).digest("hex")}`;
 
   app.get(HAKO_LOGO_PROXY_PATH, async (c: Context) => {
     const query = logoQuerySchema.safeParse(c.req.query());
@@ -92,6 +113,11 @@ export function registerLogo(app: Hono, ctx: X402Context): void {
       const { contentType, base64 } = JSON.parse(cached) as { contentType: string; base64: string };
       return logoResponse({ contentType, bytes: Buffer.from(base64, "base64") });
     }
+    // Every miss is an upstream fetch (and maybe a cache entry): limited per client, the way invoice creation is.
+    const fetches = ctx.kv ? await ctx.kv.hit(`${KV_PREFIX}:logo-rate:${clientIp(c)}`, LOGO_RATE_WINDOW_S).catch(() => 0) : 0;
+    if (fetches > LOGO_FETCHES_PER_WINDOW) {
+      return refuse(c, HTTP_TOO_MANY_REQUESTS, "rate_limited", `At most ${LOGO_FETCHES_PER_WINDOW} new logos a minute from one address; try again shortly.`);
+    }
     let fetched: Fetched;
     try {
       fetched = await fetchLogo(ctx.fetch, src);
@@ -100,7 +126,8 @@ export function registerLogo(app: Hono, ctx: X402Context): void {
       return jsonError(c, HTTP_BAD_GATEWAY, "logo_unreachable", `${src.hostname} did not answer.`);
     }
     if ("refused" in fetched) return jsonError(c, HTTP_NOT_FOUND, "logo_unavailable", `No logo at that URL: ${fetched.refused}.`);
-    if (ctx.kv) {
+    // Small logos only: a big one is served (immutable, cached by browsers) but never held in the shared Redis.
+    if (ctx.kv && fetched.bytes.length <= LOGO_CACHE_MAX_BYTES) {
       const entry = JSON.stringify({ contentType: fetched.contentType, base64: fetched.bytes.toString("base64") });
       await ctx.kv.set(cacheKey(src), entry, LOGO_CACHE_TTL_S).catch(() => undefined);
     }

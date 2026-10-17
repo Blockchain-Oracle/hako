@@ -3,7 +3,7 @@
  * row → `ReceiptData`. Amounts are exact; a token the registry doesn't know is left out rather than guessed.
  */
 
-import type { InvoiceData, ReceiptData, ReceiptKind as CardReceiptKind, TokenAmount, TxLink } from "@hako/cards/contract";
+import { activitySurfaceSchema, type InvoiceData, type ReceiptData, type ReceiptKind as CardReceiptKind, type TokenAmount, type TxLink } from "@hako/cards/contract";
 import { HAKO_APP_PATHS, HAKO_APP_URL } from "@hako/config";
 import type { InvoiceRow, ListedReceipt } from "@hako/db/node";
 import { formatTokenAmount, fromAtomic, sameAddress, shortenAddress } from "@hako/money";
@@ -67,7 +67,6 @@ export function invoiceCard(row: InvoiceRow, agentPayUrl: string): InvoiceData {
 }
 
 const CARD_STATUS: Record<ListedReceipt["status"], ReceiptData["status"]> = { pending: "pending", confirmed: "confirmed", failed: "reverted" };
-const CARD_SURFACES = new Set<string>(["web", "mcp", "cli", "plugin", "voice"]);
 
 /** The verb line: "Paid OpenWeather · Current weather", "Bridged 5.00 USDC Base → Solana", "Invoice paid by 0x92a3…bf0a". */
 function receiptTitle(row: ListedReceipt, kind: CardReceiptKind, sent: TokenAmount | null, toolName: (id: string) => string | null): string {
@@ -125,7 +124,8 @@ export function receiptCard(row: ListedReceipt, toolName: (id: string) => string
     requestId: row.payboxRequestId,
     draftId: row.draftId,
     shareUrl: row.isPublic ? appUrl(HAKO_APP_PATHS.receipt, row.id) : null,
-    surface: CARD_SURFACES.has(row.surface) ? (row.surface as ReceiptData["surface"]) : null,
+    // The contract's Activity surfaces only: a gateway-recorded settlement (surface `gateway`) shows none.
+    surface: activitySurfaceSchema.safeParse(row.surface).data ?? null,
     at: row.createdAt.toISOString(),
   };
 }

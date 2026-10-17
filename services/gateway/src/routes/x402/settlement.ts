@@ -1,7 +1,9 @@
 /**
  * One receipt row for every settled x402 payment (plan add-ons, Activity ledger): paid runs, batches and invoice
- * payments, including plugin payments from hosts Hako has no session for. The hook runs after the facilitator settled,
- * so a failure here is logged and never touches the payer's answer.
+ * payments, including plugin payments from hosts Hako has no session for. The hook runs after the facilitator settled
+ * and before the paid answer is sent, so it only starts the ledger write and returns: a slow or unreachable Postgres
+ * never delays the answer the payer already paid for, and a failure is logged. The insert is idempotent on
+ * (kind, chain, tx hash).
  */
 
 import type { AfterSettleHook, HTTPTransportContext, SettleResultContext } from "@x402/core/server";
@@ -48,23 +50,21 @@ export function recordSettlement(pool: Pool | null): AfterSettleHook {
       console.warn(JSON.stringify({ event: "receipt_not_recorded", reason: !pool ? "no_database" : "unknown_payment", ...event }));
       return;
     }
-    try {
-      const { receipt, created } = await recordReceipt(pool, {
-        kind: "x402_settlement",
-        status: "confirmed",
-        // Who paid is known by address only: plugin runs and core use_service carry no Hako session.
-        surface: "gateway",
-        chain: result.network,
-        asset: requirements.asset,
-        amountAtomic: result.amount ?? requirements.amount,
-        payer: result.payer ?? null,
-        payTo: requirements.payTo,
-        txHash: result.transaction,
-        ...bought,
-      });
-      console.log(JSON.stringify({ event: "receipt_recorded", id: receipt.id, created, ...event }));
-    } catch (error) {
-      console.error(JSON.stringify({ event: "receipt_record_failed", error: String(error), ...event }));
-    }
+    // Not awaited: the money already moved, and the payer's answer must not wait on the ledger.
+    void recordReceipt(pool, {
+      kind: "x402_settlement",
+      status: "confirmed",
+      // Who paid is known by address only: plugin runs and core use_service carry no Hako session.
+      surface: "gateway",
+      chain: result.network,
+      asset: requirements.asset,
+      amountAtomic: result.amount ?? requirements.amount,
+      payer: result.payer ?? null,
+      payTo: requirements.payTo,
+      txHash: result.transaction,
+      ...bought,
+    })
+      .then(({ receipt, created }) => console.log(JSON.stringify({ event: "receipt_recorded", id: receipt.id, created, ...event })))
+      .catch((error: unknown) => console.error(JSON.stringify({ event: "receipt_record_failed", error: String(error), ...event })));
   };
 }

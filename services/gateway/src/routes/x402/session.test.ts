@@ -3,7 +3,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { createLocalJWKSet, exportJWK, generateKeyPair, SignJWT } from "jose";
+import { createLocalJWKSet, errors, exportJWK, generateKeyPair, SignJWT } from "jose";
 
 import { paidFor } from "./settlement.js";
 import { sessionReader } from "./session.js";
@@ -33,6 +33,20 @@ describe("Hako sessions", () => {
     assert.deepEqual(await read(`Bearer ${await sign({})}`), { status: "invalid" });
     const other = await keys();
     assert.deepEqual(await read(`Bearer ${await other.sign({ sub: "user-1" })}`), { status: "invalid" });
+  });
+
+  it("tells an issuer it could not reach from a bad token (retry, not sign in again)", async () => {
+    const { sign } = await keys();
+    const token = `Bearer ${await sign({ sub: "user-1" })}`;
+    const timedOut = sessionReader(ISSUER, async () => {
+      throw new errors.JWKSTimeout();
+    });
+    assert.deepEqual(await timedOut(token), { status: "unavailable" });
+    const unreachable = sessionReader(ISSUER, async () => {
+      throw new TypeError("fetch failed");
+    });
+    assert.deepEqual(await unreachable(token), { status: "unavailable" });
+    assert.deepEqual(await unreachable("Bearer not-a-jwt"), { status: "invalid" }, "a malformed token is the token's fault");
   });
 });
 
