@@ -112,6 +112,7 @@ export function paidLayer(ctx: X402Context, resource: PaidResource): MiddlewareH
     serviceName: SERVICE_NAME,
     unpaidResponseBody: async (context) => ({ contentType: "application/json", body: await resource.unpaidBody(ofRequest(context)) }),
   };
-  const http = new PublicUrlResourceServer(server, { [`GET ${resource.path}`]: route }, ctx.publicBaseUrl);
+  // No verb in the key: Hono answers HEAD with the GET handlers, and a HEAD must not run a batch unpaid either.
+  const http = new PublicUrlResourceServer(server, { [resource.path]: route }, ctx.publicBaseUrl);
   return paymentMiddlewareFromHTTPServer(http);
 }

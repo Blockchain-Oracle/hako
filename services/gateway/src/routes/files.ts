@@ -29,7 +29,12 @@ export function registerFiles(app: Hono, ctx: X402Context): void {
     }
     if (upstream.status === HTTP_NOT_FOUND) return missing();
     if (upstream.status !== HTTP_OK) return jsonError(c, HTTP_BAD_GATEWAY, "file_unavailable", `The tool router answered HTTP ${upstream.status}.`);
-    const headers = new Headers({ "cache-control": `public, max-age=${FILE_TTL_S}, immutable`, "x-content-type-options": "nosniff" });
+    // Bytes from a tool: never rendered as an active document on the gateway's origin.
+    const headers = new Headers({
+      "cache-control": `public, max-age=${FILE_TTL_S}, immutable`,
+      "x-content-type-options": "nosniff",
+      "content-security-policy": "default-src 'none'; media-src 'self'; sandbox",
+    });
     for (const name of PASSED_HEADERS) {
       const value = upstream.headers.get(name);
       if (value) headers.set(name, value);

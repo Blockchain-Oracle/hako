@@ -42,6 +42,7 @@ interface Harness {
   app: Hono;
   endpoints: Map<string, CatalogEndpoint>;
   settled: number;
+  runs: number;
   failing: Set<string>;
 }
 
@@ -49,7 +50,7 @@ function harness(): Harness {
   const endpoints = new Map(
     [endpoint("openweather/current", "1000", "0.001"), endpoint("frankfurter/convert", "2500", "0.0025")].map((e) => [e.path, e]),
   );
-  const h: Harness = { app: new Hono(), endpoints, settled: 0, failing: new Set() };
+  const h: Harness = { app: new Hono(), endpoints, settled: 0, runs: 0, failing: new Set() };
   const facilitator: FacilitatorClient = {
     getSupported: async () => ({ kinds: [{ x402Version: 2, scheme: "exact", network: NETWORK }], extensions: [], signers: {} }),
     verify: async () => ({ isValid: true, payer: PAYER }),
@@ -69,8 +70,10 @@ function harness(): Harness {
         (JSON.parse(body) as { bad?: boolean }).bad
           ? json(HTTP_UNPROCESSABLE, { error: { code: "invalid_input", message: "input does not match", details: ["body: bad"] } })
           : json(HTTP_OK, { valid: true }),
-      run: async (id) =>
-        h.failing.has(id) ? json(HTTP_BAD_GATEWAY, { error: { code: "upstream" } }) : json(HTTP_OK, { billable: true, data: { tool: id } }),
+      run: async (id) => {
+        h.runs += 1;
+        return h.failing.has(id) ? json(HTTP_BAD_GATEWAY, { error: { code: "upstream" } }) : json(HTTP_OK, { billable: true, data: { tool: id } });
+      },
       file: async () => new Response(null, { status: HTTP_NOT_FOUND }),
     },
     sessions: async () => ({ status: "none" }),
@@ -162,6 +165,13 @@ describe("batches", () => {
     const replay = await h.app.request(path, { headers: { "payment-signature": payment } });
     assert.equal(replay.status, HTTP_OK);
     assert.equal(h.settled, 1, "a settled batch is never settled twice");
+  });
+
+  it("never runs a batch for an unpaid request, HEAD included", async () => {
+    const created = await createBatch(h, [{ id: "openweather/current", input: { city: "Lagos" } }]);
+    const head = await h.app.request(`/v2/batch/${created.body.batchId}`, { method: "HEAD" });
+    assert.equal(head.status, HTTP_PAYMENT_REQUIRED);
+    assert.equal(h.runs, 0);
   });
 
   it("stores nothing when an input doesn't fit or a tool is unknown", async () => {
