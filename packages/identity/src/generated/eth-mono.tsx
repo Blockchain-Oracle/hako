@@ -1,0 +1,8 @@
+// GENERATED from svg/ by build.mjs. Do not edit; replace the SVG and rebuild.
+import type { SVGProps } from "react";
+
+const MarkEthMono = (props: SVGProps<SVGSVGElement>) => (
+  <svg fill="none" viewBox="0 0 24 24" width="100%" height="100%" {...props}><path fill="currentColor" d="M12 3v6.65l5.625 2.516zm0 0-5.625 9.166L12 9.651zm0 13.477v4.522l5.625-7.784zM12 21v-4.523l-5.625-3.262z" /><path fill="currentColor" d="m12 15.43 5.625-3.263L12 9.65zm-5.625-3.263L12 15.429V9.651z" /><path fill="currentColor" fillRule="evenodd" d="m12 15.429-5.625-3.263L12 3l5.625 9.166zM6.749 11.9l5.161-8.41v6.115zm-.077.23 5.238-2.327v5.364zm5.418-2.327v5.364l5.233-3.038zm0-.198 5.16 2.295-5.16-8.41z" clipRule="evenodd" /><path fill="currentColor" fillRule="evenodd" d="M12 16.406 6.375 13.21 12 21l5.625-7.79zm-4.995-2.633 4.905 2.79v4.005zm5.085 2.79v4.005l4.905-6.795z" clipRule="evenodd" /></svg>
+);
+
+export default MarkEthMono;

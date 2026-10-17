@@ -246,6 +246,9 @@ importers:
       '@hako/env':
         specifier: workspace:*
         version: link:../../packages/env
+      '@hako/identity':
+        specifier: workspace:*
+        version: link:../../packages/identity
       '@hako/model':
         specifier: workspace:*
         version: link:../../packages/model
@@ -363,6 +366,28 @@ importers:
       '@types/node':
         specifier: 'catalog:'
         version: 24.12.3
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+
+  packages/identity:
+    dependencies:
+      '@hako/config':
+        specifier: workspace:*
+        version: link:../config
+      '@hako/networks':
+        specifier: workspace:*
+        version: link:../networks
+    devDependencies:
+      '@hako/brand':
+        specifier: workspace:*
+        version: link:../brand
+      '@types/react':
+        specifier: 'catalog:'
+        version: 19.2.18
+      react:
+        specifier: 'catalog:'
+        version: 19.2.8
       typescript:
         specifier: 'catalog:'
         version: 5.9.3

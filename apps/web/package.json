@@ -14,6 +14,7 @@
     "@hako/brand": "workspace:*",
     "@hako/config": "workspace:*",
     "@hako/env": "workspace:*",
+    "@hako/identity": "workspace:*",
     "@hako/model": "workspace:*",
     "ai": "catalog:",
     "class-variance-authority": "catalog:",

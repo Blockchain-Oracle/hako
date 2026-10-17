@@ -13,7 +13,15 @@ export const HERO = {
     "and signed with your PayBox wallet, and shown as clickable cards wherever your agent lives: Hako's web app, and " +
     "inside Claude, ChatGPT, Cursor and VS Code.",
   honesty: "Live today: the tool catalog. Money moves, the cards inside AI hosts and the PayBox plugin are being built.",
-  builtOn: "Built on PayBox · MoonPay",
+} as const;
+
+/** "Built on PayBox · MoonPay" with their real marks (@hako/identity provider ids). */
+export const BUILT_ON = {
+  lead: "Built on",
+  partners: [
+    { id: "paybox", name: "PayBox" },
+    { id: "moonpay", name: "MoonPay" },
+  ],
 } as const;
 
 export type StandingState = "live" | "building";

@@ -46,7 +46,9 @@ envelope; set per provider in `packages/tools/src/hako_tools/connectors/*/provid
 - NASA and USGS: US Government works, public domain (image credits as stated per image).
 - OpenAlex (CC0), Crossref and arXiv metadata; Open Food Facts (ODbL); PubChem (NCBI).
 
-Provider logos in `apps/web/public/logos/` are the providers' own icons, used only to identify each integration.
+Provider, chain and token marks live in `packages/identity/svg/`, each with its source and licence in
+`packages/identity/PROVENANCE.md` (first-party brand assets, web3icons under MIT, simple-icons under CC0, circle-flags
+under MIT); they are shown only to identify each integration and remain their owners' trademarks.
 
 ## Packaged libraries
 

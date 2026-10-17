@@ -1,10 +1,12 @@
+import { Mark, providerKey } from "@hako/identity";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 import { CopyCommand } from "@/components/common/CopyCommand";
 import { SKILL_COMMAND } from "@/lib/constants/site";
 
-import { HERO } from "../lib/content";
+import { BUILT_ON_MARK_SIZE } from "../landing.config";
+import { BUILT_ON, HERO } from "../lib/content";
 
 /**
  * The hero (Kawase landing grammar on Senryo tokens): a status line in words, the promise as the one title, black
@@ -40,7 +42,18 @@ export function Hero({ tools }: { tools: number }) {
         <p className="mb-2 text-sm text-muted-foreground">Give this to your agent</p>
         <CopyCommand command={SKILL_COMMAND} />
       </div>
-      <p className="mt-10 text-sm font-semibold text-foreground">{HERO.builtOn}</p>
+      <p className="mt-10 inline-flex flex-wrap items-center gap-x-2 gap-y-1 text-sm font-semibold text-foreground">
+        <span>{BUILT_ON.lead}</span>
+        {BUILT_ON.partners.map((partner, i) => (
+          <span key={partner.id} className="inline-flex items-center gap-1.5">
+            {i > 0 && <span className="text-muted-foreground" aria-hidden>·</span>}
+            <span aria-hidden className="inline-flex">
+              <Mark entity={providerKey(partner.id)} size={BUILT_ON_MARK_SIZE} disc={false} />
+            </span>
+            {partner.name}
+          </span>
+        ))}
+      </p>
     </section>
   );
 }

@@ -2,11 +2,12 @@
 @import "tw-animate-css";
 @import "@hako/brand/paint.css";
 
-/* Tailwind scans the shared React packages too: the card library, the installed UI components and the brand's mark
- * and lockup (plan §3). */
+/* Tailwind scans the shared React packages too: the card library, the installed UI components, the brand's mark and
+ * lockup, and the identity marks (plan §3). */
 @source "../../../../packages/cards/src";
 @source "../../../../packages/ui/src";
 @source "../../../../packages/brand/src";
+@source "../../../../packages/identity/src";
 
 /*
  * Dark mode: `.dark` on <html>, set before the first paint by the script in app/layout.tsx (the visitor's choice,
