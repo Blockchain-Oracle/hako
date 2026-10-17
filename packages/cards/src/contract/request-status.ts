@@ -77,3 +77,20 @@ const STAGE_BY_PENDING = {
 
 export const pendingRequestStage = (status: PayboxRequestStatus): MoveStage | null =>
   isTerminalRequestStatus(status) ? null : STAGE_BY_PENDING[status];
+
+/**
+ * A `use_service` request's output on `success` (x402 gateway mode): PayBox re-fetched the paid resource and stores its
+ * answer as `output.value.response = {status, content_type, body}` (context/01-paybox-platform/request-lifecycle.md,
+ * "Flow per operation"). For Hako's `/v2/run/*` the body is the run envelope; for `/v2/invoice/<id>`, the paid invoice.
+ * `body` may arrive parsed or as the JSON text, so readers accept both.
+ */
+export const payboxServiceOutputSchema = z.looseObject({
+  value: z.looseObject({
+    response: z.looseObject({
+      status: z.number().int(),
+      content_type: z.string().nullish(),
+      body: z.unknown(),
+    }),
+  }),
+});
+export type PayboxServiceOutput = z.output<typeof payboxServiceOutputSchema>;

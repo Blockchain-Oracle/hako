@@ -35,14 +35,28 @@ export type CardAction = z.output<typeof cardActionSchema>;
 /**
  * The one named fix of a blocked card (plan D21 "blocked CTA with one named fix", add-ons "Agent passport"): connect or
  * reconnect PayBox, add money (the Fund card), raise the limit (`request_account_change` → `manage_url`), top up gas,
- * retry, or take a fresh quote.
+ * retry, take a fresh quote, or move the draft to a network Hako executes on (R17: "Hako can't move money from
+ * Ethereum yet" → "Switch to Base").
  */
-export const CARD_FIXES = ["connect_paybox", "reconnect_paybox", "add_money", "raise_limit", "top_up_gas", "retry", "fresh_quote"] as const;
+export const CARD_FIXES = [
+  "connect_paybox",
+  "reconnect_paybox",
+  "add_money",
+  "raise_limit",
+  "top_up_gas",
+  "retry",
+  "fresh_quote",
+  "change_network",
+] as const;
 export type CardFix = (typeof CARD_FIXES)[number];
 export const cardFixSchema = z.enum(CARD_FIXES);
 
+/** A fix and the button that applies it (a failure card, an activity row stopped at the limit). */
+export const namedFixSchema = z.object({ fix: cardFixSchema, action: cardActionSchema });
+export type NamedFix = z.output<typeof namedFixSchema>;
+
 export const blockedSchema = z.object({
-  /** In words: "Your agent stopped at your limit", "Not enough USDC on Base". */
+  /** In words: "Your agent stopped at your limit", "Not enough USDC on Base", "Hako can't move money from Ethereum yet". */
   reason: z.string().min(1),
   fix: cardFixSchema,
   action: cardActionSchema,

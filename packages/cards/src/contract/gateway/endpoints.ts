@@ -27,6 +27,7 @@ import {
   receiptsQuerySchema,
   rehearseRequestSchema,
   routesRequestSchema,
+  sharedReceiptsQuerySchema,
 } from "./money-schemas.ts";
 import {
   chainBalanceRequestSchema,
@@ -264,11 +265,21 @@ export const GATEWAY_ENDPOINTS = {
   receipts: {
     method: "GET",
     path: "/v1/receipts",
-    summary: "The caller's own receipts, newest first",
+    summary: "The caller's own receipts, newest first (filters: kind, status, chain, surface, draftId)",
     query: receiptsQuerySchema,
     response: receiptsPageSchema,
     responseType: "json",
     auth: "hako",
+  },
+  // Registered before `/v1/receipts/:id`, so `shared` is never read as a receipt id.
+  receiptsShared: {
+    method: "GET",
+    path: "/v1/receipts/shared",
+    summary: "Receipts their owners shared as /r/<id>, newest first (the landing's proof section; anonymous)",
+    query: sharedReceiptsQuerySchema,
+    response: receiptsPageSchema,
+    responseType: "json",
+    auth: "none",
   },
   receiptGet: { method: "GET", path: "/v1/receipts/:id", summary: "One receipt (the shared /r/<id> page)", params: idParamsSchema, response: receiptDataSchema, responseType: "json", auth: "none" },
   receiptCreate: {

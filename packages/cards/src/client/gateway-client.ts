@@ -105,8 +105,10 @@ export interface GatewayClientOptions {
 
 export interface GatewayClient {
   readonly baseUrl: string;
-  /** The absolute URL of a route (x402 `paidUrl`s, `/v1/files/<id>`, logo proxy links). */
+  /** The absolute URL of a route on this client's origin (`/v1/files/<id>`, logo proxy links). */
   url<K extends EndpointKey>(key: K, ...args: UrlArgs<K>): string;
+  /** Whether calls carry a Hako session (a bearer), which `auth: 'hako'` routes need. */
+  authenticated(): Promise<boolean>;
   call<K extends JsonEndpointKey>(key: K, ...args: Args<K>): Promise<EndpointResponse<K>>;
   stream<K extends StreamEndpointKey>(key: K, ...args: Args<K>): AsyncGenerator<EndpointResponse<K>>;
   bytes<K extends BinaryEndpointKey>(key: K, ...args: Args<K>): Promise<BinaryBody>;
@@ -117,29 +119,41 @@ const ACCEPT: Record<ResponseType, string> = { json: "application/json", ndjson:
 
 type RawRequest = Partial<Record<Field, unknown>>;
 
-export function createGatewayClient(options: GatewayClientOptions = {}): GatewayClient {
-  const baseUrl = (options.baseUrl ?? HAKO_GATEWAY_URL).replace(/\/+$/, "");
-  const fetchImpl = options.fetch ?? globalThis.fetch;
-  const defOf = (key: EndpointKey): EndpointDef => GATEWAY_ENDPOINTS[key];
+const defOf = (key: EndpointKey): EndpointDef => GATEWAY_ENDPOINTS[key];
+const originOf = (baseUrl: string): string => baseUrl.replace(/\/+$/, "");
 
-  function urlOf(def: EndpointDef, request: RawRequest): URL {
-    const params = def.params ? (def.params.parse(request.params ?? {}) as Record<string, unknown>) : {};
-    const path = def.path.replace(/:([A-Za-z]+)/g, (_, name: string) => encodeURIComponent(String(params[name])));
-    const url = new URL(`${baseUrl}${path}`);
-    if (def.query) {
-      const query = def.query.parse(request.query ?? {}) as Record<string, unknown>;
-      for (const [name, value] of Object.entries(query)) {
-        if (value !== undefined && value !== null) url.searchParams.set(name, String(value));
-      }
+function urlOf(baseUrl: string, def: EndpointDef, request: RawRequest): URL {
+  const params = def.params ? (def.params.parse(request.params ?? {}) as Record<string, unknown>) : {};
+  const path = def.path.replace(/:([A-Za-z]+)/g, (_, name: string) => encodeURIComponent(String(params[name])));
+  const url = new URL(`${originOf(baseUrl)}${path}`);
+  if (def.query) {
+    const query = def.query.parse(request.query ?? {}) as Record<string, unknown>;
+    for (const [name, value] of Object.entries(query)) {
+      if (value !== undefined && value !== null) url.searchParams.set(name, String(value));
     }
-    return url;
   }
+  return url;
+}
+
+/**
+ * A route's absolute URL on a given gateway origin, without a client. Paid URLs that PayBox's servers fetch
+ * (`/v2/run/*` on a pay card, `use_service` instructions) are built on the public origin with this, even when the
+ * caller reaches the gateway on an internal address.
+ */
+export function endpointUrl<K extends EndpointKey>(baseUrl: string, key: K, ...[location]: UrlArgs<K>): string {
+  return urlOf(baseUrl, defOf(key), (location ?? {}) as RawRequest).toString();
+}
+
+export function createGatewayClient(options: GatewayClientOptions = {}): GatewayClient {
+  const baseUrl = originOf(options.baseUrl ?? HAKO_GATEWAY_URL);
+  const fetchImpl = options.fetch ?? globalThis.fetch;
+  const bearerOf = async (): Promise<string | null> => (options.bearer ? await options.bearer() : null);
 
   async function send(key: EndpointKey, request: RawRequest, init: CallInit = {}): Promise<Response> {
     const def = defOf(key);
-    const url = urlOf(def, request);
+    const url = urlOf(baseUrl, def, request);
     const headers: Record<string, string> = { accept: ACCEPT[def.responseType] };
-    const token = options.bearer ? await options.bearer() : null;
+    const token = await bearerOf();
     if (token) headers.authorization = `Bearer ${token}`;
     else if (def.auth === "hako") {
       throw new GatewayError(key, HTTP_UNAUTHORIZED, "auth_required", `${key} needs a signed-in Hako session`, false);
@@ -165,7 +179,8 @@ export function createGatewayClient(options: GatewayClientOptions = {}): Gateway
 
   return {
     baseUrl,
-    url: (key, ...[location]) => urlOf(defOf(key), (location ?? {}) as RawRequest).toString(),
+    url: (key, ...args) => endpointUrl(baseUrl, key, ...args),
+    authenticated: async () => Boolean(await bearerOf()),
     async call(key, ...[request, init]) {
       const res = await send(key, (request ?? {}) as RawRequest, init);
       return checked(key, await res.json());

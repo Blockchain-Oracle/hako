@@ -2,10 +2,10 @@ import { BATCH_MAX_CALLS, INVOICE_NOTE_MAX_CHARS } from "@hako/config";
 import { z } from "zod";
 
 import { ACTIVITY_PAGE_DEFAULT, ACTIVITY_PAGE_MAX, ROUTE_RACE_MAX_ROUTES, SIGNED_TX_MAX_CHARS, TOOL_ID_MAX_CHARS } from "../contract.config.ts";
-import { draftRefSchema } from "../intent.ts";
+import { draftKindSchema, draftRefSchema } from "../intent.ts";
 import { anyRunEnvelopeSchema } from "../kinds/catalog.ts";
 import { routeDataSchema } from "../kinds/money.ts";
-import { receiptDataSchema } from "../kinds/outcome.ts";
+import { activitySurfaceSchema, receiptDataSchema, receiptKindSchema, receiptStatusSchema } from "../kinds/outcome.ts";
 import { moneyMovedSchema } from "../phase.ts";
 import {
   addressSchema,
@@ -143,11 +143,36 @@ export const rehearseRequestSchema = z.union([
   draftRefSchema.extend({ chain: caip2Schema, from: solanaAddressSchema, transactionBase64: z.string().min(1) }),
 ]);
 
-/** `POST /v1/broadcast`: a PayBox-signed transaction with the draft version it must equal (the only sender of signed txs). */
+/**
+ * What a signed transaction must equal when its draft lives outside `@hako/db` (the CLI's in-process store, plan §1
+ * "CLI money moves" and §5b): the transaction the draft version was built into, and the reviewed values R15 binds.
+ * EVM: chainId, from, to, data and value; Solana: the signer and the message the signature covers.
+ */
+export const broadcastExpectationSchema = z.object({
+  kind: draftKindSchema.exclude(["run", "invoice_pay"]),
+  tx: z.discriminatedUnion("family", [
+    evmCallSchema.omit({ gas: true }).extend({ family: z.literal("evm"), from: evmAddressSchema }),
+    z.object({
+      family: z.literal("solana"),
+      signer: solanaAddressSchema,
+      /** The serialized transaction message (what the signer signed), base64. */
+      messageBase64: z.string().min(1),
+    }),
+  ]),
+  /** The reviewed route (swap, bridge) or Earn move whose fresh quote the tx was built from; null for a send. */
+  reviewed: z.union([bridgeRequestSchema, earnMoveRequestSchema]).nullable(),
+});
+
+/**
+ * `POST /v1/broadcast`: a PayBox-signed transaction with the draft version it must equal (the only sender of signed
+ * txs). The gateway checks it against the stored draft version in `@hako/db`; when `(draftId, version)` isn't stored
+ * there (a CLI draft) it checks it against `draft` instead, and refuses when `draft` is missing.
+ */
 export const broadcastRequestSchema = draftRefSchema.extend({
   chain: caip2Schema,
   /** The signed tx: EVM `serializedTransaction` (0x hex) or Solana `signedTransactionBase64`. */
   signedTx: z.string().min(1).max(SIGNED_TX_MAX_CHARS),
+  draft: broadcastExpectationSchema.optional(),
 });
 
 export const broadcastResponseSchema = z.object({
@@ -195,11 +220,26 @@ export const invoiceCreateRequestSchema = z.object({
 
 export const idParamsSchema = z.object({ id: z.string().min(1) });
 
-/** `GET /v1/receipts`: the caller's own receipts, newest first (query values arrive as strings, so numbers coerce). */
-export const receiptsQuerySchema = z.object({
+/** A page of receipts (query values arrive as strings, so numbers coerce). */
+const receiptsPageQuerySchema = z.object({
   cursor: z.string().min(1).optional(),
   limit: z.coerce.number<string | number>().int().min(1).max(ACTIVITY_PAGE_MAX).default(ACTIVITY_PAGE_DEFAULT),
 });
+
+/**
+ * `GET /v1/receipts`: the caller's own receipts, newest first, with the Activity filters (plan D23: type, status,
+ * chain, surface) and `draftId`, so a confirmed move's card turns into its receipt.
+ */
+export const receiptsQuerySchema = receiptsPageQuerySchema.extend({
+  kind: receiptKindSchema.optional(),
+  status: receiptStatusSchema.optional(),
+  chain: caip2Schema.optional(),
+  surface: activitySurfaceSchema.optional(),
+  draftId: z.string().min(1).optional(),
+});
+
+/** `GET /v1/receipts/shared`: receipts their owners shared as `/r/<id>`, newest first (the landing's proof section). */
+export const sharedReceiptsQuerySchema = receiptsPageQuerySchema;
 export const receiptsPageSchema = z.object({
   receipts: z.array(receiptDataSchema),
   nextCursor: z.string().nullable(),

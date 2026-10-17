@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { cardActionSchema, cardFixSchema } from "../envelope.ts";
+import { namedFixSchema } from "../envelope.ts";
 import { draftKindSchema, intentStateSchema } from "../intent.ts";
 import { moneyMovedSchema, moveStageSchema } from "../phase.ts";
 import { payboxRequestStatusSchema, requestWaitSchema } from "../request-status.ts";
@@ -34,7 +34,7 @@ export const statusDataSchema = z.object({
   reason: z.string().nullable(),
   /** True when the execute found this version's request already created and created nothing. */
   reused: z.boolean(),
-  /** Set once the move ended in a receipt (`hako_receipt`, the broadcast job): the card turns into it. */
+  /** The receipt this move is recorded as while it still settles; once it confirms or reverts the card turns into it. */
   receiptId: z.string().nullable(),
   updatedAt: isoTimeSchema,
 });
@@ -42,7 +42,18 @@ export type StatusData = z.output<typeof statusDataSchema>;
 
 /** What a receipt records. */
 export const RECEIPT_KINDS = ["run", "batch", "send", "swap", "bridge", "earn_deposit", "earn_withdraw", "invoice", "approve"] as const;
+export type ReceiptKind = (typeof RECEIPT_KINDS)[number];
 export const receiptKindSchema = z.enum(RECEIPT_KINDS);
+
+/** Where a receipt stands on chain: still settling, or its end. */
+export const RECEIPT_STATUSES = ["confirmed", "reverted", "pending"] as const;
+export type ReceiptStatus = (typeof RECEIPT_STATUSES)[number];
+export const receiptStatusSchema = z.enum(RECEIPT_STATUSES);
+
+/** Where Hako did something (plan add-ons "Activity ledger": the surface filter). */
+export const ACTIVITY_SURFACES = ["web", "mcp", "cli", "plugin", "voice"] as const;
+export type ActivitySurface = (typeof ACTIVITY_SURFACES)[number];
+export const activitySurfaceSchema = z.enum(ACTIVITY_SURFACES);
 
 /** A receipt (`@hako/db` row; `/r/<id>` when shared): the button morphs into it (Kawase TxMorph). */
 export const receiptDataSchema = z.object({
@@ -50,7 +61,7 @@ export const receiptDataSchema = z.object({
   kind: receiptKindSchema,
   /** The verb line: "Paid Exa", "Bridged 5 USDC Base → Solana", "Invoice paid by @tobi". */
   title: z.string().min(1),
-  status: z.enum(["confirmed", "reverted", "pending"]),
+  status: receiptStatusSchema,
   sent: tokenAmountSchema.nullable(),
   received: tokenAmountSchema.nullable(),
   feeUsd: usdSchema.nullable(),
@@ -59,6 +70,8 @@ export const receiptDataSchema = z.object({
   draftId: z.string().nullable(),
   /** The public `/r/<id>` page, when the person shared it. */
   shareUrl: urlSchema.nullable(),
+  /** The surface the move was made from; null for a settlement Hako saw from outside (a plugin payment in another host). */
+  surface: activitySurfaceSchema.nullable(),
   at: isoTimeSchema,
 });
 export type ReceiptData = z.output<typeof receiptDataSchema>;
@@ -70,7 +83,7 @@ export const failureDataSchema = z.object({
   moneyMoved: moneyMovedSchema,
   requestId: z.string().nullable(),
   txs: z.array(txLinkSchema),
-  fix: z.object({ fix: cardFixSchema, action: cardActionSchema }).nullable(),
+  fix: namedFixSchema.nullable(),
   /** The technical text, behind a disclosure. */
   technical: z.string().nullable(),
 });

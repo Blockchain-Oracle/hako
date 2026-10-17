@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { CONTACT_NAME_MAX_CHARS, PAYBOX_USERNAME_MAX_CHARS } from "../contract.config.ts";
-import { cardActionSchema, cardFixSchema } from "../envelope.ts";
+import { cardActionSchema, cardFixSchema, namedFixSchema } from "../envelope.ts";
 import { cardPhaseSchema } from "../phase.ts";
 import {
   addressSchema,
@@ -16,7 +16,7 @@ import {
   usdSchema,
   walletRefSchema,
 } from "../primitives.ts";
-import { receiptKindSchema } from "./outcome.ts";
+import { activitySurfaceSchema, receiptKindSchema } from "./outcome.ts";
 
 /**
  * The person's own things (Hako-made, strict camelCase): invoices, the activity ledger, the agent passport, contacts,
@@ -48,12 +48,15 @@ export const invoiceDataSchema = z.object({
 });
 export type InvoiceData = z.output<typeof invoiceDataSchema>;
 
-export const ACTIVITY_SURFACES = ["web", "mcp", "cli", "plugin", "voice"] as const;
-
-/** One ledger row: a mark, a verb, a signed amount, a status in words and shape, a time, an explorer link. */
+/**
+ * One ledger row: a mark, a verb, a signed amount, a status in words and shape, a time, an explorer link. Rows come
+ * from Hako's receipts and from PayBox `list_requests` (requests that never produced a receipt: denied, failed or still
+ * waiting).
+ */
 export const activityRowSchema = z.object({
   id: z.string().min(1),
-  kind: receiptKindSchema,
+  /** Null for a PayBox request with no receipt: `list_requests` doesn't say what the request was for. */
+  kind: receiptKindSchema.nullable(),
   verb: z.string().min(1),
   direction: z.enum(["in", "out", "none"]),
   amount: tokenAmountSchema.nullable(),
@@ -65,7 +68,9 @@ export const activityRowSchema = z.object({
   requestId: z.string().nullable(),
   /** Opens the receipt in a side sheet. */
   receiptId: z.string().nullable(),
-  surface: z.enum(ACTIVITY_SURFACES).nullable(),
+  surface: activitySurfaceSchema.nullable(),
+  /** "Your agent stopped at your limit · Raise it": the row's one fix, when it has one. */
+  fix: namedFixSchema.nullable(),
   at: isoTimeSchema,
 });
 export type ActivityRow = z.output<typeof activityRowSchema>;
@@ -119,7 +124,10 @@ export const passportDataSchema = z.object({
 });
 export type PassportData = z.output<typeof passportDataSchema>;
 
-/** A saved recipient (plan D25): an address or a PayBox username, verified by QR. */
+/**
+ * A saved recipient (plan D25): an address or a PayBox username. `verified` turns true once the address read from the
+ * recipient's own receive QR equals the saved one (`hako_contacts` `verify`).
+ */
 export const contactSchema = z.object({
   id: z.string().min(1),
   name: z.string().min(1).max(CONTACT_NAME_MAX_CHARS),
@@ -133,8 +141,8 @@ export type Contact = z.output<typeof contactSchema>;
 
 export const contactDataSchema = z.object({
   contacts: z.array(contactSchema),
-  action: z.enum(["list", "added", "renamed", "deleted", "resolved"]),
-  /** The contact this call added, renamed, deleted or resolved. */
+  action: z.enum(["list", "added", "renamed", "deleted", "resolved", "verified"]),
+  /** The contact this call added, renamed, deleted, resolved or verified. */
   changedId: z.string().nullable(),
 });
 export type ContactData = z.output<typeof contactDataSchema>;

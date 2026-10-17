@@ -134,6 +134,15 @@ export const cardKindSchema = z.enum(CARD_KINDS as [CardKind, ...CardKind[]]);
 export const DRAFT_CARD_KINDS = ["send_draft", "swap_draft", "bridge_draft", "earn_deposit_draft", "earn_withdraw_draft"] as const satisfies readonly HakoCardKind[];
 export type DraftCardKind = (typeof DRAFT_CARD_KINDS)[number];
 
+/**
+ * What a paid run or a money move turns into once it runs (plan §1 card flow steps 1, 3 and 4): its live status, the
+ * failure card that says whether money moved, its receipt, the paid invoice, or the paid tool's result card (any catalog
+ * kind, with the receipt line in `envelope.payment`). `hako_execute`, `hako_request_status` and `hako_broadcast`
+ * answer with these.
+ */
+export const OUTCOME_CARD_KINDS = ["status", "failure", "receipt", "invoice", ...CATALOG_RENDER_KINDS] as const;
+export type OutcomeCardKind = (typeof OUTCOME_CARD_KINDS)[number];
+
 export type CardDataSchema<K extends CardKind> = (typeof CARD_SCHEMAS)[K];
 export type CardData<K extends CardKind> = z.output<CardDataSchema<K>>;
 
@@ -147,17 +156,36 @@ export function structuredContentSchema<K extends CardKind>(kind: K) {
 }
 export type StructuredContentSchema<K extends CardKind> = ReturnType<typeof structuredContentSchema<K>>;
 
-/** A tool that answers with one of several kinds (`hako_chain_read`, `hako_draft_update`, `hako_refresh`). */
-export function structuredContentUnion<const K extends readonly [CardKind, CardKind, ...CardKind[]]>(kinds: K) {
-  const [first, second, ...rest] = kinds.map((kind) => structuredContentSchema(kind));
-  return z.discriminatedUnion("kind", [first, second, ...rest] as unknown as [
-    StructuredContentSchema<K[number]>,
-    StructuredContentSchema<K[number]>,
-    ...StructuredContentSchema<K[number]>[],
-  ]);
-}
-
 export type StructuredContent<K extends CardKind = CardKind> = K extends CardKind ? z.output<StructuredContentSchema<K>> : never;
+
+/** The schema of a tool that answers with one of several kinds: its output is exactly one of those cards. */
+export type StructuredContentUnionSchema<K extends CardKind> = z.ZodType<StructuredContent<K>, unknown>;
+
+/**
+ * A tool that answers with one of several kinds (`hako_chain_read`, `hako_fund`, `hako_draft_update`, `hako_refresh`,
+ * the execute outcomes). An object at the root, as MCP `inputSchema`/`outputSchema` and the model providers' tool
+ * schemas require (`type: "object"`, no root `oneOf`): `kind` names the card, `data` lists the kinds' data schemas, and
+ * a refinement checks `data` against the named kind's own schema and keeps that schema's parse, so a card can never
+ * carry another kind's data. Put Hako's own kinds before catalog kinds: a union keeps its first match.
+ */
+export function structuredContentUnion<const K extends readonly [CardKind, ...CardKind[]]>(kinds: K): StructuredContentUnionSchema<K[number]> {
+  const options = [...new Set(kinds.map((kind): z.ZodType => CARD_SCHEMAS[kind]))];
+  const [first, ...rest] = options as [z.ZodType, ...z.ZodType[]];
+  const data = rest.length === 0 ? first : z.union([first, ...rest]);
+  const ownParse = (value: { kind: CardKind; data: unknown }) => CARD_SCHEMAS[value.kind].safeParse(value.data);
+  const schema = z
+    .object({ kind: z.enum(kinds), data, envelope: cardEnvelopeSchema })
+    .superRefine((value, ctx) => {
+      const parsed = ownParse(value);
+      if (parsed.success) return;
+      for (const issue of parsed.error.issues) ctx.addIssue({ code: "custom", path: ["data", ...issue.path], message: issue.message });
+    })
+    .overwrite((value) => {
+      const parsed = ownParse(value);
+      return parsed.success ? { ...value, data: parsed.data } : value;
+    });
+  return schema as unknown as StructuredContentUnionSchema<K[number]>;
+}
 
 /** Every card of every kind: what a surface reads back from a stored tool part before it knows the kind. */
 export const anyStructuredContentSchema = z.discriminatedUnion(
