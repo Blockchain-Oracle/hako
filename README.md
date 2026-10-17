@@ -20,7 +20,7 @@ These are planned and not finished; nothing here should be read as shipped:
 
 - **The PayBox plugin** ([`plugins/paybox`](plugins/paybox), `hako_*` tools): it starts with `hako_discover`, `hako_inspect` and `hako_run` (an x402 proposal PayBox pays) and grows into batch runs, LI.FI quotes, bridge, swap and earn proposals, market odds, chain reads and pay-me invoices. It will be submitted for review in the PayBox developer portal; until PayBox approves a version, it is installable privately under Unofficial plugins.
 - **Connect PayBox** in the web app, with editable money cards (route race, rehearsal, receipts), activity, contacts and voice.
-- **Cards inside Claude, ChatGPT, Cursor and VS Code** (MCP Apps) from the hosted MCP server at `api.usehako.xyz/mcp`.
+- **Cards inside Claude, ChatGPT, Cursor and VS Code** (MCP Apps) from the hosted MCP server at `api.usehako.site/mcp`.
 - **`hako login`** in the CLI (PayBox's own login and pairing) and paid runs and money moves from the terminal.
 - The design moves to Senryo, the design system of Kawase (the owner's own project).
 

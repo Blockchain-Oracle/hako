@@ -1,5 +1,5 @@
 {
-  "$id": "https://usehako.xyz/schemas/cards/tool.schema.json",
+  "$id": "https://usehako.site/schemas/cards/tool.schema.json",
   "title": "tool",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",

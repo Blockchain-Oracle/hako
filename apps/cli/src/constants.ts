@@ -1,6 +1,6 @@
 /** CLI / local MCP constants. Every number names its reason. */
 export const VERSION = "0.1.1";
-export const DEFAULT_API_URL = "https://api.usehako.xyz";
+export const DEFAULT_API_URL = "https://api.usehako.site";
 /** Paid runs: the gateway's mainnet x402 routes, which the user's PayBox wallet pays (PayBox core use_service). */
 export const RUN_V2_PREFIX = "/v2/run";
 export const PAID_NETWORK = "eip155:8453"; // Base mainnet, PayBox's EVM x402 rail

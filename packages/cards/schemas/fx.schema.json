@@ -1,5 +1,5 @@
 {
-  "$id": "https://usehako.xyz/schemas/cards/fx.schema.json",
+  "$id": "https://usehako.site/schemas/cards/fx.schema.json",
   "title": "fx",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",

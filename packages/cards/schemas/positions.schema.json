@@ -1,5 +1,5 @@
 {
-  "$id": "https://usehako.xyz/schemas/cards/positions.schema.json",
+  "$id": "https://usehako.site/schemas/cards/positions.schema.json",
   "title": "positions",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",

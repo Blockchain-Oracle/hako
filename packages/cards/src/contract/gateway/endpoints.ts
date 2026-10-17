@@ -49,7 +49,7 @@ import {
 } from "./read-schemas.ts";
 
 /**
- * The typed gateway endpoint table (plan W0.4, B12, B13): every route of `api.usehako.xyz` with its method, path, zod
+ * The typed gateway endpoint table (plan W0.4, B12, B13): every route of `api.usehako.site` with its method, path, zod
  * request (path params, query, JSON body) and zod response. The gateway (L1) registers exactly these; the plugin, the
  * web server, the MCP tools and the CLI call them through `createGatewayClient`. A route not in this table does not
  * exist.

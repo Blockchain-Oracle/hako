@@ -1,5 +1,5 @@
 {
-  "$id": "https://usehako.xyz/schemas/cards/balance.schema.json",
+  "$id": "https://usehako.site/schemas/cards/balance.schema.json",
   "title": "balance",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",

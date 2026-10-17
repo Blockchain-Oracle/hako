@@ -15,7 +15,7 @@ import { idParamsSchema, type InvoiceData, invoiceCreateRequestSchema, invoiceDa
 import { decimalAmountSchema } from "../wire/primitives.js";
 import { CREATES, PAYS, READ_ONLY } from "./annotations.js";
 
-const invoiceId = idParamsSchema.shape.id.describe("The invoice id (from hako_invoice_create or the pay link usehako.xyz/pay/<id>).");
+const invoiceId = idParamsSchema.shape.id.describe("The invoice id (from hako_invoice_create or the pay link usehako.site/pay/<id>).");
 
 const amountOf = (invoice: InvoiceData) => amountText(invoice.amount.amountAtomic, invoice.amount.token.decimals, invoice.amount.token.symbol);
 const noteOf = (invoice: InvoiceData) => (invoice.note ? ` for "${invoice.note}"` : "");

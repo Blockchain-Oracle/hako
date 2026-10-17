@@ -2,7 +2,7 @@ import { HAKO_AUTH_ISSUER } from "@hako/config";
 
 /**
  * Where Better Auth is mounted (`apps/web/src/app/api/auth/[...all]`), read from the issuer @hako/config names
- * (`https://usehako.xyz/api/auth`), so the path and the issuer can't drift apart.
+ * (`https://usehako.site/api/auth`), so the path and the issuer can't drift apart.
  */
 export const AUTH_BASE_PATH = new URL(HAKO_AUTH_ISSUER).pathname;
 

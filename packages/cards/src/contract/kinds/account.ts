@@ -34,7 +34,7 @@ export const invoiceDataSchema = z.object({
   /** The payee: the PayBox wallet the invoice settles to (`DynamicPayTo`). */
   payTo: evmAddressSchema,
   note: z.string().nullable(),
-  /** `usehako.xyz/pay/<id>`: what the QR encodes. */
+  /** `usehako.site/pay/<id>`: what the QR encodes. */
   payUrl: urlSchema,
   /** `GET /v2/invoice/<id>` on the gateway: what any PayBox agent pays with core `use_service`. */
   agentPayUrl: urlSchema,

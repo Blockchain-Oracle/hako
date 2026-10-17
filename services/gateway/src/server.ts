@@ -1,5 +1,5 @@
 /**
- * hako-gateway: the public front door (api.usehako.xyz). This file only builds the app: shared middleware, the HTTP
+ * hako-gateway: the public front door (api.usehako.site). This file only builds the app: shared middleware, the HTTP
  * routes (src/routes), the hosted MCP server (src/mcp), the error envelope and the listener.
  */
 

@@ -15,11 +15,11 @@ export interface HakoAuthSettings {
   pool: Pool;
   /** BETTER_AUTH_SECRET (≥ 32 characters): signs sessions and encrypts the JWKS private keys at rest. */
   secret: string;
-  /** The web app's origin (BETTER_AUTH_URL), `https://usehako.xyz` in production. */
+  /** The web app's origin (BETTER_AUTH_URL), `https://usehako.site` in production. */
   baseURL?: string;
 }
 
-/** The issuer Hako JWTs carry and the gateway verifies: `<baseURL>/api/auth` (`https://usehako.xyz/api/auth`). */
+/** The issuer Hako JWTs carry and the gateway verifies: `<baseURL>/api/auth` (`https://usehako.site/api/auth`). */
 export function authIssuer(baseURL: string = HAKO_APP_URL): string {
   return new URL(AUTH_BASE_PATH, baseURL).toString();
 }

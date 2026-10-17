@@ -1,5 +1,5 @@
 {
-  "$id": "https://usehako.xyz/schemas/cards/invoice.schema.json",
+  "$id": "https://usehako.site/schemas/cards/invoice.schema.json",
   "title": "invoice",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",

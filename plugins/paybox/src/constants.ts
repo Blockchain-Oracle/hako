@@ -19,8 +19,8 @@ export const SERVER_INSTRUCTIONS =
 
 // The gateway is a non-sensitive environment variable so the owner can point it elsewhere without a new upload.
 export const GATEWAY_URL_ENV = "HAKO_GATEWAY_URL";
-// Until usehako.xyz resolves the bundle ships the Hako gateway's sslip host; the portal variable HAKO_GATEWAY_URL switches it without an upload.
-export const DEFAULT_GATEWAY_URL = "https://hako-api.84.46.247.92.sslip.io";
+// The portal variable HAKO_GATEWAY_URL can point the plugin elsewhere without a new upload.
+export const DEFAULT_GATEWAY_URL = "https://api.usehako.site";
 
 export const PAYMENT_REQUIRED_HEADER = "payment-required";
 

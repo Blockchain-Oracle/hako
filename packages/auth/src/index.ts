@@ -13,7 +13,7 @@ let auth: HakoAuth | undefined;
 
 /**
  * The web server's Better Auth instance, built on first use (so `next build` needs no secrets) from the web env:
- * BETTER_AUTH_SECRET, BETTER_AUTH_URL (default `https://usehako.xyz`) and DATABASE_URL. A missing secret stops it
+ * BETTER_AUTH_SECRET, BETTER_AUTH_URL (default `https://usehako.site`) and DATABASE_URL. A missing secret stops it
  * with the variable's name: Hako never falls back to Better Auth's development secret.
  */
 export function getAuth(): HakoAuth {
