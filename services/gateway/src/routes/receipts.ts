@@ -8,17 +8,18 @@
 import type { Context, Hono } from "hono";
 import { z } from "zod";
 
-import { GATEWAY_ENDPOINTS, receiptsQuerySchema, sharedReceiptsQuerySchema } from "@hako/cards/contract";
+import { GATEWAY_ENDPOINTS, receiptCreateRequestSchema, receiptsQuerySchema, sharedReceiptsQuerySchema } from "@hako/cards/contract";
 import { getListedReceipt, listReceipts, type ListedReceipt, type PageCursor, type ReceiptScope } from "@hako/db/node";
 
-import { HTTP_NOT_FOUND, HTTP_UNAVAILABLE, HTTP_UNPROCESSABLE, RUN_PREFIX } from "../constants.js";
+import { HTTP_BAD_GATEWAY, HTTP_BAD_REQUEST, HTTP_NOT_FOUND, HTTP_UNAVAILABLE, HTTP_UNPROCESSABLE, RUN_PREFIX } from "../constants.js";
 import { jsonError } from "../errors.js";
 import { receiptCard } from "./x402/cards.js";
 import type { X402Context } from "./x402/context.js";
 import { refuse } from "./x402/http.js";
-import { HTTP_UNAUTHORIZED } from "./x402/x402.config.js";
+import { recordOnchainReceipt } from "./x402/onchain-receipt.js";
+import { HTTP_CONFLICT, HTTP_UNAUTHORIZED } from "./x402/x402.config.js";
 
-const { receipts, receiptsShared, receiptGet } = GATEWAY_ENDPOINTS;
+const { receipts, receiptsShared, receiptGet, receiptCreate } = GATEWAY_ENDPOINTS;
 
 /** Where the next page starts: the last row read (`{createdAt, id}`), opaque to the caller (base64url JSON). */
 const cursorSchema = z.object({ createdAt: z.iso.datetime({ offset: true }), id: z.string().min(1) });
@@ -65,16 +66,43 @@ export function registerReceipts(app: Hono, ctx: X402Context): void {
     return page(c, "public", query.data);
   });
 
+  const signedOut = (c: Context, status: "none" | "invalid") =>
+    refuse(c, HTTP_UNAUTHORIZED, status === "none" ? "auth_required" : "invalid_session",
+      "Your receipts need a signed-in Hako session (a bearer); shared receipts are at /v1/receipts/shared.");
+
   app.get(receipts.path, async (c) => {
     if (!pool) return unavailable(c);
     const session = await ctx.sessions(c.req.header("authorization"));
-    if (session.status !== "valid") {
-      return refuse(c, HTTP_UNAUTHORIZED, session.status === "none" ? "auth_required" : "invalid_session",
-        "Your receipts need a signed-in Hako session (a bearer); shared receipts are at /v1/receipts/shared.");
-    }
+    if (session.status !== "valid") return signedOut(c, session.status);
     const query = receiptsQuerySchema.safeParse(c.req.query());
     if (!query.success) return refuse(c, HTTP_UNPROCESSABLE, "invalid_query", "Unknown or malformed filters.", queryDetails(query.error));
     return page(c, { userId: session.userId }, query.data);
+  });
+
+  app.post(receiptCreate.path, async (c) => {
+    if (!pool) return unavailable(c);
+    const session = await ctx.sessions(c.req.header("authorization"));
+    if (session.status !== "valid") return signedOut(c, session.status);
+    let body: unknown;
+    try {
+      body = await c.req.json();
+    } catch {
+      return jsonError(c, HTTP_BAD_REQUEST, "invalid_json", "Request body is not valid JSON.");
+    }
+    const parsed = receiptCreateRequestSchema.safeParse(body);
+    if (!parsed.success) return refuse(c, HTTP_UNPROCESSABLE, "invalid_receipt", "A receipt is {chain, txHash, draft?}.", queryDetails(parsed.error));
+    const outcome = await recordOnchainReceipt(ctx, session.userId, parsed.data);
+    if (outcome.ok) return c.json(receiptCard(outcome.receipt, toolName));
+    switch (outcome.reason) {
+      case "chain_unavailable":
+        return jsonError(c, HTTP_BAD_GATEWAY, outcome.reason, outcome.message);
+      case "recorded_by_another_account":
+        return refuse(c, HTTP_CONFLICT, outcome.reason, outcome.message);
+      case "unsupported_chain":
+        return refuse(c, HTTP_UNPROCESSABLE, outcome.reason, outcome.message);
+      default:
+        return jsonError(c, HTTP_NOT_FOUND, outcome.reason, outcome.message);
+    }
   });
 
   app.get(receiptGet.path, async (c) => {

@@ -10,6 +10,7 @@ import type { z } from "zod";
 
 import { endpointUrl } from "@hako/cards/client";
 import { batchRequestSchema, type batchResponseSchema, type batchResultSchema, GATEWAY_ENDPOINTS } from "@hako/cards/contract";
+import { BATCH_TTL_S, SECONDS_PER_MINUTE } from "@hako/config";
 import { fromAtomic } from "@hako/money";
 import { networkByCaip2, X402_NETWORK } from "@hako/networks";
 
@@ -120,7 +121,7 @@ export function registerBatch(app: Hono, ctx: X402Context): void {
       const stored = await store.result(batchId);
       if (stored) return c.body(stored, HTTP_OK, { "content-type": "application/json" });
       if (!(await store.load(batchId))) {
-        return jsonError(c, HTTP_NOT_FOUND, "unknown_batch", `no batch ${batchId}: unknown, or expired after 15 minutes; nothing was charged`,
+        return jsonError(c, HTTP_NOT_FOUND, "unknown_batch", `no batch ${batchId}: unknown, or expired after ${BATCH_TTL_S / SECONDS_PER_MINUTE} minutes; nothing was charged`,
           [`POST ${batchCreate.path} again to price a new batch`]);
       }
       if (await store.claimed(batchId)) {
