@@ -1,3 +1,4 @@
+import type { ReceiptKind as CardReceiptKind } from "@hako/cards/contract";
 import type { AtomicString } from "@hako/defi/core";
 
 import type { Queryable } from "./pool.ts";
@@ -115,6 +116,19 @@ export async function findReceiptByTx(q: Queryable, kind: ReceiptKind, chain: st
   return rows[0] ?? null;
 }
 
+/**
+ * The x402 settlement that paid an invoice, if one was recorded: the gateway reads it to finish an invoice left
+ * `settling` (paid on chain, but the row was never marked paid). Only used on that rare path, so no index.
+ */
+export async function getReceiptByInvoice(q: Queryable, invoiceId: string): Promise<ReceiptRow | null> {
+  const { rows } = await q.query<ReceiptRow>(
+    `select ${COLUMNS} from receipts where kind = 'x402_settlement' and invoice_id = $1 and tx_hash is not null
+     order by created_at asc, id asc limit 1`,
+    [invoiceId],
+  );
+  return rows[0] ?? null;
+}
+
 export interface ReceiptUpdate {
   status?: ReceiptStatus;
   txHash?: string;
@@ -179,4 +193,61 @@ export async function listPublicReceipts(q: Queryable, page: PageOptions = {}): 
     [...cursorParams(page), pageLimit(page.limit)],
   );
   return rows;
+}
+
+/**
+ * What a receipt is in the Activity ledger: the receipt kinds of the card contract. An x402 settlement is a run, a
+ * batch or an invoice payment; a PayBox transfer is a send; a LI.FI move takes its draft's kind (swap, bridge, Earn
+ * deposit or withdraw), else bridge when it changed chains and swap when it didn't.
+ */
+export type ActivityKind = CardReceiptKind;
+export interface ListedReceipt extends ReceiptRow {
+  activityKind: ActivityKind;
+}
+
+const ACTIVITY_KIND = `case
+    when kind = 'x402_settlement' then case when invoice_id is not null then 'invoice' when batch_id is not null then 'batch' else 'run' end
+    when kind = 'paybox_transfer' then 'send'
+    else coalesce(
+      (select d.kind from drafts d where d.draft_id = receipts.draft_id and d.version = receipts.draft_version
+        and d.kind in ('swap', 'bridge', 'earn_deposit', 'earn_withdraw')),
+      case when to_chain is not null and to_chain <> chain then 'bridge' else 'swap' end)
+  end`;
+
+/** Whose receipts a list reads: one user's own, or the ones their owners shared (`/r/<id>`, the landing proof). */
+export type ReceiptScope = { userId: string } | "public";
+
+/** The Activity filters (plan D23: type, status, chain, surface) and a draft, so a confirmed move's card finds its receipt. */
+export interface ReceiptFilter {
+  activityKind?: ActivityKind;
+  status?: ReceiptStatus;
+  chain?: string;
+  surface?: Surface;
+  draftId?: string;
+}
+
+/** A scope's receipts with the Activity filters, newest first, each with its Activity kind. */
+export async function listReceipts(q: Queryable, scope: ReceiptScope, filter: ReceiptFilter = {}, page: PageOptions = {}): Promise<ListedReceipt[]> {
+  const { rows } = await q.query<ListedReceipt>(
+    `select * from (
+       select ${COLUMNS}, ${ACTIVITY_KIND} as "activityKind" from receipts
+       where ($1::text is null or user_id = $1) and (not $2::boolean or is_public)
+         and ($3::text is null or status = $3) and ($4::text is null or chain = $4)
+         and ($5::text is null or surface = $5) and ($6::text is null or draft_id = $6)
+         and ($7::timestamptz is null or (created_at, id) < ($7::timestamptz, $8::text))
+     ) listed
+     where ($9::text is null or "activityKind" = $9)
+     order by "createdAt" desc, id desc limit $10`,
+    [
+      scope === "public" ? null : scope.userId, scope === "public", filter.status ?? null, filter.chain ?? null,
+      filter.surface ?? null, filter.draftId ?? null, ...cursorParams(page), filter.activityKind ?? null, pageLimit(page.limit),
+    ],
+  );
+  return rows;
+}
+
+/** One receipt with its Activity kind. */
+export async function getListedReceipt(q: Queryable, id: string): Promise<ListedReceipt | null> {
+  const { rows } = await q.query<ListedReceipt>(`select ${COLUMNS}, ${ACTIVITY_KIND} as "activityKind" from receipts where id = $1`, [id]);
+  return rows[0] ?? null;
 }

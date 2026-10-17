@@ -8,7 +8,7 @@ description: The free GET routes, the full catalog, the gateway's identity, a re
 Every provider and tool, with input and output schemas and prices.
 
 ```bash
-curl -s https://api.usehako.xyz/v1/catalog | jq '{hash, providers: (.providers | length), tools: (.endpoints | length)}'
+curl -s https://api.usehako.site/v1/catalog | jq '{hash, providers: (.providers | length), tools: (.endpoints | length)}'
 ```
 
 | Field | Meaning |
@@ -29,7 +29,7 @@ The gateway re-reads the catalog from the backend every minute, so a new tool be
 The gateway's identity.
 
 ```bash
-curl -s https://api.usehako.xyz/v1/version
+curl -s https://api.usehako.site/v1/version
 ```
 
 It includes `catalog`, the catalog hash, and `endpoints`, the number of runnable tools.
@@ -47,15 +47,15 @@ Readiness. Answers `200` with:
 x402 discovery: every paid resource on this gateway.
 
 ```bash
-curl -s https://api.usehako.xyz/.well-known/x402
+curl -s https://api.usehako.site/.well-known/x402
 ```
 
 ```json
 {
   "version": 1,
   "resources": [
-    "https://api.usehako.xyz/v2/run/hako/answer",
-    "https://api.usehako.xyz/v2/run/hako/business-days",
+    "https://api.usehako.site/v2/run/hako/answer",
+    "https://api.usehako.site/v2/run/hako/business-days",
     "…"
   ]
 }

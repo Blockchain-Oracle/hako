@@ -35,7 +35,7 @@ export function NotFoundPanel() {
         ))}
       </div>
       <a href={site.app} className="mt-8 text-sm text-fd-primary underline-offset-4 hover:underline">
-        Or open the app at usehako.xyz
+        Or open the app at usehako.site
       </a>
     </div>
   );

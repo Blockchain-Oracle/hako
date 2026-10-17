@@ -26,9 +26,17 @@ MAX_SHRINK_PASSES: Final = 8
 
 # USDC has 6 decimals: $0.005 = 5000 atomic units.
 USDC_DECIMALS: Final = 6
+# Free reads (chain lookups, market odds, Earn vaults): served by the gateway's free /v1 aliases and never sold on /v2
+# (plan C17, B13), so they cost nothing anywhere.
+PRICE_FREE_USD: Final = "0"
 PRICE_LOCAL_USD: Final = "0.001"  # keyless upstreams and local compute
 PRICE_STANDARD_USD: Final = "0.005"  # keyed upstream, cheap per call
 PRICE_PREMIUM_USD: Final = "0.01"  # upstream cost ≥ $0.005 (Firecrawl search ≈ 2 credits, composites)
+# Media tiers (plan B11: media as fixed tiers, one slug each). ElevenLabs Starter: $5 per 30,000 credits ≈ $0.000167;
+# Flash speech ≈ 0.5 credit per character, sound effects ≈ 10 credits per second (measured 2026-10-17).
+PRICE_MEDIA_SMALL_USD: Final = "0.02"  # a ≤ 5 s sound effect: ≤ 50 credits ≈ $0.008
+PRICE_MEDIA_MEDIUM_USD: Final = "0.05"  # ≤ 500 characters of speech: ≤ 250 credits ≈ $0.042
+PRICE_MEDIA_LARGE_USD: Final = "0.2"  # ≤ 2,000 characters of speech: ≤ 1,000 credits ≈ $0.167
 PAYMENT_NETWORK: Final = "eip155:8453"  # Base mainnet USDC: the gateway's paid /v2 route (x402 exact, CDP)
 
 # Discover

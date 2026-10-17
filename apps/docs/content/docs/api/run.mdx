@@ -12,7 +12,7 @@ The body is the tool's input, exactly as its input schema describes ([inspect](/
 
 ```bash
 # returns 402 with the price until it is paid
-curl -si -X POST https://api.usehako.xyz/v2/run/openweather/current
+curl -si -X POST https://api.usehako.site/v2/run/openweather/current
 ```
 
 ## Paying with PayBox
@@ -22,7 +22,7 @@ Pay a run from your PayBox wallet with PayBox's `use_service`: `url` is this rou
 ```json title="use_service arguments"
 {
   "credential_id": "<your Base wallet, from list_credentials>",
-  "url": "https://api.usehako.xyz/v2/run/wikipedia/summary",
+  "url": "https://api.usehako.site/v2/run/wikipedia/summary",
   "method": "POST",
   "body": { "title": "Alan Turing" }
 }

@@ -6,7 +6,7 @@ import { describe, it } from "node:test";
 import { BASE, EVM_NATIVE_ADDRESS, LIFI_DIAMOND, SOLANA } from "@hako/networks";
 
 import { bindQuote, erc20ApproveCalldata, HEX_RADIX, planApproveSequence, UINT256_MAX, type ApproveCheckInput } from "../src/core/index.ts";
-import { r15RulesFor, r16RulesFor } from "../src/server/rules.ts";
+import { r15RulesFor, r16RulesFor } from "../src/rules.ts";
 import { AMOUNT, EVM_SENDER, freshBridgeQuote, reviewedBridge } from "./fixtures.ts";
 
 const rules = r16RulesFor(BASE.caip2)!;

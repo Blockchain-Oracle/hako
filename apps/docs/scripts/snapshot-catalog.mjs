@@ -4,7 +4,7 @@
  * regenerates content/docs/tools.
  *
  *   node scripts/snapshot-catalog.mjs                          GET $HAKO_API_URL (or NEXT_PUBLIC_API_URL)/v1/catalog
- *   node scripts/snapshot-catalog.mjs https://api.usehako.xyz
+ *   node scripts/snapshot-catalog.mjs https://api.usehako.site
  *   node scripts/snapshot-catalog.mjs --file /tmp/catalog.json  e.g. `uv run hako-tools catalog > /tmp/catalog.json`
  */
 
@@ -13,7 +13,7 @@ import path from "node:path";
 
 import { generateTools } from "./generate-tools.mjs";
 
-const DEFAULT_API_URL = "https://api.usehako.xyz";
+const DEFAULT_API_URL = "https://api.usehako.site";
 const FETCH_TIMEOUT_MS = 15_000;
 const SNAPSHOT = path.join(import.meta.dirname, "..", "content", "catalog.json");
 

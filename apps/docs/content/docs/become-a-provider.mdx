@@ -82,5 +82,5 @@ uv run hako-tools catalog | jq '.endpoints[] | select(.provider == "<id>") | .id
 When the connector is deployed, refresh these docs' snapshot so the [Tools](/docs/tools) pages include it:
 
 ```bash
-cd apps/docs && pnpm catalog:snapshot https://api.usehako.xyz
+cd apps/docs && pnpm catalog:snapshot https://api.usehako.site
 ```

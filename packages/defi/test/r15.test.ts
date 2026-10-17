@@ -6,7 +6,7 @@ import { describe, it } from "node:test";
 import { BASE, ETHEREUM, EVM_NATIVE_ADDRESS, LIFI_DIAMOND, SOLANA } from "@hako/networks";
 
 import { bindQuote, type EvmTransactionRequest, type NormalizedQuote, type R15Result, type ReviewedRoute } from "../src/core/index.ts";
-import { r15RulesFor } from "../src/server/rules.ts";
+import { r15RulesFor } from "../src/rules.ts";
 import { AMOUNT, BRIDGE_CALLDATA, encodeBase58, freshBridgeQuote, keyBytes, REVIEWED_MIN, reviewedBridge, solanaTx } from "./fixtures.ts";
 
 const baseRules = r15RulesFor(BASE.caip2)!;

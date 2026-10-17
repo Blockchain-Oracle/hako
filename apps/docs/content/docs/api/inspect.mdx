@@ -15,7 +15,7 @@ content-type: application/json
 | `id` | string | yes | The tool id, e.g. `openweather/current` (3–120 characters) |
 
 ```bash
-curl -s -X POST https://api.usehako.xyz/v1/inspect \
+curl -s -X POST https://api.usehako.site/v1/inspect \
   -H 'content-type: application/json' \
   -d '{"id": "openweather/current"}'
 ```
@@ -80,5 +80,5 @@ Never guess field names: read `input`. An unknown id answers `404 unknown_endpoi
 `GET /v1/endpoints/{provider}/{endpoint}` returns the same object, for clients that prefer a URL per tool:
 
 ```bash
-curl -s https://api.usehako.xyz/v1/endpoints/openweather/current
+curl -s https://api.usehako.site/v1/endpoints/openweather/current
 ```

@@ -8,7 +8,7 @@ description: "Hako's own tools: cited answers from live sources, time zones and 
 - **Provider id:** `hako`
 - **Tools:** 9, at $0.001–$0.01 per call
 - **Categories:** AI Answers, Time & Calendar, Finance & Markets, Weather & Earth, News, Jobs
-- **Homepage:** [usehako.xyz](https://usehako.xyz)
+- **Homepage:** [usehako.site](https://usehako.site)
 
 | Tool | Price | What it does |
 | --- | --- | --- |
@@ -51,7 +51,7 @@ Related: [`serper/search`](/docs/tools/serper#search), [`jina/search`](/docs/too
 
 ```json title="Pay and run it with PayBox (use_service)"
 {
-  "url": "https://api.usehako.xyz/v2/run/hako/answer",
+  "url": "https://api.usehako.site/v2/run/hako/answer",
   "method": "POST",
   "body": {
     "question": "Who invented the transistor, and when?"
@@ -97,7 +97,7 @@ Give exactly one of: `end`, or `add_days`.
 
 ```json title="Pay and run it with PayBox (use_service)"
 {
-  "url": "https://api.usehako.xyz/v2/run/hako/business-days",
+  "url": "https://api.usehako.site/v2/run/hako/business-days",
   "method": "POST",
   "body": {
     "country": "US",
@@ -138,7 +138,7 @@ An entity (Wikidata QID or a name) and a property (PID or an alias such as 'capi
 
 ```json title="Pay and run it with PayBox (use_service)"
 {
-  "url": "https://api.usehako.xyz/v2/run/hako/fact",
+  "url": "https://api.usehako.site/v2/run/hako/fact",
   "method": "POST",
   "body": {
     "subject": "Japan",
@@ -184,7 +184,7 @@ A base currency and up to ten quotes; optionally an amount to convert and a past
 
 ```json title="Pay and run it with PayBox (use_service)"
 {
-  "url": "https://api.usehako.xyz/v2/run/hako/fx",
+  "url": "https://api.usehako.site/v2/run/hako/fx",
   "method": "POST",
   "body": {
     "base": "USD",
@@ -230,7 +230,7 @@ A country (ISO 3166-1 alpha-2) and a year; optionally a subdivision or a market 
 
 ```json title="Pay and run it with PayBox (use_service)"
 {
-  "url": "https://api.usehako.xyz/v2/run/hako/holidays",
+  "url": "https://api.usehako.site/v2/run/hako/holidays",
   "method": "POST",
   "body": {
     "country": "MA",
@@ -276,7 +276,7 @@ Any mix of words, companies, location, remote, minimum stated salary and currenc
 
 ```json title="Pay and run it with PayBox (use_service)"
 {
-  "url": "https://api.usehako.xyz/v2/run/hako/jobs",
+  "url": "https://api.usehako.site/v2/run/hako/jobs",
   "method": "POST",
   "body": {
     "query": "engineer",
@@ -319,7 +319,7 @@ Words to match; optionally how many hours back, a country mentioned (ISO code) a
 
 ```json title="Pay and run it with PayBox (use_service)"
 {
-  "url": "https://api.usehako.xyz/v2/run/hako/news",
+  "url": "https://api.usehako.site/v2/run/hako/news",
   "method": "POST",
   "body": {
     "query": "AI",
@@ -367,7 +367,7 @@ Give at least one of: `zone`, or `place`.
 
 ```json title="Pay and run it with PayBox (use_service)"
 {
-  "url": "https://api.usehako.xyz/v2/run/hako/time",
+  "url": "https://api.usehako.site/v2/run/hako/time",
   "method": "POST",
   "body": {
     "place": "Casablanca",
@@ -411,7 +411,7 @@ Give at least one of: `lat` and `lon`, or `place`.
 
 ```json title="Pay and run it with PayBox (use_service)"
 {
-  "url": "https://api.usehako.xyz/v2/run/hako/weather",
+  "url": "https://api.usehako.site/v2/run/hako/weather",
   "method": "POST",
   "body": {
     "place": "Chicago"
