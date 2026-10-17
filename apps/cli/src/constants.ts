@@ -7,4 +7,5 @@ export const PAID_NETWORK = "eip155:8453"; // Base mainnet, PayBox's EVM x402 ra
 export const PAID_METHOD = "POST";
 export const REQUEST_TIMEOUT_MS = 20_000;
 export const DEFAULT_DISCOVER_LIMIT = 5;
+export const MAX_DISCOVER_LIMIT = 25; // the gateway caps discover at the same 25
 export const MCP_MAX_TEXT_CHARS = 12_000; // what one MCP tool result returns to the model

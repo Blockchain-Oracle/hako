@@ -16,6 +16,7 @@ export const FETCH_TIMEOUT_MS = 4_000;
 export const BASE_CHAIN = "eip155:8453" as const;
 export const BASE_USDC = "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913";
 export const USDC_DECIMALS = 6;
+export const USDC_ATOMIC_PER_UNIT = 1_000_000; // 10 ** USDC_DECIMALS, for display text only
 
 export const DISCOVER_DEFAULT_LIMIT = 5;
 export const DISCOVER_MAX_LIMIT = 10; // keeps the result readable in PayBox's own interface

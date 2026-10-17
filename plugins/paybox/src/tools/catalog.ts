@@ -9,6 +9,7 @@ import {
   DISCOVER_MAX_LIMIT,
   QUERY_MAX_CHARS,
   TOOL_ID_PATTERN,
+  USDC_ATOMIC_PER_UNIT,
 } from "../constants.js";
 import { paidUrl, postJson, preflightRun } from "../gateway.js";
 import { proposeX402, x402OutputSchema } from "../paybox.js";
@@ -99,7 +100,7 @@ export function registerCatalogTools(server: McpServer) {
       const proposal = proposeX402({ chain: BASE_CHAIN, url, method: "POST", body: input, maxAmount: amount });
       return {
         ...proposal,
-        content: [{ type: "text", text: `Pay ${Number(amount) / 1e6} USDC on Base to run ${id}. Approve in PayBox; the answer comes back with the request.` }],
+        content: [{ type: "text", text: `Pay ${Number(amount) / USDC_ATOMIC_PER_UNIT} USDC on Base to run ${id}. Approve in PayBox; the answer comes back with the request.` }],
       };
     },
   );

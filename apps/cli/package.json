@@ -12,7 +12,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json --noEmit && esbuild src/main.ts --bundle --platform=node --target=node20 --format=esm --outfile=dist/hako.mjs --banner:js=\"#!/usr/bin/env node\nimport{createRequire}from'module';const require=createRequire(import.meta.url);\" && node -e \"require('node:fs').chmodSync('dist/hako.mjs', 0o755)\"",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "lint": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint src",
     "prepack": "pnpm build"
   },
   "devDependencies": {
